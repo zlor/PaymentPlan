@@ -7,6 +7,9 @@
 
 require('./bootstrap');
 
+// AdminLTE code here.
+require('admin-lte');
+
 window.Vue = require('vue');
 
 /**
