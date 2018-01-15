@@ -11,11 +11,11 @@
 |
 */
 
-Route::get('/', function () {
-
-    // TODO 展示系统概要信息
-    // 1. 系统地图
-    // 2. 相关信息
-
-    return view('layouts/default');
-});
+// Route::get('/', function () {
+//
+//     // TODO 展示系统概要信息
+//     // 1. 系统地图
+//     // 2. 相关信息
+//
+//     return view('layouts/default');
+// });

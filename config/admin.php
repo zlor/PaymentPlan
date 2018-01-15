@@ -5,24 +5,24 @@ return [
     /*
      * Laravel-admin name.
      */
-    'name' => 'Laravel-admin',
+    'name' => env('APP_ADMIN_NAME', 'Ranto-Payment'),
 
     /*
      * Logo in admin panel header.
      */
-    'logo' => '<b>Laravel</b> admin',
+    'logo' => env('APP_ADMIN_LOGO_TXT', '<b>Ranto</b>Payment'),
 
     /*
      * Mini-logo in admin panel header.
      */
-    'logo-mini' => '<b>La</b>',
+    'logo-mini' => env('APP_ADMIN_LOGO_MINI', '<b>Rt</b>'),
 
     /*
      * Route configuration.
      */
     'route' => [
 
-        'prefix' => 'admin',
+        'prefix' => env('APP_ADMIN_ROUTE_PREFIX', ''),
 
         'namespace' => 'App\\Admin\\Controllers',
 
@@ -37,7 +37,7 @@ return [
     /*
      * Laravel-admin html title.
      */
-    'title' => 'Admin',
+    'title' => env('APP_ADMIN_TITLE', 'Admin'),
 
     /*
      * Use `https`.
@@ -145,7 +145,12 @@ return [
     /*
      * Version displayed in footer.
      */
-    'version' => '1.5.x-dev',
+    'version' => '0.1',
+
+    /**
+     * Power By
+     */
+    'power_by' => 'Ranto',//'<a href="https://github.com/z-song/laravel-admin" target="_blank">laravel-admin</a>',
 
     /*
      * Settings for extensions.

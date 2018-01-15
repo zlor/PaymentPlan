@@ -109,4 +109,9 @@ return [
         'filter_clear'       => '显示全部',
         'filter_placeholder' => '过滤',
     ],
+
+
+    'dashboard' => '仪表盘',
+    'descript' => '系统参数',
+
 ];
