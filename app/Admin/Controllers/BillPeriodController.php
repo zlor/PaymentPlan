@@ -143,10 +143,6 @@ class BillPeriodController extends Controller
             // 账期范围
             $form->dateRange('time_begin', 'time_end', trans('bill.period.time'));
 
-            $form->select('status', trans('bill.period.status'))
-                ->options(BillPeriod::getStatusOptions())
-                ->default('standby');
-
             // 现金余额
             $form->currency('cash_balance', trans('bill.period.cash_balance'))->prepend('￥');
 
@@ -159,10 +155,18 @@ class BillPeriodController extends Controller
             // 承兑额度
             $form->currency('acceptance_line', trans('bill.period.acceptance_line'))->prepend('￥');
 
+            $form->divider();
+
+            // 状态
+            $form->select('status', trans('bill.period.status'))
+                ->options(BillPeriod::getStatusOptions())
+                ->default('standby');
+
             // 负责人
             $form->text('charge_man', trans('bill.period.charge_man'))
                 ->rules('required');
 
+            $form->divider();
 
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');

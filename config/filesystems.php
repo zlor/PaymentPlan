@@ -62,6 +62,11 @@ return [
             'url' => env('APP_URL').'/uploads',
         ],
 
+        'backups' => [
+            'driver' => 'local',
+            'root'   => storage_path('app/backups'), // that's where your backups are stored by default: storage/backups
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
