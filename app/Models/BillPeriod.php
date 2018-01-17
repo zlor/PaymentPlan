@@ -48,4 +48,12 @@ class BillPeriod extends Model
     {
         return $this->cash_pool - $this->paid_total;
     }
+
+    /**
+     *
+     */
+    public static function getStatusOptions()
+    {
+        return trans_options('status', ['standby', 'active', 'lock', 'close'], 'bill.period');
+    }
 }

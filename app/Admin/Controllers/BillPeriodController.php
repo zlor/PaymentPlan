@@ -41,8 +41,8 @@ class BillPeriodController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header(trans('bill.periods'));
+            $content->description(trans('admin.edit'));
 
             $content->body($this->form()->edit($id));
         });
@@ -57,8 +57,8 @@ class BillPeriodController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header(trans('bill.periods'));
+            $content->description(trans('admin.create'));
 
             $content->body($this->form());
         });
@@ -100,15 +100,10 @@ class BillPeriodController extends Controller
                 return $this->cash_pool;
             });
 
-            // 战旗余额
+            // 账期余额
             $grid->column('balance', trans('bill.period.balance'))->display(function($value){
                 return $this->balance;
             });
-
-
-
-
-
 
 
             $grid->created_at();
@@ -148,17 +143,21 @@ class BillPeriodController extends Controller
             // 账期范围
             $form->dateRange('time_begin', 'time_end', trans('bill.period.time'));
 
+            $form->select('status', trans('bill.period.status'))
+                ->options(BillPeriod::getStatusOptions())
+                ->default('standby');
+
             // 现金余额
-            $form->decimal('cash_balance', trans('bill.period.cash_balance'));
+            $form->currency('cash_balance', trans('bill.period.cash_balance'))->prepend('￥');
 
             // 确认收款(已收发票总额)
-            $form->decimal('invoice_balance', trans('bill.period.invoice_balance'));
+            $form->currency('invoice_balance', trans('bill.period.invoice_balance'))->prepend('￥');
 
             // 预计收款
-            $form->decimal('except_balance', trans('bill.period.except_balance'));
+            $form->currency('except_balance', trans('bill.period.except_balance'))->prepend('￥');
 
             // 承兑额度
-            $form->decimal('acceptance_line', trans('bill.period.acceptance_line'));
+            $form->currency('acceptance_line', trans('bill.period.acceptance_line'))->prepend('￥');
 
             // 负责人
             $form->text('charge_man', trans('bill.period.charge_man'))
