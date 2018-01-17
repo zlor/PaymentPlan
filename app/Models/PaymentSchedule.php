@@ -5,15 +5,9 @@ namespace App\Models;
 use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Database\Eloquent\Model;
 
-class PaymentDetail extends Model
+class PaymentSchedule extends Model
 {
-    protected $table = 'payment_details';
-
-    protected $fillable = [
-        'bill_period_id', 'supplier_id', 'payment_schedule_id', 'user_id',
-        'pay_type', 'time', 'money', 'code', 'collecting_company', 'collecting_proof','payment_proof',
-        'memo'
-    ];
+    protected $table = 'payment_schedules';
 
     /**
      * 账期
@@ -40,14 +34,4 @@ class PaymentDetail extends Model
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
-
-    /**
-     * 付款计划
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function payment_schedule()
-    {
-        return $this->belongsTo(PaymentSchedule::class, 'payment_schedule_id');
-    }
-
 }

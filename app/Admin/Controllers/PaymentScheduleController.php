@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\PaymemtSchedule;
+use App\Models\PaymentSchedule;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -24,8 +24,8 @@ class PaymentScheduleController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header(trans('payment.schedule'));
+            $content->description(trans('admin.list'));
 
             $content->body($this->grid());
         });
@@ -41,8 +41,8 @@ class PaymentScheduleController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header(trans('payment.schedule'));
+            $content->description(trans('admin.edit'));
 
             $content->body($this->form()->edit($id));
         });
@@ -57,8 +57,8 @@ class PaymentScheduleController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header(trans('payment.schedule'));
+            $content->description(trans('admin.create'));
 
             $content->body($this->form());
         });
@@ -71,9 +71,51 @@ class PaymentScheduleController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(PaymemtSchedule::class, function (Grid $grid) {
+        return Admin::grid(PaymentSchedule::class, function (Grid $grid) {
 
             $grid->id('ID')->sortable();
+
+            // 账期
+            $grid->column('bill_period.name', trans('payment.schedule.bill_period'));
+
+            // 供应商名称(导入)
+            $grid->column('supplier_name', trans('payment.schedule.supplier_name'));
+
+            // 供应商(匹配)
+            $grid->column('supplier.name', trans('payment.schedule.supplier'));
+
+            // 供应商余额
+            $grid->column('supplier_balance', trans('payment.schedule.supplier_balance'));
+
+            // 应付款
+            $grid->column('due_money', trans('payment.schedule.due_money'));
+
+            // 已付金额
+            $grid->column('paid_money', trans('payment.schedule.paid_money'))
+                ->display(function(){
+                    return $this->paid_money;
+                });
+
+            // 已付现金
+            $grid->column('cash_paid', trans('payment.schedule.cash_paid'));
+
+            // 已付承兑
+            $grid->column('acceptance_paid', trans('payment.schedule.acceptance_paid'));
+
+            // 计划时间
+            $grid->column('plan_time', trans('payment.schedule.plan_time'));
+
+            // 状态
+            $grid->column('status', trans('payment.schedule.status'))
+                ->display(function($value){
+                    return trans('payment.schedule.status.' . $value);
+                });
+
+            // 导入批次
+            $grid->column('batch', trans('payment.schedule.batch'));
+
+
+            // filter 过滤器
 
             $grid->created_at();
             $grid->updated_at();
@@ -87,7 +129,7 @@ class PaymentScheduleController extends Controller
      */
     protected function form()
     {
-        return Admin::form(PaymemtSchedule::class, function (Form $form) {
+        return Admin::form(PaymentSchedule::class, function (Form $form) {
 
             $form->display('id', 'ID');
 

@@ -16,6 +16,9 @@ Route::group([
     // 配置页
     $router->get('/config', 'ConfigController@index')->name('config');
 
+    // 账期总览
+    $router->get('/bill/current', 'HomeController@bill_current')->name('bill_period');
+
     // 基础档案
     // --  供应商
     $router->resource('/base/suppliers', 'SupplierController');

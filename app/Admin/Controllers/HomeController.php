@@ -29,6 +29,19 @@ class HomeController extends Controller
         });
     }
 
+    /**
+     * 当前账期信息
+     * @return Content
+     */
+    public function bill_current()
+    {
+        return Admin::content(function (Content $content){
+
+            $content->row('Current BillPeriod Info ~');
+
+        });
+    }
+
 
     protected function account_period()
     {
@@ -37,4 +50,6 @@ class HomeController extends Controller
 
         return $boxAccountPeriod;
     }
+
+
 }
