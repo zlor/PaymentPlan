@@ -21,6 +21,10 @@ Route::group([
     $router->resource('/base/suppliers', 'SupplierController');
     // --  账期档案
     $router->resource('/base/bill_periods', 'BillPeriodController');
+    // --  付款计划档案
+    $router->resource('/base/bill/payment_schedules', 'PaymentScheduleController');
+    // --  付款明细档案
+    $router->resource('/base/bill/payment_details', 'PaymentDetailController');
 
 
 });
