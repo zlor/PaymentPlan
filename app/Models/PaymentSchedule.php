@@ -2,36 +2,46 @@
 
 namespace App\Models;
 
-use Encore\Admin\Auth\Database\Administrator;
+use App\Models\Traits\BelongsToAdministrator;
+use App\Models\Traits\BelongsToBillPeriod;
+use App\Models\Traits\BelongsToPaymentMateriel;
+use App\Models\Traits\BelongsToPaymentType;
+use App\Models\Traits\BelongsToSupplier;
+use App\Models\Traits\CommonOptions;
+use App\Models\Traits\HasManyPaymentDetail;
 use Illuminate\Database\Eloquent\Model;
 
 class PaymentSchedule extends Model
 {
     protected $table = 'payment_schedules';
 
+    use CommonOptions;
     /**
-     * 账期
+     * 归属于 账期、用户、供应商、物料、类型
      */
-    public function bill_period()
+    use BelongsToBillPeriod, BelongsToAdministrator, BelongsToSupplier, BelongsToPaymentMateriel, BelongsToPaymentType;
+
+    /**
+     * 拥有 付款明细
+     */
+    use HasManyPaymentDetail;
+
+
+    /**
+     * 在 select中显示的字段
+     * @return string
+     */
+    public function select_text()
     {
-        return $this->belongsTo(BillPeriod::class, 'bill_period_id');
+        return $this->bill_period_name .'_'. $this->payment_type_name .' ('.$this->supplier_name.')';
     }
 
     /**
-     * 操作人
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 已付金额
+     * @return mixed
      */
-    public function user()
+    public function getPaidMoneyAttribute()
     {
-        return $this->belongsTo(Administrator::class, 'user_id');
-    }
-
-    /**
-     * 供应商
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
+        return $this->cash_paid + $this->acceptance_paid;
     }
 }

@@ -2,12 +2,29 @@
 return [
     'index' => '付款管理',
 
+    'types' => '类型',
+    'type'  => '类型明细',
+    'type.name' => '类型名称',
+    'type.code' => '类型编号',
+
+    'materiels' => '物料',
+    'materiel'  => '物料明细',
+    'materiel.name' => '物料名称',
+    'materiel.code' => '物料编号',
+
     'schedules' => '付款计划',
     'schedule'  => '付款计划明细',
     'schedule.name' => '编号',
     'schedule.supplier_name' => '供应商名称(导入)',
     'schedule.supplier' => '供应商(匹配)',
-    'schedule.supplier_balance' => '供应商余款(未付款总额)',
+    'schedule.supplier_balance' => '总应付款',
+    'schedule.supplier_lpu_balance'   => '上期未付清余额',//supplier_last_period_unpaid_balance
+
+    'schedule.materiel_name' => '物料名称(导入)',
+    'schedule.payment_materiel' => '物料(匹配)',
+
+    'schedule.payment_type' => '付款类型',
+
     'schedule.bill_period' => '账期',
     'schedule.due_money'   => '应付款',
     'schedule.paid_money'   => '已付款',

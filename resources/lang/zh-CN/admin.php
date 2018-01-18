@@ -34,6 +34,7 @@ return [
     'show'         => '显示',
     'entries'      => '条',
     'captcha'      => '验证码',
+    'memo'         => '备注',
 
     'action'            => '操作',
     'title'             => '标题',

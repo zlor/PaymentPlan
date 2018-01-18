@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Supplier;
 
+use App\Models\SupplierOwner;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -11,7 +12,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 
-class SupplierController extends Controller
+class SupplierOwnerController extends Controller
 {
     use ModelForm;
 
@@ -24,7 +25,7 @@ class SupplierController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header(trans('supplier.index'));
+            $content->header(trans('supplier.owner'));
             $content->description(trans('admin.list'));
 
             $content->body($this->grid());
@@ -41,7 +42,7 @@ class SupplierController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header(trans('supplier.index'));
+            $content->header(trans('supplier.owner'));
             $content->description(trans('admin.edit'));
 
             $content->body($this->form()->edit($id));
@@ -57,7 +58,7 @@ class SupplierController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header(trans('supplier.index'));
+            $content->header(trans('supplier.owner'));
             $content->description(trans('admin.create'));
 
             $content->body($this->form());
@@ -71,7 +72,7 @@ class SupplierController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(Supplier::class, function (Grid $grid) {
+        return Admin::grid(SupplierOwner::class, function (Grid $grid) {
 
             // 关闭多行操作
             $grid->disableRowSelector();
@@ -80,19 +81,14 @@ class SupplierController extends Controller
 
             $grid->id('ID')->sortable();
 
-            $grid->column('name', trans('supplier.name'));
+            $grid->column('name', trans('supplier.owner.name'));
 
-            $grid->column('code', trans('supplier.code'));
+            $grid->column('code', trans('supplier.owner.code'));
 
-            $grid->column('head', trans('supplier.head'));
-
-            $grid->column('contact', trans('supplier.contact'));
+            $grid->column('company', trans('supplier.owner.company'));
 
             $grid->column('tel', trans('supplier.tel'));
 
-            $grid->column('address', trans('supplier.address'));
-
-            $grid->column('owner.name', trans('supplier.owner'));
 
             $grid->created_at();
             $grid->updated_at();
@@ -106,40 +102,27 @@ class SupplierController extends Controller
      */
     protected function form()
     {
-        return Admin::form(Supplier::class, function (Form $form) {
+        return Admin::form(SupplierOwner::class, function (Form $form) {
 
             $form->display('id', 'ID');
 
             // 名称
-            $form->text('name', trans('supplier.name'));
+            $form->text('name', trans('supplier.owner.name'))
+                ->rules('required');
 
-            // 抬头
-            $form->text('head', trans('supplier.head'));
+            // 公司
+            $form->text('company', trans('supplier.owner.company'))
+                ->rules('required');
 
             // 标识号
-            $form->text('code', trans('supplier.code'));
-
-            // 联系人
-            $form->text('contact', trans('supplier.contact'));
+            $form->text('code', trans('supplier.owner.code'));
 
             // 联系方式
-            $form->mobile('tel', trans('supplier.tel'));
-
-            // 联系地址
-            $form->text('address', trans('supplier.address'));
-
-            // 供应商所有人
-            // TODO 使用自动完成控件
-            $form->select('supplier_owner_id', trans('supplier.owner'))
-                ->options(Supplier::getOwnerOptions());
-
-            $form->divider();
-
-            // 供应商logo
-            $form->image('logo', trans('supplier.logo'));
+            $form->mobile('tel', trans('supplier.owner.tel'))
+                ->rules('required');
 
             // 备注
-            $form->textarea('memo', trans('supplier.memo'))->rules('nullable');
+            $form->textarea('memo', trans('supplier.owner.memo'))->rules('nullable');
 
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');

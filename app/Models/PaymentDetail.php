@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
-use Encore\Admin\Auth\Database\Administrator;
+use App\Models\Traits\BelongsToAdministrator;
+use App\Models\Traits\BelongsToBillPeriod;
+use App\Models\Traits\BelongsToPaymentSchedule;
+use App\Models\Traits\BelongsToSupplier;
 use Illuminate\Database\Eloquent\Model;
 
 class PaymentDetail extends Model
@@ -16,38 +19,23 @@ class PaymentDetail extends Model
     ];
 
     /**
-     * 账期
+     * 归属于 账期、用户、供应商
      */
-    public function bill_period()
-    {
-        return $this->belongsTo(BillPeriod::class, 'bill_period_id');
-    }
+    use BelongsToBillPeriod, BelongsToAdministrator, BelongsToSupplier;
 
     /**
-     * 操作人
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 归属于 付款计划
      */
-    public function user()
-    {
-        return $this->belongsTo(Administrator::class, 'user_id');
-    }
+    use BelongsToPaymentSchedule;
+
 
     /**
-     * 供应商
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 付款方式备选
+     * @return array
      */
-    public function supplier()
+    public static function getPayTypeOptions()
     {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
-    }
-
-    /**
-     * 付款计划
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function payment_schedule()
-    {
-        return $this->belongsTo(PaymentSchedule::class, 'payment_schedule_id');
+        return trans_options('pay_type', ['cash', 'acceptance'], 'payment.detail');
     }
 
 }

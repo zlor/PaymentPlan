@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\PaymentDetail;
 
+use URL;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -124,6 +125,48 @@ class PaymentDetailController extends Controller
         return Admin::form(PaymentDetail::class, function (Form $form) {
 
             $form->display('id', 'ID');
+
+            // 账期
+            $form->select('bill_period_id', trans('payment.detail.bill_period'))
+                ->options(PaymentDetail::getBillPeriodOptions())
+                ->load('payment_schedule_id',
+                    URL::route('select.payment_schedule.loading'),
+                    'id',
+                    'name'
+                );
+
+            // 付款计划
+            $form->select('payment_schedule_id', trans('payment.detail.payment_schedule'))
+                ->options(PaymentDetail::getPaymentScheduleOptions());
+
+            // 供应商
+            $form->select('supplier_id', trans('payment.detail.supplier'))
+                ->options(PaymentDetail::getSupplierOptions());
+
+
+            $form->divider();
+
+            // 付款类型
+            $form->select('pay_type', trans('payment.detail.pay_type'))
+                ->options(PaymentDetail::getPayTypeOptions());
+
+            // 付款金额
+            $form->currency('money', trans('payment.detail.money'));
+
+            // 付款时间
+            $form->date('time', trans('payment.detail.time'));
+
+            // 收款公司
+            $form->text('collecting_company', trans('payment.detail.collecting_company'));
+
+            // 备注
+            $form->textarea('memo', trans('admin.memo'));
+
+            // 收款证明
+            $form->image('collecting_proof', trans('payment.detail.collecting_proof'))->nullable();
+            // 付款证明
+            $form->image('payment_proof', trans('payment.detail.payment_proof'))->nullable();
+
 
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');

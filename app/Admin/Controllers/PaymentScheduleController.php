@@ -2,8 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\BillPeriod;
 use App\Models\PaymentSchedule;
 
+use App\Models\UserEnv;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -132,6 +134,75 @@ class PaymentScheduleController extends Controller
         return Admin::form(PaymentSchedule::class, function (Form $form) {
 
             $form->display('id', 'ID');
+
+            $billPeriodId = BillPeriod::getCurrentId();
+
+            // 账期
+            $form->select('bill_period_id', trans('payment.schedule.bill_period'))
+                 ->options(PaymentSchedule::getBillPeriodOptions())
+                 ->default($billPeriodId)
+                 ->rules('required');
+
+            // 供应商(系统匹配)
+            $form->select('supplier_id', trans('payment.schedule.supplier'))
+                ->options(PaymentSchedule::getSupplierOptions());
+
+            // 供应商(原始名称)
+            $form->text('supplier_name', trans('payment.schedule.supplier_name'));
+
+            // 付款类型
+            $form->select('payment_type_id', trans('payment.schedule.payment_type'))
+                ->options(PaymentSchedule::getPaymentTypeOptions());
+
+            // 付款物料(系统匹配)
+            $form->select('payment_materiel_id', trans('payment.schedule.payment_materiel'))
+                ->options(PaymentSchedule::getPaymentMaterielOptions());
+
+            // 付款物料(导入名称)
+            $form->text('materiel_name', trans('payment.schedule.materiel_name'));
+
+
+            // 付款计划流水
+            $form->text('name', trans('payment.schedule.name'));
+
+            // 付款计划状态
+            $form->select('status', trans('payment.schedule.status'))
+                ->options(PaymentSchedule::getStatusOptions('payment.schedule', ['init','import_init', 'web_init', 'checked','paying','lock' ]))
+                ->default('web_init');
+
+            $form->divider();
+
+            // 供应商余额
+            $form->currency('supplier_balance', trans('payment.schedule.supplier_balance'));
+
+            // 上期未付清余款
+            $form->currency('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'));
+
+            // 应付款
+            $form->currency('due_money', trans('payment.schedule.due_money'));
+
+            $form->divider();
+
+            // 已支付
+            $form->currency('paid_money', trans('payment.schedule.paid_money'))
+                ->readOnly();
+            // 已支付现金
+            $form->currency('cash_paid', trans('payment.schedule.cash_paid'))
+                ->readOnly();
+            // 已支付承兑
+            $form->currency('acceptance_paid', trans('payment.schedule.acceptance_paid'))
+                ->readOnly();
+
+            $form->ignore(['paid_money','cash_paid', 'acceptance_paid']);
+
+            $form->divider();
+
+            // 计划时间
+            $form->date('plan_time', trans('payment.schedule.plan_time'));
+
+            // 导入批次
+            $form->display('batch', trans('payment.schedule.batch'));
+
 
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');

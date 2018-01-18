@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToSupplierOwner;
+use App\Models\Traits\HasManyPaymentDetail;
+use App\Models\Traits\HasManyPaymentSchedule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -18,23 +21,12 @@ class Supplier extends Model
     ];
 
     /**
-     * 供应商-所有人
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 归属于 供应商所有人
      */
-    public function owner()
-    {
-       return $this->belongsTo(SupplierOwner::class, 'supplier_owner_id');
-    }
-
+    use BelongsToSupplierOwner;
 
     /**
-     * 获取所有人选项
-     *
-     * @return \Illuminate\Support\Collection
+     * 拥有 付款计划、付款明细
      */
-    public static function getOwnerOptions()
-    {
-        return SupplierOwner::query()->get()->pluck('name', 'id');
-    }
+    use HasManyPaymentSchedule, HasManyPaymentDetail;
 }

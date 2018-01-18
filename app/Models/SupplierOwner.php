@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasManySupplier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -15,12 +16,7 @@ class SupplierOwner extends Model
     ];
 
     /**
-     * 供应商
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * 拥有 供应商
      */
-    public function suppliers()
-    {
-       return $this->hasMany(Supplier::class, 'supplier_owner_id');
-    }
+    use HasManySupplier;
 }

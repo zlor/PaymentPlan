@@ -129,15 +129,15 @@ class BillPeriodController extends Controller
 
             $form->display('id', 'ID');
 
-            // 账期名称
-            $form->text('name', trans('bill.period.name'))
-                ->default(date('Y年m月'))
-                ->rules('required');
-
             // 账期年月
             $form->date('month', trans('bill.period.month'))
                 ->format('YYYY-MM')
                 ->default(date('Y-m'))
+                ->rules('required');
+
+            // 账期名称
+            $form->text('name', trans('bill.period.name'))
+                ->default(date('Y年m月'))
                 ->rules('required');
 
             // 账期范围
