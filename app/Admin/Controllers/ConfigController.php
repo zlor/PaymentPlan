@@ -14,14 +14,19 @@ class ConfigController extends Controller
 {
     use ModelForm;
 
-    public function index()
+    public function indexEnvs()
     {
         return Admin::content(function (Content $content) {
 
-            $content->header(__('admin.dashboard'));
-            $content->description(__('admin.descript'));
+            $content->header(__('admin.descript'));
+            $content->description(__('admin.description'));
 
-            $content->row(Dashboard::title());
+            $content->breadcrumb(
+                ['text' => '后台管理', 'url' => '#'],
+                ['text'=>'系统参数' ,'url'=>$this->getUrl('self')]
+            );
+
+            $content->row($this->title());
 
             $content->row(function (Row $row) {
 
@@ -38,5 +43,11 @@ class ConfigController extends Controller
                 });
             });
         });
+    }
+
+
+    protected function title()
+    {
+        return view('admin.base.envs_title');
     }
 }

@@ -6,11 +6,13 @@ return [
     'type'  => '类型明细',
     'type.name' => '类型名称',
     'type.code' => '类型编号',
+    'type.icon' => '类型标识',
 
     'materiels' => '物料',
     'materiel'  => '物料明细',
     'materiel.name' => '物料名称',
     'materiel.code' => '物料编号',
+    'materiel.icon' => '物料标识',
 
     'schedules' => '付款计划',
     'schedule'  => '付款计划明细',

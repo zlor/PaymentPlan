@@ -81,6 +81,9 @@ class PaymentMaterielController extends Controller
             // 物料代号
             $grid->column('code', trans('payment.materiel.code'));
 
+            // 物料标识
+            $grid->column('icon', trans('payment.materiel.icon'));
+
 
             $grid->created_at();
             $grid->updated_at();
@@ -103,6 +106,8 @@ class PaymentMaterielController extends Controller
 
             $form->text('code', trans('payment.materiel.code'))
                 ->rules('required');
+
+            $form->icon('icon', trans('payment.materiel.icon'));
 
             $form->textarea('memo', trans('admin.memo'));
 

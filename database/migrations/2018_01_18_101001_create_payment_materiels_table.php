@@ -15,8 +15,9 @@ class CreatePaymentMaterielsTable extends Migration
     {
         Schema::create('payment_materiels', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->comment('物料名称');
-            $table->string('code')->comment('物料编号');
+            $table->string('name', 100)->comment('物料名称');
+            $table->string('icon', 250)->default('')->comment('物料标识');
+            $table->string('code', 50)->default('')->comment('物料编号');
             $table->text('memo')->comment('物料备注')->nullable();
             $table->softDeletes();
             $table->timestamps();
@@ -25,8 +26,9 @@ class CreatePaymentMaterielsTable extends Migration
 
         Schema::create('payment_types', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->comment('类型名称');
-            $table->string('code')->comment('类型编号');
+            $table->string('name', 100)->comment('类型名称');
+            $table->string('icon', 250)->default('')->comment('类型标识');
+            $table->string('code', 50)->default('')->comment('类型编号');
             $table->text('memo')->comment('类型备注')->nullable();
             $table->softDeletes();
             $table->timestamps();

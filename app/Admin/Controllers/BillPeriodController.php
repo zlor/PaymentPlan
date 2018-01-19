@@ -32,6 +32,23 @@ class BillPeriodController extends Controller
     }
 
     /**
+     * 显示账期详情
+     * @param $id
+     *
+     * @return Content
+     */
+    public function show($id)
+    {
+        return Admin::content(function (Content $content) use ($id) {
+
+            $content->header(trans('bill.periods'));
+            $content->description(trans('admin.show'));
+
+            $content->body($this->form()->view($id));
+        });
+    }
+
+    /**
      * Edit interface.
      *
      * @param $id

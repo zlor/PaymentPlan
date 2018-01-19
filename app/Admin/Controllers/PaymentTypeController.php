@@ -76,11 +76,14 @@ class PaymentTypeController extends Controller
         return Admin::grid(PaymentType::class, function (Grid $grid) {
 
             $grid->id('ID')->sortable();
-            // 物料名称
+            // 类型名称
             $grid->column('name', trans('payment.type.name'));
 
-            // 物料代号
+            // 类型代号
             $grid->column('code', trans('payment.type.code'));
+
+            // 类型标识
+            $grid->column('icon', trans('payment.type.icon'));
 
 
             $grid->created_at();
@@ -104,6 +107,8 @@ class PaymentTypeController extends Controller
 
             $form->text('code', trans('payment.type.code'))
                 ->rules('required');
+
+            $form->icon('icon', trans('payment.type.icon'));
 
             $form->textarea('memo', trans('admin.memo'));
 
