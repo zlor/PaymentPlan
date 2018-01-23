@@ -6,10 +6,44 @@ use App\Models\Traits\BelongsToAdministrator;
 use App\Models\Traits\HasManyPaymentDetail;
 use App\Models\Traits\HasManyPaymentSchedule;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
+/**
+ * Class BillPeriod
+ *
+ * 账期 [账期数据，第一条数据初始化产生，其后的数据自动生成。]
+ *
+ * [就绪: 激活前的准备状态]
+ * 可以向就绪状态的账期内，先行导入数据
+ *
+ * [激活: 当前付款计划/付款明细基于的账期状态]
+ * 可以向激活状态下的账期，导入数据，调整并审核付账计划，录入付账明细
+ *
+ * 激活状态的账期始终保持在一个；
+ *
+ * 检测到不存在其他「激活」中的账期，方可激活当前账期；
+ *
+ * 在激活当前账期时，自动生成下一个就绪状态的账期；
+ *
+ * [锁定]
+ * 锁定状态，在出现新的激活账期后即不可逆。
+ * 锁定状态的账期，只能由财务主管来调整数据，每次调整数据，会记录调整履历；
+ *
+ * [关闭]
+ * 关闭状态，快照指定的锁定状态账期。关闭状态，将封闭所有调整入口
+ *
+ *
+ * @package App\Models
+ */
 class BillPeriod extends Model
 {
     protected $table = 'bill_periods';
+
+    const STATUS_STANDYBY = 'standby';
+    const STATUS_ACTIVE = 'active';
+    const STATUS_LOCK = 'lock';
+    const STATUS_CLOSE = 'close';
 
     /**
      * 归属于 用户
@@ -20,6 +54,16 @@ class BillPeriod extends Model
      * 拥有 付款计划、付款明细
      */
     use HasManyPaymentSchedule, HasManyPaymentDetail;
+
+
+    /**
+     * 是否激活中
+     * @return bool
+     */
+    public function isActive()
+    {
+        return in_array($this->original['status'], ['active']);
+    }
 
     /**
      * 现金总额 （ 现金余额 + 确认计划收款额 + 预计收款）
@@ -75,18 +119,105 @@ class BillPeriod extends Model
      *
      * 若未设定账期，默认获取当前最新active账期的ID
      *
-     * @return Model|mixed|null|string|static
+     * @return integer
      */
     public static function getCurrentId()
     {
-        $bill_period = self::query()
-                            ->whereIn('status', ['active'])
-                            ->orderBy('id', 'desc')
-                            ->first();
+        $bill_period = self::getDefault();
+
         // 返回默认账期的ID
-        return UserEnv::authEnv(
-            UserEnv::ENV_DEFAULT_BILL_PERIOD,
-            empty($bill_period) ? 0 : $bill_period->id
-        );
+        return empty($bill_period) ? 0 : $bill_period->id;
     }
+
+    /**
+     * 获得默认账期
+     *
+     * 激活中的账期只能存在一个
+     *
+     * @return BillPeriod|Model|null|static
+     */
+    public static function getDefault()
+    {
+        $bill_period = self::query()
+            ->whereIn('status', ['active'])
+            ->orderBy('id', 'desc')
+            ->first();
+
+        return empty($bill_period) ? (new BillPeriod()) : $bill_period;
+    }
+
+    /**
+     * 是否为允许的默认账期
+     *
+     * 激活状态 ( // 就绪状态 )
+     *
+     * @param int $periodId
+     *
+     * @return bool
+     */
+    public static function allowDefaultPeriod($periodId = 0)
+    {
+        return self::query()
+                ->where('id', $periodId)
+                ->whereIn('status', ['active'])
+                ->count() > 0;
+    }
+
+
+    /**
+     * 获取环境变量中的 当前账期
+     */
+    public static function envCurrent()
+    {
+        $billPeriodId = UserEnv::getEnv(UserEnv::ENV_DEFAULT_BILL_PERIOD);
+
+        $billPeriod = self::query()->find($billPeriodId);
+
+        return empty($billPeriod)? self::getDefault(): $billPeriod;
+    }
+
+    /**
+     * 导入付款计划
+     *
+     * @param PaymentFile $file
+     */
+    public static function importSchedule(PaymentFile $file)
+    {
+        Excel::load($file->getLocalPath(), function ($reader) use (& $data) {
+            $reader = $reader->getSheet(0);
+            $data = $reader->toArray();
+        });
+
+        $columnMap = [
+            'name' => 1,
+            'supplier_name' =>2,
+            'materiel_name' =>3,
+            'charge_man' => 4,
+            'pay_cycle'  => 5,
+            'supplier_balance' =>6,
+            'supplier_lpy_balance' =>7,
+            'due_money' => 8,
+            // 下月付款
+            'due_money_last_month'=>9,
+            // 计划付款
+            'due_money_plan'=>10,
+        ];
+        $schedules = [];
+        $reapeatMap = [];
+        $vaildMessageMap   = [];
+
+        for($rowIndex = 5; $rowIndex< count($data); $rowIndex++){
+
+            for($columnIndex = 1; $columnIndex<12; $columnIndex++)
+            {
+                // 识别供应商
+                $schedules[] = [
+                    'name' => $data[$rowIndex][$columnMap['name']],
+
+
+                ];
+            }
+        }
+    }
+
 }

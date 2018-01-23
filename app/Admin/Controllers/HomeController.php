@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\BillPeriod;
 use App\Models\PaymentType;
+use App\Models\UserEnv;
 use Encore\Admin\Controllers\Dashboard;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Column;
@@ -20,11 +21,15 @@ class HomeController extends Controller
 
     protected $routeMap = [
         'index' => 'admin.index',
-        'gather_bill_period' => 'admin.bill.gather',
+        'gather.bill_periods' => 'admin.bill.gather',
+        'gather.bill_period' => 'bill.target.gather',
         'query' => 'admin.bill.period.query',
         'base.bill_periods'   => 'bill_periods.index',
         'base.bill_period.view' => 'bill_periods.show',
         'base.bill_period.edit' => 'bill_periods.edit',
+
+        'excel_page'    => 'payment.plan.excel',
+        'schedule_page' => '',
     ];
 
     public function index()
@@ -51,11 +56,14 @@ class HomeController extends Controller
 
     /**
      * 账期汇总信息
+     *
+     * @param $id integer
+     *
      * @return Content
      */
-    public function indexGatherBillPeriod()
+    public function indexGatherBillPeriod($id = 0)
     {
-        return Admin::content(function(Content $content){
+        return Admin::content(function(Content $content)use($id){
 
             $content->header('账期');
 
@@ -67,11 +75,11 @@ class HomeController extends Controller
                 ['text' => '账期总览', 'url' => $this->getUrl('gather_bill_period')]
             );
 
-            $content->row(function (Row $row) {
+            $content->row(function (Row $row)use($id) {
 
-                $row->column(3, function (Column $column) {
+                $row->column(3, function (Column $column)use($id) {
                     // 账期列表
-                    $column->append($this->_gatherPartList());
+                    $column->append($this->_gatherPartList($id));
                 });
 
                 $row->column(9, function (Column $column) {
@@ -100,9 +108,11 @@ SCRIPT;
     /**
      * 获取账期列表
      *
+     * @param $id integer
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    protected function _gatherPartList()
+    protected function _gatherPartList($id = 0)
     {
         $items = BillPeriod::query()->orderBy('month', 'desc')->get();
 
@@ -110,12 +120,14 @@ SCRIPT;
         {
             $item->view = $this->getUrl('base.bill_period.view', ['id'=>$item->id]);
             $item->edit = $this->getUrl('base.bill_period.edit', ['id'=>$item->id]);
+            $item->locateLink = $this->getUrl('gather.bill_period', ['id'=> $item->id]);
         }
 
         $page = [
             'url'=>[
-                'baseBillPeriod' => $this->getUrl('base.bill_periods')
-            ]
+                'baseBillPeriod' => $this->getUrl('base.bill_periods'),
+            ],
+            'targetId' => $id,
         ];
 
         return view('admin.bill.gather_list', compact('items', 'page'));
@@ -156,7 +168,14 @@ SCRIPT;
         $table = new Table($headers, $rows);
 
         // return $table->render();
-        return 'TODO 状态履历信息';
+        $response = "<pre>
+            TODO 状态履历信息
+            <p>当前状态： </p>
+            <p>文件信息: 上传数量/导入数量。</p>
+            <p>付款计划: 计划数量/审核中数量/付款中数量/完成付款数量</p>
+            <p>资金状态: 现金/承兑， 已支付现金/已支付承兑</p>
+        </pre>";
+        return $response;
     }
 
     protected function _gatherPartDetail()
@@ -173,8 +192,22 @@ SCRIPT;
 
         $table = new Table($headers, $rows);
 
-        // return $table->render();
-        return 'TODO 快速操作';
+        $defaultBillPeriodId = UserEnv::getEnv(UserEnv::ENV_DEFAULT_BILL_PERIOD);
+
+        $filePageUrl = $this->getUrl('excel_page', ['default_bill_period_id'=>$defaultBillPeriodId]);
+
+        $schedulePageUrl = $this->getUrl('schedule_page', ['bill_period_id'=>$defaultBillPeriodId]);
+
+        $detailPageUrl   = $this->getUrl('detail_page', ['bill_period_id'=>$defaultBillPeriodId]);
+
+        $response = "<pre>
+                  TODO 快速操作
+                 <p> 切换状态 </p>
+                 <p><a href='{$filePageUrl}' target='_blank'>文件管理</a></p>
+                 <p><a href='{$schedulePageUrl}' target='_blank'>付款计划管理</a></p>
+                 <p><a href='{$detailPageUrl}' target='_blank'>付款详情管理</a></p>
+        </pre>";
+        return $response;
     }
 
 

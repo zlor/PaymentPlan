@@ -7,7 +7,7 @@ Admin::registerAuthRoutes();
 Route::group([
     'prefix'        => config('admin.route.prefix'),
     'namespace'     => config('admin.route.namespace'),
-    'middleware'    => config('admin.route.middleware'),
+    'middleware'    => array_merge(config('admin.route.middleware'), ['env.user']),
 ], function (Router $router) {
 
     // 首页
@@ -18,6 +18,7 @@ Route::group([
 
     // 账期总览
     $router->get('/bill/gather', 'HomeController@indexGatherBillPeriod')->name('bill.gather');
+    $router->get('/bill/{id}/gather', 'HomeController@indexGatherBillPeriod')->name('bill.target.gather');
 
     ## 账期设置
     $router->get('/bill/period', 'PeriodController@index')->name('bill.period');
@@ -25,13 +26,15 @@ Route::group([
     $router->post('/bill/period/set', 'PeriodController@set')->name('bill.period.set');
 
     ## 付款计划作成
-    $router->get('/plan/schedule', 'PaymentController@indexPlan')->name('payment.plan.index');
+    $router->get('/plan/schedule', 'Pay\ScheduleController@index')->name('payment.plan.index');
     $router->patch('/plan/schedule/{id}/update', 'PaymentController@updatePlan')->name('payment.plan.update');
     $router->delete('/plan/schedule/{id}/delete', 'PaymentController@deletePlan')->name('payment.plan.delete');
 
-    $router->get('/plan/schedule/excel', 'PaymentController@indexExcel')->name('payment.plan.excel');
-    $router->post('/plan/schedule/upload', 'PaymentController@planUpload')->name('payment.plan.upload');
-    $router->get('/plan/schedule/import', 'PaymentController@palnImport')->name('payment.plan.import');
+    $router->get('/plan/schedule/excel', 'Pay\ExcelController@index')->name('payment.plan.excel');
+    $router->post('/plan/schedule/file/upload', 'Pay\ExcelController@upload')->name('payment.plan.file.upload');
+    $router->get('/plan/schedule/file/{id}/import', 'Pay\ExcelController@import')->name('payment.plan.file.import');
+    $router->get('/plan/schedule/file/{id}/download', 'Pay\ExcelController@download')->name('payment.plan.file.download');
+    $router->delete('/plan/schedule/file/{id}/delete', 'Pay\ExcelController@remove')->name('payment.plan.file.remove');
 
     ## 付款计划审核
     $router->get('/audit/schedule', 'PaymentController@indexAudit')->name('audit.schedule.index');

@@ -62,6 +62,12 @@ return [
             'url' => env('APP_URL').'/uploads',
         ],
 
+        'import'=> [
+            'driver' => 'local',
+            'root'   => storage_path('app/import'),
+            'url'    => env('APP_URL').'/import',
+        ],
+
         'backups' => [
             'driver' => 'local',
             'root'   => storage_path('app/backups'), // that's where your backups are stored by default: storage/backups

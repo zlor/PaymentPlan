@@ -16,7 +16,7 @@ return [
 
     'schedules' => '付款计划',
     'schedule'  => '付款计划明细',
-    'schedule.name' => '编号',
+    'schedule.name' => '科目编号',
     'schedule.supplier_name' => '供应商名称(导入)',
     'schedule.supplier' => '供应商(匹配)',
     'schedule.supplier_balance' => '总应付款',

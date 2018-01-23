@@ -35,7 +35,7 @@
     <div class="box-body period-list">
         <ul class="products-list product-list-in-box">
             @foreach($items as $item)
-                <li class="item">
+                <li class="item" data-locate="{{$item->locateLink}}">
                     <div class="product-img">
                         @if(in_array($item['status'], ['close']))
                             <span class="litter-font"  title="{{ __('bill.period.status.close') }}">

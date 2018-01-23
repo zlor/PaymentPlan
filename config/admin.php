@@ -76,6 +76,14 @@ return [
         ],
     ],
 
+    'import' => [
+        'disk' => 'import',
+        'directory'=> [
+            'payment'  => 'payments',
+            'supplier' => 'suppliers',
+        ]
+    ],
+
     /*
      * Laravel-admin database setting.
      */

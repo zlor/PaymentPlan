@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\UserEnv;
+use App\Models\File;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -11,7 +11,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 
-class UserEnvController extends Controller
+class FileController extends Controller
 {
     use ModelForm;
 
@@ -71,7 +71,7 @@ class UserEnvController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(UserEnv::class, function (Grid $grid) {
+        return Admin::grid(File::class, function (Grid $grid) {
 
             $grid->id('ID')->sortable();
 
@@ -87,7 +87,7 @@ class UserEnvController extends Controller
      */
     protected function form()
     {
-        return Admin::form(UserEnv::class, function (Form $form) {
+        return Admin::form(File::class, function (Form $form) {
 
             $form->display('id', 'ID');
 
