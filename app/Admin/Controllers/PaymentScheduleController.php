@@ -80,7 +80,19 @@ class PaymentScheduleController extends Controller
             // 账期
             $grid->column('bill_period.name', trans('payment.schedule.bill_period'));
 
-            // 供应商名称(导入)
+            // // 导入信息
+            // $grid->column('importInfo', '导入信息')->display(function(){
+            //     return "<pre>
+            //          供应商名称/物料名称/ 总应付款/ 计划付款/计划人 /导入时间
+            //     </pre>";
+            // });
+            // // 审核信息
+            // // 终稿信息
+            // // 付款信息
+            // // 状态
+
+
+            // // 供应商名称(导入)
             $grid->column('supplier_name', trans('payment.schedule.supplier_name'));
 
             // 供应商(匹配)
@@ -91,6 +103,9 @@ class PaymentScheduleController extends Controller
 
             // 应付款
             $grid->column('due_money', trans('payment.schedule.due_money'));
+
+            // 计划应付款
+            $grid->column('plan_due_money', trans('payment.schedule.plan_due_money'));
 
             // 已付金额
             $grid->column('paid_money', trans('payment.schedule.paid_money'))
@@ -104,23 +119,44 @@ class PaymentScheduleController extends Controller
             // 已付承兑
             $grid->column('acceptance_paid', trans('payment.schedule.acceptance_paid'));
 
-            // 计划时间
-            $grid->column('plan_time', trans('payment.schedule.plan_time'));
-
             // 状态
             $grid->column('status', trans('payment.schedule.status'))
                 ->display(function($value){
                     return trans('payment.schedule.status.' . $value);
                 });
 
+            // 导入时间
+            $grid->column('plan_time', trans('payment.schedule.plan_time'));
+
             // 导入批次
             $grid->column('batch', trans('payment.schedule.batch'));
 
 
             // filter 过滤器
+            $grid->filter(function(Grid\Filter $filter){
+                $filter->disableIdFilter();
 
-            $grid->created_at();
-            $grid->updated_at();
+                // 账期
+                $filter->equal('bill_period_id', trans('payment.schedule.bill_period'))
+                    ->select(PaymentSchedule::getBillPeriodOptions())
+                    ->default(strval(BillPeriod::getCurrentId()));
+
+                // 类型
+                $filter->equal('payment_type_id', trans('payment.type'))
+                    ->select(PaymentSchedule::getPaymentTypeOptions());
+
+                // 科目
+                $filter->like('name', trans('payment.schedule.name'));
+
+                // 供应商
+                $filter->like('supplier_name', trans('payment.schedule.supplier_name'));
+
+                //
+
+            });
+
+            // $grid->created_at();
+            // $grid->updated_at();
         });
     }
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Traits\BelongsToAdministrator;
 use App\Models\Traits\HasManyPaymentDetail;
 use App\Models\Traits\HasManyPaymentSchedule;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -104,6 +105,11 @@ class BillPeriod extends Model
         return $this->cash_pool - $this->paid_total;
     }
 
+    public function getLockSchedules()
+    {
+        return $this->payment_schedules()->whereNotIn('status', ['init', 'web_init', 'import_init'])->get();
+    }
+
     /**
      * 状态备选
      *
@@ -176,48 +182,24 @@ class BillPeriod extends Model
         return empty($billPeriod)? self::getDefault(): $billPeriod;
     }
 
+
     /**
      * 导入付款计划
      *
      * @param PaymentFile $file
      */
-    public static function importSchedule(PaymentFile $file)
+    public static function importSchedule(PaymentFile $file, $options = [])
     {
-        Excel::load($file->getLocalPath(), function ($reader) use (& $data) {
-            $reader = $reader->getSheet(0);
-            $data = $reader->toArray();
-        });
-
-        $columnMap = [
-            'name' => 1,
-            'supplier_name' =>2,
-            'materiel_name' =>3,
-            'charge_man' => 4,
-            'pay_cycle'  => 5,
-            'supplier_balance' =>6,
-            'supplier_lpy_balance' =>7,
-            'due_money' => 8,
-            // 下月付款
-            'due_money_last_month'=>9,
-            // 计划付款
-            'due_money_plan'=>10,
-        ];
-        $schedules = [];
-        $reapeatMap = [];
-        $vaildMessageMap   = [];
-
-        for($rowIndex = 5; $rowIndex< count($data); $rowIndex++){
-
-            for($columnIndex = 1; $columnIndex<12; $columnIndex++)
-            {
-                // 识别供应商
-                $schedules[] = [
-                    'name' => $data[$rowIndex][$columnMap['name']],
 
 
-                ];
-            }
-        }
+        // 由 payment_schedule_file 向 payment_schedule 作成计划,并保留反馈信息
+        // supplier_name:required,unique; materiel_name:required; charge_man:required;
+        $file->loadFiles();
+
+
+
+
     }
+
 
 }

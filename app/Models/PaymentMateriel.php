@@ -25,4 +25,39 @@ class PaymentMateriel extends Model
      * 拥有 付款计划
      */
     use HasManyPaymentSchedule;
+
+
+    /**
+     * 依据参数猜测出供应商的身份
+     *
+     * @param array $filter
+     * @param bool  $needSave
+     *
+     * @return Model
+     */
+    public static function guestOrCreate($filter = [], $needSave = true)
+    {
+        $query = PaymentMateriel::query();
+        $new = [];
+        if (isset($filter['name']))
+        {
+            $query->where('name', $filter['name']);
+            $new['name'] = $filter['name'];
+        }
+
+        if( isset($filter['code']))
+        {
+            $query->where('code', $filter['code']);
+            $new['code'] = $filter['code'];
+        }
+
+        if($needSave)
+        {
+            $materiel = $query->firstOrCreate([], $new);
+        }else{
+            $materiel = $query->firstOrNew([], $new);
+        }
+
+        return $materiel;
+    }
 }

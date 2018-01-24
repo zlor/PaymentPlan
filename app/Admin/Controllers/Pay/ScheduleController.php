@@ -4,6 +4,7 @@ namespace App\Admin\Controllers\Pay;
 
 use App\Admin\Extensions\Tools\Import;
 use App\Models\PaymentSchedule;
+use App\Models\UserEnv;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -17,6 +18,7 @@ class ScheduleController extends Controller
 
     protected $routeMap = [
         'excel'  => 'payment.plan.excel',
+        'index'  => 'plan.schedule'
     ];
 
     /**
@@ -30,6 +32,11 @@ class ScheduleController extends Controller
 
             $content->header('付款计划');
             $content->description('导入并编辑');
+
+            $content->breadcrumb(
+                ['text'=>'付款管理', 'url'=>'#'],
+                ['text'=>'计划录入', 'url'=> $this->getUrl('index')]
+            );
 
             $content->body($this->grid());
         });
@@ -81,13 +88,16 @@ class ScheduleController extends Controller
 
             $grid->disableCreation();
 
+
+
             $grid->filter(function(Grid\Filter $filter){
 
                 $filter->disableIdFilter();
 
                 // 账期
                 $filter->equal('bill_period_id', trans('payment.schedule.bill_period'))
-                    ->select(PaymentSchedule::getBillPeriodOptions());
+                    ->select(PaymentSchedule::getBillPeriodOptions())
+                    ->default(UserEnv::getEnv(UserEnv::ENV_DEFAULT_BILL_PERIOD));
 
                 // 分类
                 $filter->equal('payment_type_id', trans('payment.type'))

@@ -36,7 +36,7 @@ class CreateFileTables extends Migration
         });
 
         // 付款计划 < 多对多关联 > 文件, 文件导入生成多个付款计划； 一个付款计划由多个文件导入覆盖；
-        Schema::create('payment_schedule_file', function(Blueprint $table){
+        Schema::create('payment_schedule_files', function(Blueprint $table){
             $table->increments('id');
             $table->integer('file_id')->default(0)->comment('文件');
             $table->integer('payment_schedule_id')->default(0)->comment('付款计划');

@@ -14,6 +14,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Form;
+use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
@@ -35,6 +36,7 @@ class ExcelController extends Controller
         'remove' => 'payment.plan.file.remove',
         'import' => 'payment.plan.file.import',
         'download' => 'payment.plan.file.download',
+        'info'     => 'payment.plan.file.info',
 
     ];
 
@@ -89,23 +91,27 @@ class ExcelController extends Controller
                 'bill_period_id'=>$defaultPeriod->id
             ];
 
-            // $content->row($this->schedule_header());
+            $content->row($this->schedule_header());
 
 
             $content->row(function(Row $row)use($filter){
 
-                    $row->column(6, function (Column $column)use($filter) {
+                    $row->column(8, function (Column $column)use($filter) {
 
-                        $column->append(new Box('已上传文件', $this->schedule_file_list($filter)));
+                        $tabPanel = new Tab();
 
+                        $tabPanel->add('已上传的文件',$this->schedule_file_list($filter), true);
+
+                        $tabPanel->add('上传文件',    $this->schedule_file_form($filter), false);
+
+                        $column->append($tabPanel);
                     });
 
-                    $row->column(6, function (Column $column)use($filter) {
+                    $row->column(4, function (Column $column)use($filter) {
 
-                        $column->append(new Box('上传文件', $this->schedule_file($filter)));
+                        $column->append(new Box('载入预设', $this->schedule_file_import($filter)));
 
-
-                        $column->append(new Box('进度信息', '<pre></pre>'));
+                        $column->append(new Box('相关信息', '<pre id="aboutFile"></pre>'));
                     });
 
             });
@@ -129,7 +135,7 @@ class ExcelController extends Controller
 
 
     /**
-     * 付款计划导入文件列表
+     * 付款计划-数据源文件列表
      *
      * @param $filter array
      *
@@ -150,6 +156,18 @@ class ExcelController extends Controller
         $list = [];
         foreach ($files as $file)
         {
+            $span = '<span class="showMsg" data-url="'.($this->getUrl('info', ['id'=>$file->id])).'"></span>';
+            $actionImport = '<a class="btn btn-default file-import" data-id="'.($file->id).'" data-name="'.($file->name).'" data-path="'.($file->path).'" data-url="'.($this->getUrl('import', ['id'=>$file->id])).'" title="选中文件"><i class="fa fa-gear"></i>选择</a>';
+            $actionDownload ='<a href="'.($this->getUrl('download', ['id'=>$file->id])).'" target="_blank" class="btn btn-default" title="下载"><i class="fa fa-download"></i>下载</a>';
+            $actionRemove = '<a class="btn btn-default file-delete" data-path="'.($file->path).'"  data-url="'.($this->getUrl('remove', ['id'=>$file->id])).'"><i class="fa fa-trash"></i>删除</a>';
+
+            $actions = '<div class="btn-group btn-group-xs">'
+                     . ($file->importSuccess()?'':$actionImport)
+                     . $actionDownload
+                     . ($file->importSuccess()?'':$actionRemove)
+                     . '</div>'
+                     . $span;
+
             // 设置操作行
             $list[] = [
                 'name' => $file->name,
@@ -157,13 +175,7 @@ class ExcelController extends Controller
                 'type' => $file->payment_type_name,
                 'size' => $file->sizeTxt,
                 'status' => $file->statusExt,
-                '<div class="btn-group btn-group-xs">
-                       <a href="'.($this->getUrl('import', ['id'=>$file->id])).'" target="_blank" class="btn btn-default file-rename" title="导入计划"><i class="fa fa-database"></i>导入计划</a>
-                       
-                       <a href="'.($this->getUrl('download', ['id'=>$file->id])).'" target="_blank" class="btn btn-default" title="下载"><i class="fa fa-download"></i>下载</a>
-                       
-                       <a class="btn btn-default file-delete" data-path="'.($file->path).'"  data-url="'.($this->getUrl('remove', ['id'=>$file->id])).'"><i class="fa fa-trash"></i>删除</a>
-                </div>'
+                'action' =>$actions
             ];
         }
 
@@ -178,7 +190,6 @@ class ExcelController extends Controller
         $script = <<<SCRIPT
 $(function () {
     $('.file-delete').click(function () {
-
         var url  = $(this).data('url'),
             path = $(this).data('path');
         swal({
@@ -222,13 +233,13 @@ SCRIPT;
     }
 
     /**
-     * 付款计划导入文件
+     * 付款计划-数据源文件表单
      *
      * @param $filter
      *
      * @return Form
      */
-    protected function schedule_file($filter)
+    protected function schedule_file_form($filter)
     {
         $form = new Form();
 
@@ -242,6 +253,7 @@ SCRIPT;
         {
             $bill_period_id->default($filter['bill_period_id']);
         }
+
 
         $form->select('payment_type_id', '物料类型')
             ->options(PaymentSchedule::getPaymentTypeOptions());
@@ -257,16 +269,163 @@ SCRIPT;
 
 
     /**
+     * 付款计划文件
+     * @param $filter
+     */
+    protected function schedule_file_import($filter)
+    {
+        $data = [];
+
+        $import_mapping_options = PaymentSchedule::getImportMappingOptions();
+
+        $scirpt =<<<SCIPRT
+$(function(){
+    function activeTr(tr){
+        $('.table').find('tr').removeClass('active');
+        $('.table').find(tr).addClass('active');
+    }
+    
+    function showMsgTr(tr){
+        $('.table').find('tr').removeClass('focus');
+        $('.table').find(tr).addClass('focus');
+    }
+    
+    $('tbody tr').click(function(){
+        var url = $(this).find('span.showMsg').data('url'),
+            params = {};
+            
+        params._token = LA.token;
+        
+        showMsgTr($(this));
+        
+        $.get(url, params, function(data){
+        
+            var html = '', msgList = data.data.import_msg;
+            for(var i = 0; i<msgList.length; i++)
+            {
+                html += msgList[i]+'<br>';
+            }
+            $('#aboutFile').html(html);
+        }, 'json');
+    });
+    
+    
+    $('.file-import').click(function () {
+        var url  = $(this).data('url'),
+            path = $(this).data('path'),
+            form = $('#import_config');
+            
+        activeTr($(this).parents('tr'));
+        
+        $('[name="payment_file_id"]', form).val($(this).data('id'));
+        
+        $('[name="name"]', form).val($(this).data('name'));
+        
+        $('[name="url"]', form).val(url);
+        
+    });
+    
+    $('#importBtn').click(function(){
+        var form = $('#import_config'), 
+            url = $('[name="url"]', form).val(),
+            param = {};
+        param = form.serializeArray();
+        // console.log(param);
+        // param.payment_file_id    = $('[name="payment_file_id"]', form).val();
+        // param.name               = $('[name="name"]', form).val();
+        // param.import_mapping     = $('[name="import_mapping"]', form).val();
+        // param.skip_row_number    = $('[name="skip_row_number"]', form).val();
+        // param.skip_column_number = $('[name="skip_column_number"]', form).val();
+        
+        $.post(url, param, function(data){
+            $('#aboutFile').html(data.msg);
+            $.pjax.reload('#pjax-container');
+        }, 'json');
+    });
+});
+SCIPRT;
+
+        Admin::script($scirpt);
+
+
+        return view('admin.bill.excel_import', compact('data', 'import_mapping_options'));
+    }
+
+
+    /**
+     * 获取文件相关信息
+     *
+     * @param $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function info($id)
+    {
+        $file = PaymentFile::query()->find($id);
+
+        if(empty($file))
+        {
+            return response()->json(['status'=>false, 'message'=>'文件资源未找到~']);
+        }
+
+        // 获取导入信息
+        return response()->json(['status'=>true, 'message'=>'', 'data'=>$file->toArray()]);
+    }
+
+
+
+    /**
      * 将指定的文件，导入到数据库中
      *
      * @param $id
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
     public function import($id)
     {
-        $file = PaymentFile::query()->findOrFail($id);
+        $file = PaymentFile::query()->find($id);
 
-        BillPeriod::importSchedule($file);
+        if(empty($file)){
+            return response()->json(['status'=>false, 'message'=>'文件资源未记录，请重新上传！']);
+        }
 
+        $inputs = Input::get();
+        // 导入使用的参数
+        $options = [];
+
+        // 0. 取得默认的方案参数
+        if(empty($import_mapping_params = PaymentSchedule::getImportMappingParams($inputs['import_mapping'])))
+        {
+            return response()->json(['status'=>false, 'message'=>'读取Excel的配置未预设，请联系管理员添加！']);
+        }else{
+            $options = $import_mapping_params;
+        }
+
+        // 取得跳过的行数
+        if(!empty($inputs['skip_row_number']))
+        {
+            $options['skip_row_number'] = $inputs['skip_row_number'];
+        }
+        // 取得跳过的列数
+        if(!empty($inputs['skip_column_number']))
+        {
+            $options['skip_row_number'] = $inputs['skip_row_number'];
+        }
+
+        // 缓存文件
+        $result = $file->cacheFile($options);
+
+        // 载入数据
+        $result && $result = $file->setupSchedule();
+
+        // 获取载入后的信息
+        $data = [
+            'status'  => true,
+            'message' => $result['msg'],
+            'data'    => $result
+        ];
+
+        return response()->json(compact('data'));
     }
 
     /**

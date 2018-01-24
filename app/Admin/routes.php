@@ -27,28 +27,31 @@ Route::group([
 
     ## 付款计划作成
     $router->get('/plan/schedule', 'Pay\ScheduleController@index')->name('payment.plan.index');
-    $router->patch('/plan/schedule/{id}/update', 'PaymentController@updatePlan')->name('payment.plan.update');
-    $router->delete('/plan/schedule/{id}/delete', 'PaymentController@deletePlan')->name('payment.plan.delete');
+    $router->patch('/plan/schedule/{id}/update', 'Pay\ScheduleController@updatePlan')->name('payment.plan.update');
+    $router->delete('/plan/schedule/{id}/delete', 'Pay\ScheduleController@deletePlan')->name('payment.plan.delete');
 
     $router->get('/plan/schedule/excel', 'Pay\ExcelController@index')->name('payment.plan.excel');
     $router->post('/plan/schedule/file/upload', 'Pay\ExcelController@upload')->name('payment.plan.file.upload');
-    $router->get('/plan/schedule/file/{id}/import', 'Pay\ExcelController@import')->name('payment.plan.file.import');
+    $router->post('/plan/schedule/file/{id}/import', 'Pay\ExcelController@import')->name('payment.plan.file.import');
     $router->get('/plan/schedule/file/{id}/download', 'Pay\ExcelController@download')->name('payment.plan.file.download');
     $router->delete('/plan/schedule/file/{id}/delete', 'Pay\ExcelController@remove')->name('payment.plan.file.remove');
+    $router->get('/plan/schedule/file/{id}/info', 'Pay\ExcelController@info')->name('payment.plan.file.info');
 
     ## 付款计划审核
-    $router->get('/audit/schedule', 'PaymentController@indexAudit')->name('audit.schedule.index');
-    $router->patch('/audit/schedule/{id}/confirm', 'PaymentController@auditConfirm')->name('audit.schedule.confirm');
-    $router->patch('/audit/schedule/{id}/cancel', 'PaymentController@auditCancel')->name('audit.schedule.cancel');
-    $router->patch('/lock/schedule/{id}/confirm', 'PaymentController@lockConfirm')->name('lock.schedule.confirm');
-    $router->patch('/lock/schedule/{id}/cancel', 'PaymentController@lockCancel')->name('lock.schedule.cancel');
+    $router->get('/audit/schedule', 'Pay\AuditController@index')->name('payment.audit.index');
+    $router->patch('/audit/schedule/{id}/confirm', 'Pay\AuditController@auditConfirm')->name('audit.schedule.confirm');
+    $router->patch('/audit/schedule/{id}/cancel', 'Pay\AuditController@auditCancel')->name('audit.schedule.cancel');
+    $router->patch('/final/schedule/{id}/confirm', 'Pay\AuditController@finalConfirm')->name('final.schedule.confirm');
+    $router->patch('/final/schedule/{id}/cancel', 'Pay\AuditController@finalCancel')->name('final.schedule.cancel');
+    $router->patch('/lock/schedule/{id}/confirm', 'Pay\AuditController@lockConfirm')->name('lock.schedule.confirm');
+    $router->patch('/lock/schedule/{id}/cancel', 'Pay\AuditController@lockCancel')->name('lock.schedule.cancel');
 
     ## 付款
-    $router->get('/pay/schedule', 'PaymentController@indexPay')->name('pay.schedule.index');
-    $router->get('/pay/schedule/{id}/detail', 'PaymentController@indexScheduleDetail')->name('pay.schedule.detail.index');
-    $router->patch('/pay/schedule/{id}/detail/{detail_id}/update', 'PaymentController@updateScheduleDetail')->name('pay.schedule.detail.update');
-    $router->post('/pay/schedule/{id}/detail', 'PaymentController@storeScheduleDetail')->name('pay.schedule.detail.store');
-    $router->delete('/pay/schedule/{id}/detail/{detail_id}', 'PaymentController@deleteScheduleDetail')->name('pay.schedule.detail.delete');
+    $router->get('/pay/schedule', 'Pay\DetailController@index')->name('pay.schedule.index');
+    $router->get('/pay/schedule/detail/{id}', 'Pay\DetailController@indexScheduleDetail')->name('pay.schedule.detail.index');
+    $router->patch('/pay/schedule/detail/{id}/update', 'Pay\DetailController@updateScheduleDetail')->name('pay.schedule.detail.update');
+    $router->post('/pay/schedule/detail', 'Pay\DetailController@storeScheduleDetail')->name('pay.schedule.detail.store');
+    $router->delete('/pay/schedule/detail/{id}', 'Pay\DetailController@deleteScheduleDetail')->name('pay.schedule.detail.delete');
 
 
     // 基础档案

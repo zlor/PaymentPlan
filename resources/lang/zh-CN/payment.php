@@ -16,6 +16,11 @@ return [
 
     'schedules' => '付款计划',
     'schedule'  => '付款计划明细',
+    'schedule.importInfo' => '导入信息',
+    'schedule.auditInfo'  => '审核信息',
+    'schedule.finalInfo'  => '终稿信息',
+    'schedule.payInfo'    => '付款信息',
+
     'schedule.name' => '科目编号',
     'schedule.supplier_name' => '供应商名称(导入)',
     'schedule.supplier' => '供应商(匹配)',
@@ -28,11 +33,24 @@ return [
     'schedule.payment_type' => '付款类型',
 
     'schedule.bill_period' => '账期',
-    'schedule.due_money'   => '应付款',
+    'schedule.suggest_due_money' => '建议应付款',
+
+    'schedule.plan_time' => '导入时间',
+    'schedule.plan_due_money' => '导入应付款(计划)',
+    'schedule.plan_man' => '导入人',
+
+    'schedule.audit_time' => '审核时间',
+    'schedule.audit_due_money' => '应付款(审核调整)',
+    'schedule.audit_man' => '审核人',
+
+    'schedule.final_time' => '终稿时间',
+    'schedule.final_due_money' => '应付款(终稿调整)',
+    'schedule.final_man' => '终稿人',
+
+    'schedule.due_money'   => '应付款(实际)',
     'schedule.paid_money'   => '已付款',
     'schedule.cash_paid'   => '已付现金',
     'schedule.acceptance_paid'   => '已付承兑',
-    'schedule.plan_time'   => '计划时间',
     'schedule.batch'   => '导入批次',
     'schedule.user'   => '操作人',
 
