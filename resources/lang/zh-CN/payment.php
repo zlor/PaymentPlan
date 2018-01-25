@@ -18,9 +18,10 @@ return [
     'schedule'  => '付款计划明细',
     'schedule.importInfo' => '导入信息',
     'schedule.planInfo'   => '计划信息',
-    'schedule.auditInfo'  => '审核信息',
+    'schedule.auditInfo'  => '核定信息',
     'schedule.finalInfo'  => '终稿信息',
     'schedule.payInfo'    => '付款信息',
+    'schedule.supplierBalanceInfo' => '应付款信息',
 
     'schedule.name' => '科目编号',
     'schedule.supplier_name' => '供应商名称',

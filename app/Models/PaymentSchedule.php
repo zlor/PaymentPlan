@@ -40,6 +40,17 @@ class PaymentSchedule extends Model
         'supplier_lpu_balance' => 'double'
     ];
 
+    const STATUS_INIT = 'init';
+    const STATUS_INIT_WEB = 'web_init';
+    const STATUS_INIT_IMPORT = 'import_init';
+    const STATUS_PLAN     = 'plan';
+    const STATUS_CONFIRM     = 'check_init';
+    const STATUS_CHECK     = 'check';
+    const STATUS_CHECK_AUDIT= 'check_audit';
+    const STATUS_CHECK_FINAL= 'check_final';
+    const STATUS_PAY= 'paying';
+    const STATUS_LOCK= 'lock';
+
     use CommonOptions;
     /**
      * 归属于 账期、用户、供应商、物料、类型
@@ -78,6 +89,26 @@ class PaymentSchedule extends Model
         return $this->cash_paid + $this->acceptance_paid;
     }
 
+    public function hasPlanInfo()
+    {
+        return !empty($this->plan_time) && !empty($this->plan_man);
+    }
+
+    public function hasAuditInfo()
+    {
+        return !empty($this->audit_time) && !empty($this->audit_man);
+    }
+
+    public function hasFinalInfo()
+    {
+        return !empty($this->final_time) && !empty($this->final_man);
+    }
+
+    public function hasPayInfo()
+    {
+        return !empty($this->payment_details) && $this->payment_details()->count()>0;
+    }
+
     /**
      * 允许导入数据覆盖的计划
      * @return bool
@@ -96,6 +127,17 @@ class PaymentSchedule extends Model
     {
         return in_array($this->original['status'], ['init', 'import_init', 'web_init']);
     }
+
+    /**
+     * 允许计划的 审核编辑
+     * @return bool
+     */
+    public function allowAuditEdit()
+    {
+        return in_array($this->original['status'], ['check', 'check_init', 'check_audit']) || $this->allowPlanEdit();
+    }
+
+
 
     /**
      * 获得映射方案选项

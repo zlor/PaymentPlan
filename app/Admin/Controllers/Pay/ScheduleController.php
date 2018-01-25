@@ -256,8 +256,15 @@ class ScheduleController extends Controller
 
 
             $form->row(function(Form\Row $row) use($form){
-                $row->width(6)
+                $row->width(3)
                     ->display('id', 'ID');
+
+                $row->width(3)
+                    ->display('plan_man', trans('payment.schedule.plan_man'))
+                    ->default(strval(UserEnv::getEnv('username')));
+                $row->width(0)
+                    ->hidden('plan_man')->default(strval(UserEnv::getEnv('username')));
+
                 $row->width(3)
                     ->display('created_at', trans('admin.created_at'));
                 $row->width(3)
@@ -326,9 +333,12 @@ class ScheduleController extends Controller
                 $row->width(3)
                     ->currency('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'))
                     ->prepend('￥');
-                $row->width(6)
+                $row->width(3)
                     ->currency('plan_due_money', trans('payment.schedule.plan_due_money'))
                     ->prepend('￥');
+                $row->width(3)
+                    ->date('plan_time', trans('payment.schedule.plan_time'));
+
 
                 $row->width(12)
                     ->textarea('memo', trans('admin.memo'))

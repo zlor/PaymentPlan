@@ -16,7 +16,7 @@ trait GetURLFromRouteName
 {
     protected $routeMap = [];
 
-    protected function getUrl($key, $params = [], $method = ''){
+    public function getUrl($key, $params = [], $method = ''){
         try{
             if(in_array($method, ['PUT', 'put']))
             {

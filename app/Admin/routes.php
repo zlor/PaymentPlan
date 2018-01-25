@@ -43,11 +43,23 @@ Route::group([
     $router->get('/plan/schedule/file/{id}/info', 'Pay\ExcelController@info')->name('payment.plan.file.info');
 
     ## 付款计划审核
-    $router->get('/audit/schedule', 'Pay\AuditController@index')->name('payment.audit.index');
-    $router->patch('/audit/schedule/{id}/confirm', 'Pay\AuditController@auditConfirm')->name('audit.schedule.confirm');
-    $router->patch('/audit/schedule/{id}/cancel', 'Pay\AuditController@auditCancel')->name('audit.schedule.cancel');
-    $router->patch('/final/schedule/{id}/confirm', 'Pay\AuditController@finalConfirm')->name('final.schedule.confirm');
-    $router->patch('/final/schedule/{id}/cancel', 'Pay\AuditController@finalCancel')->name('final.schedule.cancel');
+    $router->get('/audit/schedule', 'Pay\AuditController@index')->name('payment.schedule.audit');
+
+    // 初稿核定编辑页面
+    $router->get('/audit/schedule/{id}/edit', 'Pay\AuditController@edit')->name('audit.schedule.edit');
+    $router->put('/audit/schedule/{id}', 'Pay\AuditController@update')->name('audit.schedule.update');
+
+    $router->get('/final/schedule', 'Pay\AuditController@index')->name('payment.schedule.final');
+    // 终稿核定编辑页面
+    $router->get('/final/schedule/{id}/edit', 'Pay\AuditController@finalEdit')->name('final.schedule.edit');
+    $router->put('/final/schedule/{id}', 'Pay\AuditController@finalUpdate')->name('final.schedule.update');
+
+    // $router->patch('/audit/schedule/{id}/confirm', 'Pay\AuditController@auditConfirm')->name('audit.schedule.confirm');
+    // $router->patch('/audit/schedule/{id}/cancel', 'Pay\AuditController@auditCancel')->name('audit.schedule.cancel');
+
+    // $router->patch('/final/schedule/{id}/confirm', 'Pay\AuditController@finalConfirm')->name('final.schedule.confirm');
+    // $router->patch('/final/schedule/{id}/cancel', 'Pay\AuditController@finalCancel')->name('final.schedule.cancel');
+
     $router->patch('/lock/schedule/{id}/confirm', 'Pay\AuditController@lockConfirm')->name('lock.schedule.confirm');
     $router->patch('/lock/schedule/{id}/cancel', 'Pay\AuditController@lockCancel')->name('lock.schedule.cancel');
 

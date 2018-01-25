@@ -50,6 +50,8 @@ class CreatePaymentSchedulesTable extends Migration
             $table->string('status', 30)->default('init')->comment('状态, init 初始化,import_init 导入创建，web_init Web创建, check_audit 审核人检查,check_final boss检查, checked 已审核,  paying 付款中,  lock 锁定');
 
             $table->text('memo')->comment('备注')->nullable();
+            $table->string('memo_audit', 255)->comment('初稿核定备注')->nullable();
+            $table->string('memo_final', 255)->comment('终稿核定备注')->nullable();
             $table->boolean('is_checked')->default(false)->comment('是否已审核');
             $table->boolean('is_locked')->default(false)->comment('是否已锁定');
             $table->timestamps();
