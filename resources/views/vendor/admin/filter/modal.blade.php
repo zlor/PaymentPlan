@@ -22,13 +22,23 @@
     .custom-filter .form-group:last-child {
         margin-bottom: 0;
     }
+    .custom-filter .filter-body{
+        margin: 0;
+    }
+    .form-group>label{
+        font-size:10px;
+    }
+    .form-group {
+        margin-bottom: .3em;
+    }
+
 </style>
-<div class="box custom-filter">
+<div class="box custom-filter no-border">
     <div class="box-tools pull-right">
         <button class="btn btn-box-tool" data-widget="collapse">筛选<i class="fa fa-minus"></i></button>
     </div>
     <form action="{!! $action !!}" method="get" pjax-container>
-        <div class="box-body">
+        <div class="box-body filter-body">
             <div class="form">
                 @foreach($filters as $filter)
                     <div class="form-group col-sm-2">
@@ -40,7 +50,7 @@
         <div class="box-footer clearfix">
             <button type="submit" class="btn btn-primary submit"
                     style="float: right;">{{ trans('admin.filter') }}</button>
-            <a href="{!! $action !!}" class="btn btn-primary btn-facebook"
+            <a href="{!! $action !!}" class="btn btn-default"
                style="float: right; margin-right: 10px;">{{ trans('admin.reset') }}</a>
         </div>
     </form>

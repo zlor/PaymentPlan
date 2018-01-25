@@ -22,8 +22,8 @@ return [
     'schedule.payInfo'    => '付款信息',
 
     'schedule.name' => '科目编号',
-    'schedule.supplier_name' => '供应商名称(导入)',
-    'schedule.supplier' => '供应商(匹配)',
+    'schedule.supplier_name' => '供应商名称',
+    'schedule.supplier' => '供应商',
     'schedule.supplier_balance' => '总应付款',
     'schedule.supplier_lpu_balance'   => '上期未付清余额',//supplier_last_period_unpaid_balance
 

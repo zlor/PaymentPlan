@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers\Pay;
 
 use App\Admin\Extensions\Tools\Import;
+use App\Models\BillPeriod;
 use App\Models\PaymentSchedule;
 use App\Models\UserEnv;
 use Encore\Admin\Form;
@@ -17,8 +18,8 @@ class ScheduleController extends Controller
     use ModelForm;
 
     protected $routeMap = [
+        'index'  => 'plan.schedule',
         'excel'  => 'payment.plan.excel',
-        'index'  => 'plan.schedule'
     ];
 
     /**
@@ -86,18 +87,30 @@ class ScheduleController extends Controller
 
             $grid->id('ID')->sortable();
 
+            /**
+             * 暂不提供的按钮
+             *
+             * 创建、导出
+             */
             $grid->disableCreation();
+            $grid->disableExport();
 
+            // 设置默认账期
+            $defaultBillPeriod = BillPeriod::envCurrent();
 
+            if($defaultBillPeriod)
+            {
+                $grid->model()->where('bill_period_id', $defaultBillPeriod->id);
+            }
 
-            $grid->filter(function(Grid\Filter $filter){
+            $grid->filter(function(Grid\Filter $filter)use($defaultBillPeriod){
 
                 $filter->disableIdFilter();
 
                 // 账期
                 $filter->equal('bill_period_id', trans('payment.schedule.bill_period'))
                     ->select(PaymentSchedule::getBillPeriodOptions())
-                    ->default(UserEnv::getEnv(UserEnv::ENV_DEFAULT_BILL_PERIOD));
+                    ->default(strval($defaultBillPeriod->id));
 
                 // 分类
                 $filter->equal('payment_type_id', trans('payment.type'))
@@ -106,7 +119,12 @@ class ScheduleController extends Controller
                 $filter->like('name', trans('payment.schedule.name'));
             });
 
-            // 改造工具栏
+            /**
+             * 工具栏
+             *
+             * 增加导入链接
+             *
+             */
             $grid->tools(function(Grid\Tools $tools){
 
                 $tool_import = new Import();
@@ -117,11 +135,27 @@ class ScheduleController extends Controller
 
             });
 
+            // 账期
+            $grid->column('bill_period.name', trans('payment.schedule.bill_period'));
+            // 供应商(匹配)
+            $grid->column('supplier.name', trans('payment.schedule.supplier'))->popover('right', ['limit'=>15]);
+
+            /**
+             * 导入信息汇总
+             */
+            $grid->column('import_info', trans('payment.schedule.importInfo'))
+                ->display(function(){
+                    // 科目编号
+                    // 供应商名称
+                    // 物料类型
+                    // 物料名称
+                    return 'test';
+                });
+
             // 科目编号
             $grid->column('name', trans('payment.schedule.name'));
 
-            // 账期
-            $grid->column('bill_period.name', trans('payment.schedule.bill_period'));
+
 
             // 类型说明
             $grid->column('payment_type.name', trans('payment.schedule.payment_type'));
@@ -129,8 +163,7 @@ class ScheduleController extends Controller
             // 供应商名称(导入)
             $grid->column('supplier_name', trans('payment.schedule.supplier_name'));
 
-            // 供应商(匹配)
-            $grid->column('supplier.name', trans('payment.schedule.supplier'));
+
 
             // 供应商余额
             $grid->column('supplier_balance', trans('payment.schedule.supplier_balance'));
