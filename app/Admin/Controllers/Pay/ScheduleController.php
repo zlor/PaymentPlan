@@ -23,7 +23,7 @@ class ScheduleController extends Controller
     ];
 
     /**
-     * Index interface.
+     * 计划录入
      *
      * @return Content
      */
@@ -44,7 +44,7 @@ class ScheduleController extends Controller
     }
 
     /**
-     * Edit interface.
+     * 调整计划
      *
      * @param $id
      * @return Content
@@ -53,15 +53,23 @@ class ScheduleController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('付款计划');
+            $content->description('调整计划');
+
+            $content->breadcrumb(
+                ['text'=>'付款管理', 'url'=>'#'],
+                ['text'=>'计划录入', 'url'=> $this->getUrl('index')],
+                ['text'=>'调整计划']
+            );
 
             $content->body($this->form()->edit($id));
         });
     }
 
     /**
-     * Create interface.
+     * TODO 暂不开放
+     *
+     * 新增计划
      *
      * @return Content
      */
@@ -135,10 +143,33 @@ class ScheduleController extends Controller
 
             });
 
+            /**
+             * 操作行
+             *
+             * 初始化状态的允许调整记录
+             *
+             */
+            $grid->actions(function(Grid\Displayers\Actions $actions){
+
+                $paymentSchedule = $this->row;
+
+                if( ! $paymentSchedule->allowPlanEdit())
+                {
+                    $actions->disableEdit();
+                    $actions->disableDelete();
+                }
+
+
+            });
+
             // 账期
             $grid->column('bill_period.name', trans('payment.schedule.bill_period'));
-            // 供应商(匹配)
-            $grid->column('supplier.name', trans('payment.schedule.supplier'))->popover('right', ['limit'=>15]);
+            // 物料类型
+            $grid->column('payment_type.name', trans('payment.schedule.payment_type'));
+            // // 供应商(匹配)
+            // $grid->column('supplier.name', trans('payment.schedule.supplier'))->popover('right', ['limit'=>15]);
+            // // 物料名称(匹配)
+            // $grid->column('payment_materiel.name', trans('payment.schedule.payment_materiel'));
 
             /**
              * 导入信息汇总
@@ -146,28 +177,37 @@ class ScheduleController extends Controller
             $grid->column('import_info', trans('payment.schedule.importInfo'))
                 ->display(function(){
                     // 科目编号
+                    $title_name = trans('payment.schedule.name');
                     // 供应商名称
-                    // 物料类型
+                    $title_supplierName = trans('payment.schedule.supplier_name');
                     // 物料名称
-                    return 'test';
+                    $title_materiel = trans('payment.schedule.payment_materiel');
+                    // 付款周期
+                    $title_pay_cycle = trans('payment.schedule.pay_cycle');
+                    // 付款确认人
+                    $title_charge_man = trans('payment.schedule.charge_man');
+
+                    return "<div>
+                                <label class='badge badge-default' title='{$title_supplierName}'>{$this->supplier_name}</label><br>
+                                <label class='label label-default' title='$title_name'>{$this->name}</label>
+                                <label class='label label-default' title='{$title_materiel}'>{$this->payment_materiel_name}</label>
+                                <label class='label label-default' title='{$title_charge_man}'>{$this->charge_man}</label> <label class='label label-default' title='{$title_pay_cycle}'>{$this->pay_cycle}</label>
+                                
+                           </div>";
                 });
 
-            // 科目编号
-            $grid->column('name', trans('payment.schedule.name'));
+            // 供应商余额(总应付款)
+            $grid->column('supplier_balance', trans('payment.schedule.supplier_balance'))
+                ->currency();
 
-
-
-            // 类型说明
-            $grid->column('payment_type.name', trans('payment.schedule.payment_type'));
-
-            // 供应商名称(导入)
-            $grid->column('supplier_name', trans('payment.schedule.supplier_name'));
-
-
-
-            // 供应商余额
-            $grid->column('supplier_balance', trans('payment.schedule.supplier_balance'));
-
+            // 计划应付
+            $grid->column('plan_due_money', trans('payment.schedule.plan_due_money'))
+                 ->display(function($value){
+                     $value = number_format($value);
+                     return "<div>
+                                <label class='' data-toggle='tooltip' data-title='{$this->plan_man} ({$this->plan_time})'>{$value}</label><br>
+                           </div>";
+                 });
             // 应付款
             $grid->column('due_money', trans('payment.schedule.due_money'));
 
@@ -176,30 +216,32 @@ class ScheduleController extends Controller
                 ->display(function(){
                     return $this->paid_money;
                 });
-
-            // 已付现金
-            $grid->column('cash_paid', trans('payment.schedule.cash_paid'));
-
-            // 已付承兑
-            $grid->column('acceptance_paid', trans('payment.schedule.acceptance_paid'));
-
-            // 计划时间
-            $grid->column('plan_time', trans('payment.schedule.plan_time'));
-
             // 状态
             $grid->column('status', trans('payment.schedule.status'))
                 ->display(function($value){
                     return trans('payment.schedule.status.' . $value);
                 });
 
-            // 导入批次
-            $grid->column('batch', trans('payment.schedule.batch'));
+            // // 付款周期
+            // $grid->column('pay_cycle', trans('payment.schedule.pay_cycle'));
 
+            // // 已付现金
+            // $grid->column('cash_paid', trans('payment.schedule.cash_paid'));
+            //
+            // // 已付承兑
+            // $grid->column('acceptance_paid', trans('payment.schedule.acceptance_paid'));
 
-            // filter 过滤器
+            // // 计划时间
+            // $grid->column('plan_time', trans('payment.schedule.plan_time'));
+            // // 导入批次
+            // $grid->column('batch', trans('payment.schedule.batch'));
 
-            $grid->created_at();
-            $grid->updated_at();
+            // $grid->column('at_time', trans('admin.at_time'))
+            //     ->display(function(){
+            //         return $this->updated_at;
+            //     });
+            // $grid->created_at();
+            // $grid->updated_at();
         });
     }
 
@@ -212,10 +254,86 @@ class ScheduleController extends Controller
     {
         return Admin::form(PaymentSchedule::class, function (Form $form) {
 
-            $form->display('id', 'ID');
 
-            $form->display('created_at', 'Created At');
-            $form->display('updated_at', 'Updated At');
+            $form->row(function(Form\Row $row) use($form){
+                $row->width(6)
+                    ->display('id', 'ID');
+                $row->width(3)
+                    ->display('created_at', trans('admin.created_at'));
+                $row->width(3)
+                    ->display('updated_at', trans('admin.updated_at'));
+            });
+
+            // 显示导入的信息
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                $row->width(6)
+                    ->text('name', trans('payment.schedule.name'));
+
+                $row->width(3)
+                    ->select('bill_period_id', trans('payment.schedule.bill_period'))
+                    ->options(PaymentSchedule::getBillPeriodOptions())
+                    ->rules('required');
+
+                $row->width(3)
+                    ->select('payment_type_id', trans('payment.schedule.payment_type'))
+                    ->options(PaymentSchedule::getPaymentTypeOptions())
+                    ->rules('required');
+            });
+
+            // 供应商信息调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                //->rules('required|unique:empl_master,fiscal_id,');
+                $row->width(6)
+                    ->text('supplier_name', '导入数据:'.trans('payment.schedule.supplier_name'))
+                    ->readonly();
+                $row->width(6)
+                    ->select('supplier_id', '匹配:'.trans('payment.schedule.supplier'))
+                    ->options(PaymentSchedule::getSupplierOptions())
+                    ->rules('required');
+
+            });
+            // 物料信息调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                //->rules('required');
+                $row->width(6)
+                    ->text('materiel_name', '导入数据:'.trans('payment.schedule.materiel_name'))
+                    ->readonly();
+                $row->width(6)
+                    ->select('payment_materiel_id', '匹配:'.trans('payment.schedule.payment_materiel'))
+                    ->options(PaymentSchedule::getPaymentMaterielOptions())
+                    ->rules('required');
+            });
+            $form->divider();
+            // 其他导入信息
+            $form->row(function (Form\Row $row) use ($form)
+            {
+
+                $row->width(6)
+                    ->text('pay_cycle', trans('payment.schedule.pay_cycle'));
+                $row->width(6)
+                    ->text('charge_man', trans('payment.schedule.charge_man'));
+            });
+
+            //金额调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                $row->width(3)
+                    ->currency('supplier_balance', trans('payment.schedule.supplier_balance'))
+                        ->prepend('￥');
+                $row->width(3)
+                    ->currency('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'))
+                    ->prepend('￥');
+                $row->width(6)
+                    ->currency('plan_due_money', trans('payment.schedule.plan_due_money'))
+                    ->prepend('￥');
+
+                $row->width(12)
+                    ->textarea('memo', trans('admin.memo'))
+                    ->rules('nullable');
+            });
         });
     }
 }

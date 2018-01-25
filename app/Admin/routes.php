@@ -27,8 +27,13 @@ Route::group([
 
     ## 付款计划作成
     $router->get('/plan/schedule', 'Pay\ScheduleController@index')->name('payment.plan.index');
-    $router->patch('/plan/schedule/{id}/update', 'Pay\ScheduleController@updatePlan')->name('payment.plan.update');
-    $router->delete('/plan/schedule/{id}/delete', 'Pay\ScheduleController@deletePlan')->name('payment.plan.delete');
+    $router->get('/plan/schedule/{id}/edit', 'Pay\ScheduleController@edit')->name('payment.plan.edit');
+    $router->put('/plan/schedule/{id}', 'Pay\ScheduleController@update')->name('payment.plan.update');
+    $router->delete('/plan/schedule/{id}', 'Pay\ScheduleController@destroy')->name('payment.plan.destroy');
+    // // 标记计划完成
+    // // 标记需要重新检查
+    // $router->patch('/plan/schedule/{id}/confirm', 'Pay\ScheduleController@confirm')->name('payment.plan.confirm');
+    // $router->patch('/plan/schedule/{id}/review', 'Pay\ScheduleController@review')->name('payment.plan.review');
 
     $router->get('/plan/schedule/excel', 'Pay\ExcelController@index')->name('payment.plan.excel');
     $router->post('/plan/schedule/file/upload', 'Pay\ExcelController@upload')->name('payment.plan.file.upload');

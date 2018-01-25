@@ -36,20 +36,25 @@ trait BelongsToBillPeriod
 
     /**
      * 账期备选
-     * @param bool $onlyActive
+     * @param bool $noMore
+     * @param bool $allowStatus
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function getBillPeriodOptions($onlyActive = true)
+    public static function getBillPeriodOptions($noMore = true, $allowStatus = [])
     {
         $query = BillPeriod::query();
 
-        if($onlyActive)
+        $defaultStatus = ['active'];
+
+        if($noMore)
         {
-            $query->whereIn('status', ['active']);
+            $allowStatus = empty($allowStatus) ? $defaultStatus : $allowStatus;
         }else{
-            $query->whereIn('status', ['active', 'standby']);
+            $allowStatus = array_merge($defaultStatus, $allowStatus);
         }
+
+        $query->whereIn('status', $allowStatus);
 
         return $query->get()->pluck('name', 'id');
     }

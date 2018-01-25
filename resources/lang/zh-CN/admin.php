@@ -68,6 +68,7 @@ return [
 
     'created_at' => '创建时间',
     'updated_at' => '更新时间',
+    'at_time'    => '时间戳',
 
     'alert' => '注意',
 

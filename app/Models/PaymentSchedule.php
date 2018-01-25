@@ -88,6 +88,16 @@ class PaymentSchedule extends Model
     }
 
     /**
+     * 允许计划的编辑
+     *
+     * @return bool
+     */
+    public function allowPlanEdit()
+    {
+        return in_array($this->original['status'], ['init', 'import_init', 'web_init']);
+    }
+
+    /**
      * 获得映射方案选项
      *
      * @return \Illuminate\Config\Repository|mixed

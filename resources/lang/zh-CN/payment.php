@@ -17,6 +17,7 @@ return [
     'schedules' => '付款计划',
     'schedule'  => '付款计划明细',
     'schedule.importInfo' => '导入信息',
+    'schedule.planInfo'   => '计划信息',
     'schedule.auditInfo'  => '审核信息',
     'schedule.finalInfo'  => '终稿信息',
     'schedule.payInfo'    => '付款信息',
@@ -27,17 +28,20 @@ return [
     'schedule.supplier_balance' => '总应付款',
     'schedule.supplier_lpu_balance'   => '上期未付清余额',//supplier_last_period_unpaid_balance
 
-    'schedule.materiel_name' => '物料名称(导入)',
-    'schedule.payment_materiel' => '物料(匹配)',
+    'schedule.pay_cycle'    => '付款周期',
+    'schedule.charge_man'    => '付款确认人',
 
-    'schedule.payment_type' => '付款类型',
+    'schedule.materiel_name' => '物料名称(导入)',
+    'schedule.payment_materiel' => '物料',
+
+    'schedule.payment_type' => '类型', // 物料类型
 
     'schedule.bill_period' => '账期',
     'schedule.suggest_due_money' => '建议应付款',
 
-    'schedule.plan_time' => '导入时间',
-    'schedule.plan_due_money' => '导入应付款(计划)',
-    'schedule.plan_man' => '导入人',
+    'schedule.plan_time' => '计划时间', // 导入时间
+    'schedule.plan_due_money' => '计划应付款',
+    'schedule.plan_man' => '计划人',
 
     'schedule.audit_time' => '审核时间',
     'schedule.audit_due_money' => '应付款(审核调整)',

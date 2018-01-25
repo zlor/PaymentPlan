@@ -1,7 +1,7 @@
 <style>
     .custom-filter {
         box-shadow: none;
-        margin-bottom: 10px;
+        margin-bottom: 0;
         border: 1px solid #eee;
     }
 

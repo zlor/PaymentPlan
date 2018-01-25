@@ -20,9 +20,11 @@
 
 use Encore\Admin\Grid\Column;
 use App\Admin\Extensions\Popover;
+use App\Admin\Extensions\Currency;
 
 Encore\Admin\Form::forget(['map', 'editor']);
 
 app('view')->prependNamespace('admin', resource_path('views/vendor/admin'));
 
 Column::extend('popover', Popover::class);
+Column::extend('currency', Currency::class);
