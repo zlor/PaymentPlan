@@ -14,6 +14,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Form;
+use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Http\Request;
@@ -68,6 +69,8 @@ class ExcelController extends Controller
                 $defaultPeriod  = UserEnv::getCurrentPeriod();
             }
 
+            $defaultPeriodId = $defaultPeriod->id;
+
             $periods = BillPeriod::query()->whereIn('status', [BillPeriod::STATUS_ACTIVE, BillPeriod::STATUS_STANDYBY])->get();
 
             $options = [];
@@ -77,18 +80,19 @@ class ExcelController extends Controller
                 $options[] = [
                     'text'      =>  $period->name . '_' . $period->month . '('. trans('bill.period.status.'.$period->status) .')',
                     'value'     =>  $period->id,
-                    'selected'  =>  $defaultPeriod->id == $period->id,
+                    'selected'  =>  $defaultPeriodId == $period->id,
+                    'url'       =>  $this->getUrl('index', ['default_bill_period_id' => $period->id])
                 ];
             }
 
-            $selectBillPeriod = view('admin.bill.select_periods', compact('options'));;
+            $selectBillPeriod = view('admin.bill.select_periods', compact('options', 'defaultPeriodId'));;
 
             // 副标题, 设置默认账期
             $content->description($selectBillPeriod);
 
-
             $filter = [
-                'bill_period_id'=>$defaultPeriod->id
+                'bill_period_id'=>$defaultPeriodId,
+                'is_current_bill_period' => $defaultPeriod->isActive(),
             ];
 
             $content->row($this->schedule_header());
@@ -100,7 +104,7 @@ class ExcelController extends Controller
 
                         $tabPanel = new Tab();
 
-                        $tabPanel->add('已上传的文件',$this->schedule_file_list($filter), true);
+                        $tabPanel->add('已上传的文件',$this->schedule_file_list($filter).('<hr><h6>相关信息</h6><pre id="aboutFile"></pre>'), true);
 
                         $tabPanel->add('上传文件',    $this->schedule_file_form($filter), false);
 
@@ -111,10 +115,10 @@ class ExcelController extends Controller
 
                         $column->append(new Box('载入预设', $this->schedule_file_import($filter)));
 
-                        $column->append(new Box('相关信息', '<pre id="aboutFile"></pre>'));
                     });
-
             });
+
+
         });
     }
 
@@ -247,7 +251,7 @@ SCRIPT;
         $form->action($this->getUrl('upload'));
 
         $bill_period_id = $form->select('bill_period_id', '账期')
-            ->options(PaymentSchedule::getBillPeriodOptions());
+            ->options(PaymentSchedule::getBillPeriodOptions($filter['is_current_bill_period']));
 
         if($filter['bill_period_id'])
         {
@@ -269,8 +273,11 @@ SCRIPT;
 
 
     /**
-     * 付款计划文件
+     * 付款计划文件-载入数据表单
+     *
      * @param $filter
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     protected function schedule_file_import($filter)
     {
@@ -301,10 +308,14 @@ $(function(){
         $.get(url, params, function(data){
         
             var html = '', msgList = data.data.import_msg;
-            for(var i = 0; i<msgList.length; i++)
+            if(msgList)
             {
-                html += msgList[i]+'<br>';
+                for(var i = 0; i<msgList.length; i++)
+                {
+                    html += msgList[i]+'<br>';
+                }
             }
+            
             $('#aboutFile').html(html);
         }, 'json');
     });
@@ -464,6 +475,8 @@ SCIPRT;
      * 下载指定的文件
      *
      * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|void
      */
     public function download($id)
     {
@@ -545,8 +558,8 @@ SCIPRT;
         $paymentFile->save();
 
         session()->flash('success', new MessageBag(['title'=>'上传成功！', 'message'=>'']));
-        //return redirect()->route($this->routeMap['index']);
-        return response()->redirectTo($this->getUrl('index'));
+
+        return response()->redirectTo($this->getUrl('index', ['default_bill_period_id'=>$billPeriod->id]));
     }
 
 }

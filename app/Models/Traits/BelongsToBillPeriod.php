@@ -47,6 +47,8 @@ trait BelongsToBillPeriod
         if($onlyActive)
         {
             $query->whereIn('status', ['active']);
+        }else{
+            $query->whereIn('status', ['active', 'standby']);
         }
 
         return $query->get()->pluck('name', 'id');
