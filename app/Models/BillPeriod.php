@@ -67,6 +67,18 @@ class BillPeriod extends Model
     }
 
     /**
+     * 同步现金池
+     */
+    public function syncMoney()
+    {
+        $this->cash_paid = $this->payment_details()->where('pay_type', 'cash')->sum('money');
+
+        $this->acceptance_paid = $this->payment_details()->where('pay_type', 'acceptance')->sum('money');
+
+        return $this->save();
+    }
+
+    /**
      * 现金总额 （ 现金余额 + 确认计划收款额 + 预计收款）
      *
      * @return mixed
@@ -80,7 +92,7 @@ class BillPeriod extends Model
      * 已支付总额 （支出的现金 + 支出的承兑）
      * @return mixed
      */
-    public function getPaidTotalAttritbute()
+    public function getPaidTotalAttribute()
     {
         return $this->cash_paid + $this->acceptance_paid;
     }
@@ -103,6 +115,16 @@ class BillPeriod extends Model
     public function getBalanceAttribute()
     {
         return $this->cash_pool - $this->paid_total;
+    }
+
+    public function getCurrentCashBalanceAttribute()
+    {
+        return $this->cash_total - $this->cash_paid;
+    }
+
+    public function getCurrentAcceptanceBalanceAttribute()
+    {
+        return $this->acceptance_line - $this->acceptance_paid;
     }
 
     public function getLockSchedules()

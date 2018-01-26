@@ -28,6 +28,15 @@ class PaymentDetail extends Model
      */
     use BelongsToPaymentSchedule;
 
+    /**
+     * 账期激活中的, 付款计划允许付款的
+     * @return bool
+     */
+    public function allowEdit()
+    {
+        return (empty($this->bill_period)?false:$this->bill_period->isActive())
+            && (empty($this->payment_schedule)?false:$this->payment_schedule->allowPay());
+    }
 
     /**
      * 付款方式备选
@@ -37,5 +46,4 @@ class PaymentDetail extends Model
     {
         return trans_options('pay_type', ['cash', 'acceptance'], 'payment.detail');
     }
-
 }

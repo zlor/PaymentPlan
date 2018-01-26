@@ -63,7 +63,10 @@ return [
     'schedule.status.init'  => '初始化',
     'schedule.status.import_init'  => '初始化(导入)',
     'schedule.status.web_init'     => '初始化(web)',
+    'schedule.status.check_audit'      => '初稿核定',
+    'schedule.status.check_final'      => '终稿核定',
     'schedule.status.checked'      => '已审核',
+
     'schedule.status.paying'       => '付款中',
     'schedule.status.lock'         => '锁定',
 
@@ -81,7 +84,7 @@ return [
 
     'detail.pay_type'            => '付款方式',
     'detail.pay_type.cash'       => '现金',
-    'detail.pay_type.acceptance' =>'承兑',
+    'detail.pay_type.acceptance' => '承兑',
 
     'detail.code'   => '付款流水号',
     'detail.payment_proof' => '付款凭证',

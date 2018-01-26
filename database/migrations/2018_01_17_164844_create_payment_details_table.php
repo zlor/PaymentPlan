@@ -21,11 +21,11 @@ class CreatePaymentDetailsTable extends Migration
             $table->integer('user_id')->default(0)->comment('用户ID');
             $table->string('pay_type', 30)->default('cash')->comment('付款类型,cash 现金，acceptance 承兑');
             $table->date('time')->comment('付款时间')->nullable();
-            $table->decimal('money', 12, 2)->comment('付款金额');
-            $table->string('collecting_company', 100)->comment('收款公司');
+            $table->decimal('money', 12, 2)->default(0)->comment('付款金额');
+            $table->string('collecting_company', 100)->default('')->comment('收款公司');
             $table->text('collecting_proof')->comment('收款凭据')->nullable();
             $table->text('payment_proof')->comment('付款凭据')->nullable();
-            $table->string('code', 50)->comment('流水号');
+            $table->string('code', 50)->default('')->comment('流水号');
             $table->text('memo')->comment('备注')->nullable();
             $table->timestamps();
         });

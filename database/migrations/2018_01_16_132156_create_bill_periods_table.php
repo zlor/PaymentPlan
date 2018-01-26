@@ -33,6 +33,18 @@ class CreateBillPeriodsTable extends Migration
             $table->boolean('is_close')->default(false)->comment('是否核定关闭');
             $table->timestamps();
         });
+
+        // // 记录资金池的金额变动
+        // Schema::create('bill_period_moneys', function(Blueprint $table){
+        //     $table->increments('id');
+        //     $table->integer('bill_period_id')->default(0)->comment('账期');
+        //     $table->integer('payment_schedule_id')->default(0)->comment('付款计划');
+        //     $table->decimal('money', 12, 2)->default(0)->comment('变动金额');
+        //     $table->string('pay_type', 25)->default('')->comment('付款类型');
+        //     $table->string('memo');
+        //
+        //     $table->timestamps();
+        // });
     }
 
     /**

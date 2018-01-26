@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\PaymentDetail;
+use App\Observers\PaymentDetailObserver;
 use Encore\Admin\Config\Config;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,6 +18,8 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Config::load();
+
+        PaymentDetail::observe(PaymentDetailObserver::class);
     }
 
     /**

@@ -73,6 +73,11 @@ class PaymentSchedule extends Model
         return $this->bill_period_name .'_'. $this->payment_type_name .' ('.$this->supplier_name.')';
     }
 
+    public function getTitleExtAttribute()
+    {
+        return "{$this->name},{$this->supplier_name},";
+    }
+
     public function setPlanDueMoneyAttribute($value)
     {
         $this->attributes['plan_due_money'] = doubleval($value);
@@ -102,6 +107,11 @@ class PaymentSchedule extends Model
     public function hasFinalInfo()
     {
         return !empty($this->final_time) && !empty($this->final_man);
+    }
+
+    public function hasLockInfo()
+    {
+        return !empty($this->due_money) && intval(100*$this->due_money) != 0;
     }
 
     public function hasPayInfo()
@@ -137,7 +147,26 @@ class PaymentSchedule extends Model
         return in_array($this->original['status'], ['check', 'check_init', 'check_audit']) || $this->allowPlanEdit();
     }
 
+    /**
+     * 允许计划 付款
+     */
+    public function allowPay()
+    {
+        return in_array($this->original['status'], [self::STATUS_PAY]);
+    }
 
+
+    /**
+     * 同步现金池
+     */
+    public function syncMoney()
+    {
+        $this->cash_paid = $this->payment_details()->where('pay_type', 'cash')->sum('money');
+
+        $this->acceptance_paid = $this->payment_details()->where('pay_type', 'acceptance')->sum('money');
+
+        return $this->save();
+    }
 
     /**
      * 获得映射方案选项
