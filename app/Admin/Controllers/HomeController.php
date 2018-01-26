@@ -61,7 +61,7 @@ class HomeController extends Controller
         // return new InfoBox('账期', 'fa fa-bill', 'blue','', '七月');
 
             // 设置付款计划
-        $billPeriod = UserEnv::getCurrentPeriod();
+        $billPeriod = UserEnv::getCurrentPeriod(false);
 
         $statusTxt = empty($billPeriod->status)?'':trans("bill.period.status.{$billPeriod->status}");
 
