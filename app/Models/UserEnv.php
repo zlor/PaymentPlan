@@ -155,8 +155,14 @@ class UserEnv extends Model
      *
      * @return \Illuminate\Database\Eloquent\Collection|Model
      */
-    public static function getCurrentPeriod()
+    public static function getCurrentPeriod($needFail =  true)
     {
-        return BillPeriod::query()->findOrFail(self::getEnv(self::ENV_DEFAULT_BILL_PERIOD, 0));
+        if($needFail)
+        {
+            return BillPeriod::query()->findOrFail(self::getEnv(self::ENV_DEFAULT_BILL_PERIOD, 0));
+        }else{
+            return BillPeriod::query()->findOrNew(self::getEnv(self::ENV_DEFAULT_BILL_PERIOD, 0));
+        }
+
     }
 }
