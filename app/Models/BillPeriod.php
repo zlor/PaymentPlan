@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\BelongsToAdministrator;
 use App\Models\Traits\HasManyPaymentDetail;
+use App\Models\Traits\HasManyPaymentFile;
 use App\Models\Traits\HasManyPaymentSchedule;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Model;
@@ -54,8 +55,7 @@ class BillPeriod extends Model
     /**
      * 拥有 付款计划、付款明细
      */
-    use HasManyPaymentSchedule, HasManyPaymentDetail;
-
+    use HasManyPaymentSchedule, HasManyPaymentDetail, HasManyPaymentFile;
 
     /**
      * 是否激活中
@@ -64,6 +64,14 @@ class BillPeriod extends Model
     public function isActive()
     {
         return in_array($this->original['status'], ['active']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function allowSetPool()
+    {
+        return in_array($this->original['status'], ['standby','active']);
     }
 
     /**
@@ -117,16 +125,157 @@ class BillPeriod extends Model
         return $this->cash_pool - $this->paid_total;
     }
 
+    /**
+     * 当前现金余额
+     *
+     * @return mixed
+     */
     public function getCurrentCashBalanceAttribute()
     {
         return $this->cash_total - $this->cash_paid;
     }
 
+    /**
+     * 当前承兑余额
+     * @return mixed
+     */
     public function getCurrentAcceptanceBalanceAttribute()
     {
         return $this->acceptance_line - $this->acceptance_paid;
     }
 
+    /**
+     * 当前总应付
+     * @return mixed
+     */
+    public function getCurrentDueMoneyAttribute()
+    {
+        return $this->payment_schedules()->where('status', PaymentSchedule::STATUS_PAY)->sum('due_money');
+    }
+
+    /**
+     * 统计供应商数量
+     *
+     * @param int $paymentTypeId
+     *
+     * @return mixed
+     */
+    public function countSuppliers($paymentTypeId = 0)
+    {
+        $query = $this->payment_schedules();
+
+        if(!empty($paymentTypeId))
+        {
+            $query->where('payment_type_id', $paymentTypeId);
+        }
+
+        return $query->distinct('supplier_id')->count('supplier_id');
+    }
+
+
+    /**
+     * 计算付款计划数量
+     *
+     * @param $filter
+     *
+     * @return mixed
+     */
+    public function countSchedules($filter)
+    {
+        $query = $this->payment_schedules();
+
+        if(!empty($filter['status']))
+        {
+            $query->whereIn('status', is_array($filter['status'])?$filter['status']:explode(',', $filter['status']));
+        }
+
+        if(!empty($filter['payment_type_id']))
+        {
+            $query->where('payment_type_id', $filter['payment_type_id']);
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * 统计并获取
+     *
+     * @param int $paymentTypeId
+     *
+     * @return mixed
+     */
+    public function sumDueMoney($paymentTypeId = 0)
+    {
+        $query = $this->payment_schedules();
+
+        if(!empty($paymentTypeId))
+        {
+            $query->where('payment_type_id', $paymentTypeId);
+        }
+
+        return $query->sum('due_money');
+    }
+
+    /**
+     * 当前支付的现金
+     *
+     * @param array $filter
+     *
+     * @return mixed
+     */
+    public function sumCashPaid($filter)
+    {
+        $query = $this->payment_schedules();
+
+        if(!empty($filter['paymentTypeId']))
+        {
+            $query->where('payment_type_id', $filter['paymentTypeId']);
+        }
+
+        return $query->sum('cash_paid');
+    }
+    /**
+     * 当前支付的承兑
+     * @param array $filter
+     *
+     * @return mixed
+     */
+    public function sumAcceptancePaid($filter)
+    {
+        $query = $this->payment_schedules();
+
+        if(!empty($filter['paymentTypeId']))
+        {
+            $query->where('payment_type_id', $filter['paymentTypeId']);
+        }
+
+        return $query->sum('acceptance_paid');
+    }
+
+    /**
+     * 统计并获取
+     *
+     * @param int $paymentTypeId
+     *
+     * @return mixed
+     */
+    public function sumPaidMoney($paymentTypeId = 0)
+    {
+        $query = $this->payment_schedules();
+
+        if(!empty($paymentTypeId))
+        {
+            $query->where('payment_type_id', $paymentTypeId);
+        }
+
+        return $query->sum('cash_paid')+ $query->sum('acceptance_paid');
+    }
+
+    /**
+     * 获取允许锁定的付款计划
+     *
+     * @return mixed
+     */
     public function getLockSchedules()
     {
         return $this->payment_schedules()->whereNotIn('status', ['init', 'web_init', 'import_init'])->get();

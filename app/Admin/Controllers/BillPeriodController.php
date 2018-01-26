@@ -10,10 +10,17 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\MessageBag;
 
 class BillPeriodController extends Controller
 {
     use ModelForm;
+
+    protected $routeMap = [
+        'billGather' => 'bill.gather',
+        'editCashPool' => 'bill.pool.edit',
+        'updateCashPool' => 'bill.pool.update',
+    ];
 
     /**
      * Index interface.
@@ -63,6 +70,31 @@ class BillPeriodController extends Controller
 
             $content->body($this->form()->edit($id));
         });
+    }
+
+    public function editCashPool($id)
+    {
+        return Admin::content(function(Content $content) use($id){
+            $content->header(trans('bill.periods'));
+            $content->description('设置账期资金池');
+
+            $content->breadcrumb(
+                ['text' => '付款管理', 'href'=>''],
+                ['text' => '账期汇总', 'href'=>$this->getUrl('billGather')],
+                ['text' => '设置资金池', 'href'=>$this->getUrl('editCashPool')]
+            );
+
+            $form = $this->formCashPool()->edit($id);
+
+            $form->setAction($this->getUrl('updateCashPool', ['id'=>$id]));
+
+            $content->body($form);
+        });
+    }
+
+    public function updateCashPool($id)
+    {
+        return $this->formCashPool()->update($id);
     }
 
     /**
@@ -187,6 +219,71 @@ class BillPeriodController extends Controller
 
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
+
+        });
+    }
+
+    protected function formCashPool()
+    {
+        return Admin::form(BillPeriod::class, function (Form $form) {
+
+            $form->tools(function(Form\Tools $tools){
+
+                $tools->disableListButton();
+            });
+
+            $form->display('id', 'ID');
+
+            // 状态
+            $form->select('status', trans('bill.period.status'))
+                ->options(BillPeriod::getStatusOptions())
+                ->readOnly();
+
+            // 账期年月
+            $form->date('month', trans('bill.period.month'))
+                ->format('YYYY-MM')
+                ->readOnly();
+
+            // 账期名称
+            $form->text('name', trans('bill.period.name'))
+                ->readOnly();
+
+            $form->divider();
+
+            // 账期范围
+            $form->dateRange('time_begin', 'time_end', trans('bill.period.time'));
+
+            // 现金余额
+            $form->currency('cash_balance', trans('bill.period.cash_balance'))->prepend('￥');
+
+            // 确认收款(已收发票总额)
+            $form->currency('invoice_balance', trans('bill.period.invoice_balance'))->prepend('￥');
+
+            // 预计收款
+            $form->currency('except_balance', trans('bill.period.except_balance'))->prepend('￥');
+
+            // 承兑额度
+            $form->currency('acceptance_line', trans('bill.period.acceptance_line'))->prepend('￥');
+
+
+            // 负责人
+            $form->text('charge_man', trans('bill.period.charge_man'))
+                ->rules('required');
+
+            $form->divider();
+
+
+            $form->display('created_at', 'Created At');
+            $form->display('updated_at', 'Updated At');
+
+            $form->ignore('status');
+
+            $form->saving(function($form){
+
+                session()->flash('success', new MessageBag(['title'=>'更新成功！', 'message'=>'']));
+
+                return redirect()->back();
+            });
 
         });
     }

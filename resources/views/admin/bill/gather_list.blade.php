@@ -20,6 +20,9 @@
     .product-img{
         width: 6.8em;
     }
+    #bill_period_list li.active{
+        background: #efefef;
+    }
 </style>
 <div class="box box-default">
     <div class="box-header with-border">
@@ -33,9 +36,9 @@
     </div>
     <!-- /.box-header -->
     <div class="box-body period-list">
-        <ul class="products-list product-list-in-box">
+        <ul id="bill_period_list" class="products-list product-list-in-box">
             @foreach($items as $item)
-                <li class="item" data-locate="{{$item->locateLink}}">
+                <li class="item @if($item->focus) active @endif" data-locate="{{$item->locateLink}}">
                     <div class="product-img">
                         @if(in_array($item['status'], ['close']))
                             <span class="litter-font"  title="{{ __('bill.period.status.close') }}">
@@ -87,14 +90,11 @@
 <script>
     $(function(){
         $('.period-list li').on('click', function(){
-            // TODO 切换数据来源
-
-            //
-            var url = "",
-                param = {};
-            $.post(url, param, function($data){
-
-            }, 'json')
+            var url = $(this).data('locate');
+            $.pjax({
+                url: url,
+                container: '#pjax-container'
+            });
         })
     });
 </script>

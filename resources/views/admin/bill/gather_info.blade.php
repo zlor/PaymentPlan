@@ -12,7 +12,7 @@
         text-align: center;
         overflow: hidden;
         width: 20%;
-        min-width: 220px;
+        min-width: 200px;
         height: 116px;
         border: 1px solid #E4E4E4;
         background: #FFFFFF;
@@ -25,12 +25,17 @@
         border: 1px solid #38ADFF;
         box-shadow: 0 0 10px 0 rgba(56, 173, 255, 0.10);
         z-index: 1000;
+        cursor: pointer;
     }
     .pay-li-min.active{
         background-color:#efefef;
         border: 1px solid #2ca02c;
         box-shadow: 0 0 10px 0 rgba(56, 173, 255, 0.10);
         z-index: 1000;
+    }
+    .pay-li-min .col-sm-4{
+        margin: 0;
+        padding: 0;
     }
     .pay-li-min .pay-item{
         position: relative;
@@ -82,37 +87,30 @@
         right: 0;
         bottom: 0;
     }
+    div.pre{
+        display: block;
+        padding: 9.5px;
+        margin: 0 0 10px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        color: #333;
+        word-break: break-all;
+        word-wrap: break-word;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    span.money{
+        color: red;
+        margin: .3em;
+    }
 </style>
 <div class="box">
     <div class="box-header with-border">
 
-        <ul class="clearfix" style="margin: auto;">
-            <li class="pay-li-min">
-                <div class="pay-item">
-                    <div class="pay-item-icon-min">
-                        <i class="fa {{isset($payment['icon'])?$payment['icon']:''}}"></i>
-                    </div>
-                    <h3 class="pay-item-title-min">总计</h3>
-                    <div class="pay-item-tips-min">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <h6>供应商</h6>
-                                {{ $payment['supplier_count']}}
-                            </div>
-                            <div class="col-sm-4">
-                                <h6>总应付</h6>
-                                {{ number_format($payment['due_money_sum']) }}
-                            </div>
-                            <div class="col-sm-4">
-                                <h6>已付清</h6>
-                                {{ number_format($payment['paid_money_sum']) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
+        <ul class="clearfix type-list" style="margin: auto;">
             @foreach($paymentTypes as $type)
-                <li class="pay-li-min">
+                <li class="pay-li-min @if($type->focus) active @endif" data-locate="{{$type->locateLink}}">
                     <div class="pay-item">
                         <div class="pay-item-icon-min">
                             <i class="fa {{$type->icon}}"></i>
@@ -142,11 +140,11 @@
     <div class="box-body period-info">
         <div class="row">
             <div class="col-sm-6">
-                {!! $schedule !!}
+                {!! $html['schedule'] !!}
             </div>
             <div class="divide"></div>
             <div class="col-sm-6">
-                {!! $detail !!}
+                {!! $html['detail']!!}
             </div>
         </div>
     </div>

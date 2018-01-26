@@ -18,7 +18,9 @@ Route::group([
 
     // 账期总览
     $router->get('/bill/gather', 'HomeController@indexGatherBillPeriod')->name('bill.gather');
-    $router->get('/bill/{id}/gather', 'HomeController@indexGatherBillPeriod')->name('bill.target.gather');
+    $router->get('/bill/{id}/{type_id}/gather', 'HomeController@indexGatherBillPeriod')->name('bill.target.gather');
+    $router->get('/bill/set_pool/{id}', 'BillPeriodController@editCashPool')->name('bill.pool.edit');
+    $router->put('/bill/set_pool/{id}', 'BillPeriodController@updateCashPool')->name('bill.pool.update');
 
     ## 账期设置
     $router->get('/bill/period', 'PeriodController@index')->name('bill.period');
@@ -26,7 +28,7 @@ Route::group([
     $router->post('/bill/period/set', 'PeriodController@set')->name('bill.period.set');
 
     ## 付款计划作成
-    $router->get('/plan/schedule', 'Pay\ScheduleController@index')->name('payment.plan.index');
+    $router->get('/plan/schedule', 'Pay\ScheduleController@index')->name('payment.schedule.plan');
     $router->get('/plan/schedule/{id}/edit', 'Pay\ScheduleController@edit')->name('payment.plan.edit');
     $router->put('/plan/schedule/{id}', 'Pay\ScheduleController@update')->name('payment.plan.update');
     $router->delete('/plan/schedule/{id}', 'Pay\ScheduleController@destroy')->name('payment.plan.destroy');

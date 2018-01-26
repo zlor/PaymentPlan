@@ -31,7 +31,7 @@ class ExcelController extends Controller
 
     protected $routeMap = [
         'index'  => 'payment.plan.excel',
-        'paymentIndex' => 'payment.plan.index',
+        'paymentIndex' => 'payment.schedule.plan',
 
         'upload' => 'payment.plan.file.upload',
         'remove' => 'payment.plan.file.remove',

@@ -846,7 +846,6 @@ class AuditController extends Controller
                     ->textarea('memo_final', trans('admin.memo'))
                     ->readonly();
 
-
             });
 
             // 终稿核定调整
