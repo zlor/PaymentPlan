@@ -16,6 +16,7 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Widgets\Widget;
+use League\Flysystem\Exception;
 
 class HomeController extends Controller
 {
@@ -59,10 +60,15 @@ class HomeController extends Controller
     {
         // return new InfoBox('账期', 'fa fa-bill', 'blue','', '七月');
 
-        // 设置付款计划
-        $billPeriod = UserEnv::getCurrentPeriod();
+        try{
+            // 设置付款计划
+            $billPeriod = UserEnv::getCurrentPeriod();
+            $statusTxt = trans("bill.period.status.{$billPeriod->status}");
 
-        $statusTxt = trans("bill.period.status.{$billPeriod->status}");
+        }catch (Exception $e){
+            $billPeriod = new BillPeriod();
+            $statusTxt  = '';
+        }
 
         $title = "账期「{$statusTxt}」: {$billPeriod->name}   ({$billPeriod->month}), ({$billPeriod->charge_man})  ";
 
