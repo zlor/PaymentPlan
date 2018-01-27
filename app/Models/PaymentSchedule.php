@@ -182,7 +182,11 @@ class PaymentSchedule extends Model
 
             $import_mapping = json_decode($import_mapping, true);
 
-            $list = $import_mapping['options'];
+            if(isset($import_mapping['options']) && is_array($import_mapping['options']))
+            {
+                $list = $import_mapping['options'];
+            }
+
         }catch (Exception $e)
         {
             Log::error(" Config lose [import_mapping]:",$e->getMessage());
@@ -214,7 +218,12 @@ class PaymentSchedule extends Model
 
             $import_mapping = json_decode($import_mapping, true);
 
-            $list = $import_mapping['mapping'];
+            if(isset($import_mapping['mapping']) && is_array($import_mapping['mapping']))
+            {
+                $list = $import_mapping['mapping'];
+            }
+
+
 
         }catch (Exception $e)
         {
