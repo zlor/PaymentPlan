@@ -77,7 +77,7 @@
         "optimize-autoloader": true
     },
     "repositories": [
-        {"type": "composer", "url": "http://pkg.phpcomposer.com/repo/packagist/"},
-        {"packagist": false}
+        {"type": "composer", "url": "https://packagist.phpcomposer.com"},
+        {"packagist": true}
     ]
 }
