@@ -407,12 +407,13 @@ class BillPeriod extends Model
      */
     protected static function autoSetPeriod()
     {
+        $time = time();
         // 创建规则
         $factoryRule = [
-            'name'  => date('Y年m月'),
-            'month' => date('Y-m'),
-            'time_begin' => date('Y-m-01'),
-            'time_end' => date('Y-m-d', strtotime(date('Y-m-01') . " +1 month -1 day")),
+            'name'  => date('Y年m月', $time ),
+            'month' => date('Y-m', $time),
+            'time_begin' => date('Y-m-01', $time),
+            'time_end' => date('Y-m-d', strtotime(date('Y-m-01', $time) . " +1 month -1 day")),
             'user_id' => 0,
             'status' => BillPeriod::STATUS_STANDYBY
         ];
