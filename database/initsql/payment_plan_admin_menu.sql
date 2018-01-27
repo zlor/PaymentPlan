@@ -10,7 +10,7 @@ INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, creat
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (8, 3, '计划录入', 'fa-battery-0', 'plan/schedule', '2018-01-16 19:11:10', '2018-01-16 19:13:36');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (8, 4, '计划审核', 'fa-battery-1', 'audit/schedule', '2018-01-16 19:11:49', '2018-01-23 10:53:06');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (8, 5, '付款录入', 'fa-battery-2', 'pay/schedule', '2018-01-16 19:12:10', '2018-01-23 16:15:57');
-INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (8, 8, '计划进度', 'fa-flash', 'progress/schedule', null, null);
+INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (8, 8, '计划进度', 'fa-progress', 'progress/schedule', null, null);
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (0, 7, '基础管理', 'fa-file', null, '2018-01-16 19:13:31', '2018-01-16 19:13:36');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (34, 15, '供应商档案', 'fa-truck', 'base/suppliers', '2018-01-16 19:14:13', '2018-01-18 14:27:09');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (14, 8, '账期档案', 'fa-calendar', 'base/bill_periods', '2018-01-16 19:15:00', '2018-01-18 14:27:09');
@@ -22,6 +22,7 @@ INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, creat
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (2, 26, 'Config', 'fa-toggle-on', 'config', '2018-01-17 11:02:11', '2018-01-18 14:27:09');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (0, 27, 'Messages', 'fa-paper-plane', 'messages', '2018-01-17 12:24:25', '2018-01-18 14:27:09');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (0, 28, 'Backup', 'fa-copy', 'backup', '2018-01-17 13:11:57', '2018-01-18 14:27:09');
+INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (33, 0, '类型档案', 'fa-map-o', 'base/bill/payment_types', '2018-01-18 14:28:15', '2018-01-18 14:28:15');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (0, 29, 'Helpers', 'fa-gears', '', '2018-01-17 14:31:32', '2018-01-18 14:27:09');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (26, 30, 'Scaffold', 'fa-keyboard-o', 'helpers/scaffold', '2018-01-17 14:31:32', '2018-01-18 14:27:09');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (26, 31, 'Database terminal', 'fa-database', 'helpers/terminal/database', '2018-01-17 14:31:32', '2018-01-18 14:27:09');
@@ -31,4 +32,3 @@ INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, creat
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (34, 14, '供应商-分组', 'fa-bars', '/base/supplier_owners', '2018-01-18 12:22:14', '2018-01-18 14:27:09');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (14, 11, '物料管理', 'fa-archive', null, '2018-01-18 14:26:05', '2018-01-18 14:27:09');
 INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (14, 13, '供应商管理', 'fa-truck', null, '2018-01-18 14:26:50', '2018-01-18 14:27:09');
-INSERT INTO payment_plan.admin_menu (parent_id, `order`, title, icon, uri, created_at, updated_at) VALUES (33, 0, '类型档案', 'fa-map-o', 'base/bill/payment_types', '2018-01-18 14:28:15', '2018-01-18 14:28:15');
