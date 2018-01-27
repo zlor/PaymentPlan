@@ -57,13 +57,19 @@ class BillPeriod extends Model
      */
     use HasManyPaymentSchedule, HasManyPaymentDetail, HasManyPaymentFile;
 
+
+    public function isStandby()
+    {
+        return in_array($this->original['status'], [self::STATUS_STANDYBY]);
+    }
+
     /**
      * 是否激活中
      * @return bool
      */
     public function isActive()
     {
-        return in_array($this->original['status'], ['active']);
+        return in_array($this->original['status'], [self::STATUS_ACTIVE]);
     }
 
     /**
@@ -354,6 +360,60 @@ class BillPeriod extends Model
     }
 
 
+    public static function haveActive()
+    {
+        return self::query()->whereIn('status', [self::STATUS_ACTIVE])->count() > 0;
+    }
+
+
+    /**
+     * 初始化系统账期
+     */
+    public static function initBillPeriod()
+    {
+        $query =  BillPeriod::query();
+
+        $count = $query->whereIn('status', [self::STATUS_STANDYBY, self::STATUS_ACTIVE])
+                       ->count();
+
+        if(!$count>0)
+        {
+            // 创建一条最新的
+            return  self::autoSetPeriod();
+        }
+
+        // $count = $query->whereIn('status', [self::STATUS_ACTIVE])
+        //                ->count();
+        // if(!$count>0)
+        // {
+        //     // 将最接近月的就绪账期设置为激活账期
+        //     $lastStandbyBillPeriod = $query->whereIn('status', [self::STATUS_STANDYBY])
+        //                                    ->orderBy('month', 'desc')
+        //                                    ->first();
+        // }
+
+        return true;
+    }
+
+    /**
+     * 自动创建账期
+     */
+    protected static function autoSetPeriod()
+    {
+        // 创建规则
+        $factoryRule = [
+            'name'  => date('Y年m月'),
+            'month' => date('Y-m'),
+            'time_begin' => date('Y-m-01'),
+            'time_end' => date('Y-m-d', strtotime(date('Y-m-01') . " +1 month -1 day")),
+            'user_id' => 0,
+            'status' => BillPeriod::STATUS_STANDYBY
+        ];
+
+        return BillPeriod::query()->create($factoryRule);
+    }
+
+
     /**
      * 导入付款计划
      *
@@ -361,14 +421,9 @@ class BillPeriod extends Model
      */
     public static function importSchedule(PaymentFile $file, $options = [])
     {
-
-
         // 由 payment_schedule_file 向 payment_schedule 作成计划,并保留反馈信息
         // supplier_name:required,unique; materiel_name:required; charge_man:required;
         $file->loadFiles();
-
-
-
 
     }
 

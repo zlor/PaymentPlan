@@ -16,6 +16,7 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Widgets\Widget;
+use Illuminate\Support\MessageBag;
 use League\Flysystem\Exception;
 
 class HomeController extends Controller
@@ -30,7 +31,10 @@ class HomeController extends Controller
         'base.bill_period.view' => 'bill_periods.show',
         'base.bill_period.edit' => 'bill_periods.edit',
 
-        'set_bill_period' => 'bill.pool.edit',
+        'setBillPeriod'  => 'bill.pool.edit',
+
+        'fireBillPeriod'  => 'bill.period.index',
+
 
         'excel_page'    => 'payment.plan.excel',
         'schedule_plan_page'=> 'payment.schedule.plan',
@@ -84,7 +88,28 @@ class HomeController extends Controller
      */
     public function indexGatherBillPeriod($id = 0, $type_id = 0)
     {
-        return Admin::content(function(Content $content)use($id, $type_id){
+        // 设置聚焦的账期
+        $focusBillPeriod = BillPeriod::query()->find($id);
+
+
+        if(empty($focusBillPeriod))
+        {
+            $focusBillPeriod = UserEnv::getCurrentPeriod(false);
+        }
+
+        //异常处理
+        if(empty($focusBillPeriod->id))
+        {
+            session()->flash('error', new MessageBag(['title'=>'请先激活或新建一个账期~']));
+
+            return redirect()->to($this->getUrl('fireBillPeriod'));
+        }
+
+        // 识别聚焦的类型
+        $focusPaymentType = PaymentType::query()->findOrNew($type_id);
+
+
+        return Admin::content(function(Content $content)use($focusBillPeriod, $focusPaymentType){
 
             $content->header('账期');
 
@@ -95,17 +120,6 @@ class HomeController extends Controller
                 ['text' => '付款管理', 'url' => '#'],
                 ['text' => '账期总览', 'url' => $this->getUrl('gather_bill_period')]
             );
-
-            // 设置聚焦的账期
-            $focusBillPeriod = BillPeriod::query()->find($id);
-
-            if(empty($focusBillPeriod))
-            {
-                $focusBillPeriod = UserEnv::getCurrentPeriod();
-            }
-
-            // 识别聚焦的类型
-            $focusPaymentType = PaymentType::query()->findOrNew($type_id);
 
             $content->row(function (Row $row)use($focusBillPeriod, $focusPaymentType) {
 
@@ -205,7 +219,7 @@ SCRIPT;
 
         $url = [
             // 设置账期
-            'set_cash_pool'     =>$this->getUrl('set_bill_period', ['id'=>$focusBillPeriodId]),
+            'set_cash_pool'     =>$this->getUrl('setBillPeriod', ['id'=>$focusBillPeriodId]),
             // 账期下文件管理
             'file_page'         =>  $this->getUrl('excel_page', ['default_bill_period_id'=>$focusBillPeriodId]),
 

@@ -23,9 +23,11 @@ Route::group([
     $router->put('/bill/set_pool/{id}', 'BillPeriodController@updateCashPool')->name('bill.pool.update');
 
     ## 账期设置
-    $router->get('/bill/period', 'PeriodController@index')->name('bill.period');
-    $router->get('/bill/period/query', 'PeriodController@query')->name('bill.period.query');
-    $router->post('/bill/period/set', 'PeriodController@set')->name('bill.period.set');
+    $router->get('/bill/period', 'PeriodController@index')->name('bill.period.index');
+    $router->get('/bill/period/create', 'PeriodController@create')->name('bill.period.create');
+    $router->post('/bill/period', 'PeriodController@store')->name('bill.period.store');
+    $router->get('/bill/period/{id}/fire', 'PeriodController@fire')->name('bill.period.fire');
+
 
     ## 付款计划作成
     $router->get('/plan/schedule', 'Pay\ScheduleController@index')->name('payment.schedule.plan');
@@ -63,9 +65,10 @@ Route::group([
     $router->put('/lock/schedule/{id}', 'Pay\AuditController@lockUpdate')->name('lock.schedule.update');
 
     ## 付款计划进度(用于锁定付款)
-    $router->get('progress/schedule', 'Pay\FinalController@indexProgress')->name('payment.schedule.progress');
-    $router->get('/pause/schedule/{id}/edit', 'Pay\FinalController@pauseEdit')->name('pause.schedule.edit');
-    $router->put('/pause/schedule/{id}', 'Pay\FinalController@pauseUpdate')->name('pause.schedule.update');
+    $router->get('/progress/schedule', 'Pay\ProgressController@index')->name('payment.schedule.progress');
+    $router->get('/progress/schedule/{id}/edit', 'Pay\ProgressController@edit')->name('progress.schedule.edit');
+    $router->put('/progress/schedule/{id}/', 'Pay\ProgressController@update')->name('progress.schedule.update');
+    $router->get('/progress/schedule/{id}', 'Pay\ProgressController@view')->name('progress.schedule.view');
 
     // $router->patch('/audit/schedule/{id}/confirm', 'Pay\AuditController@auditConfirm')->name('audit.schedule.confirm');
     // $router->patch('/audit/schedule/{id}/cancel', 'Pay\AuditController@auditCancel')->name('audit.schedule.cancel');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\BillPeriod;
 use App\Models\UserEnv;
 use Closure;
 
@@ -16,6 +17,12 @@ class UserEnvs
      */
     public function handle($request, Closure $next)
     {
+        /**
+         * 读取账期信息
+         * 1. 若无账期信息,创建一条,并激活。
+         */
+        BillPeriod::initBillPeriod();
+
         /**
          * 读取并初始化用户的环境变量
          * 1. 若未读取到环境变量，则创建一个新的记录
