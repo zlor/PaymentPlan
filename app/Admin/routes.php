@@ -40,7 +40,7 @@ Route::group([
     // $router->patch('/plan/schedule/{id}/review', 'Pay\ScheduleController@review')->name('payment.plan.review');
 
     $router->get('/plan/schedule/excel', 'Pay\ExcelController@index')->name('payment.plan.excel');
-    $router->post('/plan/schedule/file/upload', 'Pay\ExcelController@upload')->name('payment.plan.file.upload');
+    $router->post('/plan/schedule/excel', 'Pay\ExcelController@upload')->name('payment.plan.excel.upload');
     $router->post('/plan/schedule/file/{id}/import', 'Pay\ExcelController@import')->name('payment.plan.file.import');
     $router->get('/plan/schedule/file/{id}/download', 'Pay\ExcelController@download')->name('payment.plan.file.download');
     $router->delete('/plan/schedule/file/{id}/delete', 'Pay\ExcelController@remove')->name('payment.plan.file.remove');

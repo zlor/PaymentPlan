@@ -240,9 +240,9 @@ class BillPeriod extends Model
     {
         $query = $this->payment_schedules();
 
-        if(!empty($filter['paymentTypeId']))
+        if(!empty($filter['payment_type_id']))
         {
-            $query->where('payment_type_id', $filter['paymentTypeId']);
+            $query->where('payment_type_id', $filter['payment_type_id']);
         }
 
         return $query->sum('cash_paid');
@@ -257,9 +257,9 @@ class BillPeriod extends Model
     {
         $query = $this->payment_schedules();
 
-        if(!empty($filter['paymentTypeId']))
+        if(!empty($filter['payment_type_id']))
         {
-            $query->where('payment_type_id', $filter['paymentTypeId']);
+            $query->where('payment_type_id', $filter['payment_type_id']);
         }
 
         return $query->sum('acceptance_paid');

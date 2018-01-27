@@ -33,7 +33,7 @@ class ExcelController extends Controller
         'index'  => 'payment.plan.excel',
         'paymentIndex' => 'payment.schedule.plan',
 
-        'upload' => 'payment.plan.file.upload',
+        'upload' => 'payment.plan.excel.upload',
         'remove' => 'payment.plan.file.remove',
         'import' => 'payment.plan.file.import',
         'download' => 'payment.plan.file.download',
@@ -267,6 +267,8 @@ SCRIPT;
         $form->text('name', '文件重命名')->rules('nullable');
 
         $form->textarea('memo', '备注');
+
+        $form->hidden('_token')->default(csrf_token());
 
         return $form;
     }

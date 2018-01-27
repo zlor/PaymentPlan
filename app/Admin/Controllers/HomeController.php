@@ -237,8 +237,8 @@ SCRIPT;
         $statusTxt = trans("bill.period.status.{$focusBillPeriod->status}");
 
         $count = [
-            'uploadNum' => $focusBillPeriod->countFile(['is_upload_success'=>true]),
-            'importNum' => $focusBillPeriod->countFile(['is_import_success'=>true]),
+            'uploadNum' => $focusBillPeriod->countFile(['is_upload_success'=>true, 'payment_type_id'=>$focusTypeId]),
+            'importNum' => $focusBillPeriod->countFile(['is_import_success'=>true, 'payment_type_id'=>$focusTypeId]),
             'planNum'   => $focusBillPeriod->countSchedules(['status'=>['init', 'web_init', 'import_init'], 'payment_type_id'=>$focusTypeId]),
             'auditNum'   => $focusBillPeriod->countSchedules(['status'=>['check_audit'], 'payment_type_id'=>$focusTypeId]),
             'finalNum'   => $focusBillPeriod->countSchedules(['status'=>['check_final'], 'payment_type_id'=>$focusTypeId]),

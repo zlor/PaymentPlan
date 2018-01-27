@@ -43,6 +43,11 @@ trait HasManyPaymentFile
             $query->where('is_upload_success', $filter['is_upload_success']);
         }
 
+        if(isset($filter['payment_type_id']) && !empty($filter['payment_type_id']))
+        {
+            $query->where('payment_type_id', $filter['payment_type_id']);
+        }
+
         return $query->count();
     }
 
