@@ -42,6 +42,13 @@ class BillPeriod extends Model
 {
     protected $table = 'bill_periods';
 
+    protected $fillable = [
+        'user_id',
+        'name', 'month', 'time_begin', 'time_end',
+        'status', 'is_actived', 'is_locked', 'is_close',
+        'charge_man',
+    ];
+
     const STATUS_STANDYBY = 'standby';
     const STATUS_ACTIVE = 'active';
     const STATUS_LOCK = 'lock';
@@ -410,7 +417,13 @@ class BillPeriod extends Model
             'status' => BillPeriod::STATUS_STANDYBY
         ];
 
-        return BillPeriod::query()->create($factoryRule);
+        $billPeriod = new BillPeriod();
+
+        $billPeriod->fill($factoryRule);
+
+
+
+        return BillPeriod::query()->create();
     }
 
 
