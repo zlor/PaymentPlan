@@ -52,15 +52,20 @@ Route::group([
     $router->put('/audit/schedule/{id}', 'Pay\AuditController@update')->name('audit.schedule.update');
 
     ## 付款计划终稿审核
-    $router->get('/final/schedule', 'Pay\AuditController@index')->name('payment.schedule.final');
+    $router->get('/final/schedule', 'Pay\FinalController@index')->name('payment.schedule.final');
     // 终稿核定编辑页面
-    $router->get('/final/schedule/{id}/edit', 'Pay\AuditController@finalEdit')->name('final.schedule.edit');
-    $router->put('/final/schedule/{id}', 'Pay\AuditController@finalUpdate')->name('final.schedule.update');
+    $router->get('/final/schedule/{id}/edit', 'Pay\FinalController@edit')->name('final.schedule.edit');
+    $router->put('/final/schedule/{id}', 'Pay\FinalController@update')->name('final.schedule.update');
 
     ## 付款计划付款核定
     $router->get('/lock/schedule', 'Pay\AuditController@index')->name('payment.schedule.lock');
     $router->get('/lock/schedule/{id}/edit', 'Pay\AuditController@lockEdit')->name('lock.schedule.edit');
     $router->put('/lock/schedule/{id}', 'Pay\AuditController@lockUpdate')->name('lock.schedule.update');
+
+    ## 付款计划进度(用于锁定付款)
+    $router->get('progress/schedule', 'Pay\FinalController@indexProgress')->name('payment.schedule.progress');
+    $router->get('/pause/schedule/{id}/edit', 'Pay\FinalController@pauseEdit')->name('pause.schedule.edit');
+    $router->put('/pause/schedule/{id}', 'Pay\FinalController@pauseUpdate')->name('pause.schedule.update');
 
     // $router->patch('/audit/schedule/{id}/confirm', 'Pay\AuditController@auditConfirm')->name('audit.schedule.confirm');
     // $router->patch('/audit/schedule/{id}/cancel', 'Pay\AuditController@auditCancel')->name('audit.schedule.cancel');
