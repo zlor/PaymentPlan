@@ -410,7 +410,7 @@ class BillPeriod extends Model
         $time = time();
         // 创建规则
         $factoryRule = [
-            'name'  => date('Y年m月', $time ),
+            'name'  => date('Y年m月', $time),
             'month' => date('Y-m', $time),
             'time_begin' => date('Y-m-01', $time),
             'time_end' => date('Y-m-d', strtotime(date('Y-m-01', $time) . " +1 month -1 day")),
@@ -422,9 +422,7 @@ class BillPeriod extends Model
 
         $billPeriod->fill($factoryRule);
 
-
-
-        return BillPeriod::query()->create();
+        return $billPeriod->save();
     }
 
 
