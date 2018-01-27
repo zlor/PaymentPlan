@@ -78,6 +78,6 @@
     },
     "repositories": [
         {"type": "composer", "url": "https://packagist.phpcomposer.com"},
-        {"packagist": true}
+        {"packagist": false}
     ]
 }
