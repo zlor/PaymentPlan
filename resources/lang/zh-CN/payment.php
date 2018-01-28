@@ -18,8 +18,9 @@ return [
     'schedule'  => '付款计划明细',
     'schedule.importInfo' => '导入信息',
     'schedule.planInfo'   => '计划信息',
-    'schedule.auditInfo'  => '核定信息',
-    'schedule.finalInfo'  => '终稿信息',
+    'schedule.auditInfo'  => '一次核定',
+    'schedule.finalInfo'  => '二次核定',
+    'schedule.lockInfo'  => '最终敲定',
     'schedule.payInfo'    => '付款信息',
     'schedule.supplierBalanceInfo' => '应付款信息',
 

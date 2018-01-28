@@ -84,11 +84,11 @@ class BillPeriodController extends Controller
                 ['text' => '设置资金池', 'href'=>$this->getUrl('editCashPool')]
             );
 
-            $form = $this->formCashPool()->edit($id);
+            $form = $this->formCashPool();
 
             $form->setAction($this->getUrl('updateCashPool', ['id'=>$id]));
 
-            $content->body($form);
+            $content->body($form->edit($id));
         });
     }
 
