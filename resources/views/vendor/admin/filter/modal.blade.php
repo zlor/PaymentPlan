@@ -35,7 +35,7 @@
 </style>
 <div class="box custom-filter no-border">
     <div class="box-tools pull-right">
-        <button class="btn btn-box-tool" data-widget="collapse">筛选<i class="fa fa-minus"></i></button>
+        <button id="filter_btn" class="btn btn-box-tool" data-widget="collapse">筛选<i class="fa fa-minus"></i></button>
     </div>
     <form action="{!! $action !!}" method="get" pjax-container>
         <div class="box-body filter-body">

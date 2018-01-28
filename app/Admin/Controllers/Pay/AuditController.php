@@ -47,7 +47,60 @@ class AuditController extends Controller
                 ['text'=>'计划审核', 'url'=> $this->getUrl('index')]
             );
 
-            $content->body($this->grid());
+            $grid = $this->grid();
+
+            $grid->disablePagination();
+
+            $css = <<<STYLE
+<style>
+td{
+// min-width: 8em;
+}
+td>div>ul.list-unstyled>li>div{
+    // min-width: 9em;
+    display:inline-flex;
+}            
+td>div>ul.list-unstyled>li i.text-gray{
+    display:none;
+}
+</style>
+STYLE;
+            $content->row($css);
+
+            $content->body($grid);
+
+            Admin::js(asset('/vendor/laravel-admin/ele-fixed/eleFixed.js'));
+
+            $script =<<<SCRIPT
+        $(function(){
+            var filterHeight = 29;
+            
+            var initFixed = function(){
+                var headHeight = $('.ele-fixed').offset().top;
+                eleFixed.push({
+                    target: document.getElementsByClassName('ele-fixed')[0], // it must be a HTMLElement
+                    offsetTop: (headHeight - filterHeight + 30) // height from window offsetTop
+                });
+                eleFixed.push({
+                    target: document.getElementsByClassName('counter')[0], // it must be a HTMLElement
+                    offsetTop: (headHeight + 4 - filterHeight + 30) // height from window offsetTop
+                });
+                
+                var height = $('#filter_div').height();
+                filterHeight = height;
+            };
+            $('#filter_btn').click(function(){
+                eleFixed.delete(document.getElementsByClassName('ele-fixed')[0]);
+                eleFixed.delete(document.getElementsByClassName('counter')[0]);
+                initFixed();
+            });
+            initFixed();
+            
+        });
+        
+SCRIPT;
+            Admin::script($script);
+
         });
     }
 
@@ -142,8 +195,6 @@ class AuditController extends Controller
                 $filter->like('name', trans('payment.schedule.name'));
             });
 
-
-
             /**
              * 操作行
              *
@@ -161,8 +212,7 @@ class AuditController extends Controller
 
                     $actions->disableDelete();
 
-
-                    $actions->add('一次核定', new AuditPost());
+                    $actions->add('一次核定-批量排款', new AuditPost());
 
                 });
             });
@@ -178,7 +228,7 @@ class AuditController extends Controller
                 $action_audit_edit = _A(
                     '核定',
                     ['href'=>$that->getUrl('auditEdit', ['id'=>$paymentSchedule->id])],
-                    ['title'=>'初稿核定']
+                    ['title'=>'一次核定']
                 );
                 $action_final_edit = _A(
                     '终核',
@@ -218,6 +268,64 @@ class AuditController extends Controller
 
             });
 
+            $grid->footer(function(Grid\Tools\Footer $footer){
+                $row = [
+                    'supplier_balance' => $footer->column('supplier_balance'),
+                    'supplier_lpu_balance' => $footer->column('supplier_lpu_balance'),
+                    'plan_due_money'  => $footer->column('plan_due_money'),
+                    'audit_due_money'  => $footer->column('audit_due_money'),
+                    'final_due_money'  => $footer->column('final_due_money'),
+                    'due_money'  => $footer->column('due_money'),
+                    'cash_paid'  => $footer->column('cash_paid'),
+                    'acceptance_paid'  => $footer->column('acceptance_paid'),
+                ];
+
+                $count = $row['supplier_balance']->count();
+                $sum['supplier_balance'] = number_format($row['supplier_balance']->sum(), 2);
+                $sum['supplier_lpu_balance'] = number_format($row['supplier_lpu_balance']->sum(), 2);
+                $sum['plan_due_money'] = number_format($row['plan_due_money']->sum(), 2);
+                $sum['audit_due_money'] = number_format($row['audit_due_money']->sum(), 2);
+                $sum['final_due_money'] = number_format($row['final_due_money']->sum(), 2);
+                $sum['due_money']       = number_format($row['due_money']->sum(), 2);
+                $sum['cash_paid']       = number_format($row['cash_paid']->sum(), 2);
+                $sum['acceptance_paid']       = number_format($row['acceptance_paid']->sum(), 2);
+                $sum['paid_money']       = number_format($row['cash_paid']->sum() + $row['acceptance_paid']->sum(), 2);
+
+
+                $footer->td("合计[{$count}]")
+                       ->td()->td()
+                       ->td("<div><ul class='list-unstyled' style='margin: auto'>
+                                    <li class='text-right' data-toggle='tooltip' data-title='总应付款总计'> <div>￥<label class='bg-white text-danger'>{$sum['supplier_balance']}</label> <i>总</i></div></li>
+                                    <!--<li class='text-right text-gray' data-toggle='tooltip' data-title='上期未付清余额总计'> ￥<label class='bg-white text-gray'>{$sum['supplier_balance']}</label> <i>余</i></li>-->
+                                </ul>
+                            </div>")
+                        ->td("<div>
+                                <ul class='list-unstyled' style='margin: auto'>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划应付'> <div>￥<label class='bg-white text-red'>{$sum['plan_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                                </ul>
+                            </div>")
+                        ->td("<div>
+                                <ul class='list-unstyled' style='margin: auto'>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期一核应付'> <div>￥<label class='bg-white text-red'>{$sum['audit_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                                </ul>
+                            </div>")
+                        ->td("<div>
+                                <ul class='list-unstyled' style='margin: auto'>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期二核应付'> <div>￥<label class='bg-white text-red'>{$sum['final_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                                </ul>
+                            </div>")
+                        ->td("<div>
+                                <ul class='list-unstyled' style='margin: auto'>
+                                    <li class='text-right' data-toggle='tooltip' data-title='敲定都应付'> <div>￥<label class='bg-white text-green'>{$sum['due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                                </ul>
+                            </div>")
+                        ->td("<div>
+                                <ul class='list-unstyled' style='margin: auto'>
+                                    <li class='text-right' data-toggle='tooltip' data-title='现金({$sum['cash_paid']}), 承兑({$sum['acceptance_paid']})'> <div>￥<label class='bg-white text-red'>{$sum['paid_money']}</label> <i>总额</i></div></li>
+                                </ul>
+                            </div>");
+            });
+
             // 账期
             $grid->column('bill_period.name', trans('payment.schedule.bill_period'))
                 ->display(function($value){
@@ -228,13 +336,6 @@ class AuditController extends Controller
                                 <label class=' label-' title='{$title_typeName}'>{$this->payment_type['name']}</label>
                             </div>";
                 });
-            // 物料类型
-            // $grid->column('payment_type.name', trans('payment.schedule.payment_type'));
-            // // 供应商(匹配)
-            // $grid->column('supplier.name', trans('payment.schedule.supplier'))->popover('right', ['limit'=>15]);
-            // // 物料名称(匹配)
-            // $grid->column('payment_materiel.name', trans('payment.schedule.payment_materiel'));
-
             /**
              * 导入信息汇总
              */
@@ -266,9 +367,9 @@ class AuditController extends Controller
                     $money  = number_format($this->due_money, 2);
                     return "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='总应付款'> ￥<label class='bg-white text-danger'>{$total}</label> <i>总</i></li>
-                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='上期未付清余额'> ￥<label class='bg-white text-gray'>{$last}</label> <i>余</i></li>
-                                    <li class='text-right text-green' data-toggle='tooltip' data-title='本期应付款'> ￥<label class='bg-white text-green'>{$money}</label> <i class='text-black'>本</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='总应付款'> <div>￥<label class='bg-white text-danger'>{$total}</label> <i>总</i></div></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='上期未付清余额'> <div>￥<label class='bg-white text-gray'>{$last}</label> <i>余</i></div></li>
+                                    <!-- <li class='text-right text-green' data-toggle='tooltip' data-title='本期应付款'> ￥<label class='bg-white text-green'>{$money}</label> <i class='text-black'>本</i></li>-->
                                 </ul>
                             </div>";
                 });
@@ -283,9 +384,8 @@ class AuditController extends Controller
                     $plan  = number_format($this->plan_due_money, 2);
                     return "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划应付'> ￥<label class='bg-white text-red'>{$plan}</label> <i class='text-gray'>金额</i></li>
-                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='计划人'> <label class='bg-white text-defaut'>{$this->plan_man}</label> <i>担当</i></li>
-                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='计划时间'> <label class='bg-white text-gray'>{$this->plan_time}</label> <i>时间</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划应付'> <div>￥<label class='bg-white text-red'>{$plan}</label> <i class='text-gray'>金额</i></div></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='担当({$this->plan_man}),时间[{$this->plan_time}]'> <div><label class='bg-white text-gray'>{$this->plan_time}</label> <i class='text-gray'>时间</i></div></li>
                                 </ul>
                             </div>";
                 });
@@ -301,9 +401,8 @@ class AuditController extends Controller
                         $audit = number_format($this->audit_due_money, 2);
                         $html  =  "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期一核应付'> ￥<label class='bg-white text-red'>{$audit}</label> <i class='text-gray'>金额</i></li>
-                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='核定人'> <label class='bg-white text-defaut'>{$this->audit_man}</label> <i>担当</i></li>
-                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='核定时间'> <label class='bg-white text-gray'>{$this->audit_time}</label> <i>时间</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期一核应付'> <div>￥<label class='bg-white text-red'>{$audit}</label> <i class='text-gray'>金额</i></div></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='担当({$this->audit_man}),时间({$this->audit_time})'> <div><label class='bg-white text-gray'>{$this->audit_time}</label> <i class='text-gray'>时间</i></div></li>
                                 </ul>
                             </div>";
                     }
@@ -321,9 +420,12 @@ class AuditController extends Controller
                         $final  = number_format($this->final_due_money, 2);
                         $html= "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期二核应付'> ￥<label class='bg-white text-red'>{$final}</label> <i class='text-gray'>金额</i></li>
-                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='终核人'> <label class='bg-white text-defaut'>{$this->final_man}</label> <i>担当</i></li>
-                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='终核时间'> <label class='bg-white text-gray'>{$this->final_time}</label> <i>时间</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期二核应付'> 
+                                        <div>￥<label class='bg-white text-red'>{$final}</label> <i class='text-gray'>金额</i></div>
+                                    </li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='担当人({$this->final_man}),时间({$this->final_time})'> 
+                                        <div><label class='bg-white text-gray'>{$this->final_time}</label> <i class='text-gray'>时间</i></div>
+                                    </li>
                                 </ul>
                             </div>";
                     }
@@ -341,8 +443,9 @@ class AuditController extends Controller
 
                         $html = "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right text-green' data-toggle='tooltip' data-title='最终应付款'> ￥<label class='bg-white'>{$due_money}</label> <i class='text-gray'>金额</i></li>
-                                    
+                                    <li class='text-right text-green' data-toggle='tooltip' data-title='最终应付款'> 
+                                        <div>￥<label class='bg-white'>{$due_money}</label> <i class='text-gray'>金额</i></div>
+                                    </li>
                                 </ul>
                             </div>";
                     }
@@ -360,11 +463,16 @@ class AuditController extends Controller
                         $cash_paid = number_format($this->cash_paid, 2);
                         $acceptance_paid = number_format($this->acceptance_paid, 2);
 
+                        $cashPercent = round((intval(100* $this->paid_money)==0)?0:(100*$this->cash_paid/$this->paid_money), 2);
+
                         $html = "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期已付款'> ￥<label class='bg-white text-red'>{$paid}</label> <i>总额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='已付现金'> <label class='bg-white text-defaut'>{$cash_paid}</label> <i>现金</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='已付承兑'> <label class='bg-white text-warning'>{$acceptance_paid}</label> <i>承兑</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期已付款'> 
+                                        <div>￥<label class='bg-white text-red'>{$paid}</label> <i>总额</i></div>
+                                    </li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='现金({$cash_paid}), 承兑({$acceptance_paid})'> 
+                                        <div><label class='bg-white text-default'>{$cashPercent}%</label> <i>现金</i></div>
+                                    </li>
                                 </ul>
                             </div>";
                     }
@@ -372,13 +480,6 @@ class AuditController extends Controller
                     return $html;
                 });
 
-
-
-            // // 已付金额
-            // $grid->column('paid_money', trans('payment.schedule.paid_money'))
-            //     ->display(function(){
-            //         return $this->paid_money;
-            //     });
             // 状态
             $grid->column('status', trans('payment.schedule.status'))
                 ->display(function($value){

@@ -259,7 +259,7 @@ SCRIPT;
             <hr>
             <p>文件数量({$count['uploadNum']}) / 导入数量({$count['importNum']})</p>
             <hr>
-            <p>计划({$count['planNum']}) => 已初审({$count['auditNum']}) => 已终审({$count['finalNum']})/付款中({$count['payingNum']})/完成付款({$count['paidNum']})</p>
+            <p>计划( {$count['planNum']} ) => 一次核定( {$count['auditNum']} ) => 二次核定( {$count['finalNum']} ) =>付款中( {$count['payingNum']} ) => 完成付款({$count['paidNum']})</p>
             <hr>
             <p>已支付现金(<span class='money'>{$count['cash_paid']}</span>)/已支付承兑(<span class='money'>{$count['acceptance_paid']}</span>)</p>
         </div>
@@ -279,9 +279,9 @@ SCRIPT;
                  <p>
                     <a href='{$url['schedules_manage']}' target='_blank'>档案-付款计划</a>&nbsp;
                     <a href='{$url['schedule_plan_page']}' target='_blank'>计划录入</a>&nbsp;
-                    <a href='{$url['schedule_audit_page']}' target='_blank'>初稿审核</a>&nbsp;
-                    <a href='{$url['schedule_audit_page']}' target='_blank'>终稿审核</a>&nbsp;
-                    <a href='{$url['schedule_audit_page']}' target='_blank'>设置应付款</a>&nbsp;
+                    <a href='{$url['schedule_audit_page']}' target='_blank'>一次核定</a>&nbsp;
+                    <a href='{$url['schedule_audit_page']}' target='_blank'>二次核定</a>&nbsp;
+                    <a href='{$url['schedule_audit_page']}' target='_blank'>应付款敲定</a>&nbsp;
                  </p>
                  <hr>
                  <p>
