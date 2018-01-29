@@ -39,7 +39,7 @@
     }
     .pay-li-min .pay-item{
         position: relative;
-        margin-top: -37px;
+        margin-top: -22px;
     }
 
     .pay-li-min .pay-item .pay-item-icon-min{
@@ -108,7 +108,7 @@
 <div class="box">
     <div class="box-header with-border">
 
-        <ul class="clearfix type-list" style="margin: auto;">
+        <ul class="clearfix type-list list-unstyled" style="margin: auto;">
             @foreach($paymentTypes as $type)
                 <li class="pay-li-min @if($type->focus) active @endif" data-locate="{{$type->locateLink}}">
                     <div class="pay-item">
