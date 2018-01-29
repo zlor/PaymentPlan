@@ -404,11 +404,10 @@ SCRIPT;
 
             /**
              * 工具栏
-             *
-             * 增加导入链接
-             *
              */
+            $grid->disableRowSelector();
             $grid->tools(function(Grid\Tools $tools){
+                $tools->disableBatchActions();
             });
 
             /**

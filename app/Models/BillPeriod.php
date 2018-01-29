@@ -403,11 +403,30 @@ class BillPeriod extends Model
     }
 
     /**
+     * 识别到下一个有效年月的账期。
+     * @param $time
+     *
+     * @return mixed
+     */
+    protected static function getVaildMonthTime($time)
+    {
+        $count = BillPeriod::query()->where('month', date('Y-m', $time))->count();
+
+        if($count>0)
+        {
+            $time = self::getVaildMonthTime(strtotime(date('Y-m-01', $time) . " +1 month"));
+        }
+
+        return $time;
+    }
+
+    /**
      * 自动创建账期
      */
     protected static function autoSetPeriod()
     {
-        $time = time();
+        $time = self::getVaildMonthTime(time());
+
         // 创建规则
         $factoryRule = [
             'name'  => date('Y年m月', $time),

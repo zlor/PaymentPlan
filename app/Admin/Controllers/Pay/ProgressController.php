@@ -124,11 +124,10 @@ class ProgressController extends Controller
 
             /**
              * 工具栏
-             *
-             * 增加导入链接
-             *
              */
+            $grid->disableRowSelector();
             $grid->tools(function(Grid\Tools $tools){
+                $tools->disableBatchActions();
             });
 
             /**
@@ -212,7 +211,6 @@ class ProgressController extends Controller
                                 <ul class='list-unstyled' style='margin: auto'>
                                     <li class='text-right' data-toggle='tooltip' data-title='总应付款'> ￥<label class='bg-white text-danger'>{$total}</label> <i>总</i></li>
                                     <li class='text-right' data-toggle='tooltip' data-title='上期未付清余额'> ￥<label class='bg-white text-warning'>{$last}</label> <i>余</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期应付款'> ￥<label class='bg-white text-red'>{$money}</label> <i>本</i></li>
                                 </ul>
                             </div>";
                 });
@@ -227,9 +225,9 @@ class ProgressController extends Controller
                     $plan  = number_format($this->plan_due_money, 2);
                     return "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划付款'> ￥<label class='bg-white text-red'>{$plan}</label> <i>金额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='计划人'> <label class='bg-white text-defaut'>{$this->plan_man}</label> <i>担当</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='计划时间'> <label class='bg-white text-warning'>{$this->plan_time}</label> <i>时间</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划付款'> ￥<label class='bg-white text-red'>{$plan}</label> <i class='text-gray'>金额</i></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='计划人'> <label class='bg-white text-defaut'>{$this->plan_man}</label> <i class='text-gray'>担当</i></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='计划时间'> <label class='bg-white text-warning'>{$this->plan_time}</label> <i class='text-gray'>时间</i></li>
                                 </ul>
                             </div>";
                 });
@@ -245,9 +243,9 @@ class ProgressController extends Controller
                         $audit = number_format($this->audit_due_money, 2);
                         $html  =  "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期核定付款'> ￥<label class='bg-white text-red'>{$audit}</label> <i>金额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='核定人'> <label class='bg-white text-defaut'>{$this->audit_man}</label> <i>担当</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='核定时间'> <label class='bg-white text-warning'>{$this->audit_time}</label> <i>时间</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期一次核定付款'> ￥<label class='bg-white text-red'>{$audit}</label> <i>金额</i></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='一次核定人'> <label class='bg-white text-defaut'>{$this->audit_man}</label> <i>担当</i></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='一次核定时间'> <label class='bg-white text-warning'>{$this->audit_time}</label> <i>时间</i></li>
                                 </ul>
                             </div>";
                     }
@@ -265,9 +263,29 @@ class ProgressController extends Controller
                         $final  = number_format($this->final_due_money, 2);
                         $html= "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期终核付款'> ￥<label class='bg-white text-red'>{$final}</label> <i>金额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='终核人'> <label class='bg-white text-defaut'>{$this->final_man}</label> <i>担当</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='终核时间'> <label class='bg-white text-warning'>{$this->final_time}</label> <i>时间</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期二次核定应付付款'> ￥<label class='bg-white text-red'>{$final}</label> <i class='text-gray'>金额</i></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='二次核定人'> <label class='bg-white text-default'>{$this->final_man}</label> <i class='text-gray'>担当</i></li>
+                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='二次核定时间'> <label class='bg-white text-warning'>{$this->final_time}</label> <i class='text-gray'>时间</i></li>
+                                </ul>
+                            </div>";
+                    }
+
+                    return $html;
+                });
+
+            $grid->column('due_money', trans('payment.schedule.due_money'))
+                ->display(function($value){
+
+                    $html = '';
+                    if($this->hasPayInfo())
+                    {
+                        $due_money  = number_format($value, 2);
+
+                        $html = "<div>
+                                <ul class='list-unstyled' style='margin: auto'>
+                                    <li class='text-right text-green' data-toggle='tooltip' data-title='最终应付款'> 
+                                        <div>￥<label class='bg-white'>{$due_money}</label> <i class='text-gray'>金额</i></div>
+                                    </li>
                                 </ul>
                             </div>";
                     }

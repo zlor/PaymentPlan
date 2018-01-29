@@ -48,7 +48,7 @@
                         @elseif(in_array($item['status'], ['lock']))
                             <span class="litter-font" title="{{ __('bill.period.status.lock') }}">
                                 <i class="fa fa-lock ext-icon text-blue"></i>
-                                <i class="fa fa-text text-black">{{ $item['month'] }}</i>
+                                <i class="fa fa-text text-gray">{{ $item['month'] }}</i>
                             </span>
                         @elseif(in_array($item['status'], ['standby']))
                             <span class="litter-font"  title="{{ __('bill.period.status.standby') }}">
@@ -63,9 +63,9 @@
                         @endif
                     </div>
                     <div class="product-info">
-                        <a href="{{ $item['view'] }}" target="_blank" class="product-title">
+                        <span href="#" class="product-title">
                             {{ $item['name'] }}
-                        </a>
+                        </span>
                         <span class="pull-right installed">
                             @if(in_array($item['status'], ['standby']))
                             <a href="{{ $item['edit'] }}" target="_blank" class="product-title" title="设置就绪中的账期">
