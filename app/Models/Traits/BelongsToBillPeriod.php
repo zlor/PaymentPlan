@@ -22,7 +22,8 @@ trait BelongsToBillPeriod
      */
     public function getBillPeriodNameAttribute()
     {
-        return empty($this->bill_period) ? '' : $this->bill_period->name;
+        $bill_period = $this->bill_period()->first();
+        return empty($bill_period) ? '' : $bill_period->name;
     }
 
     /**
@@ -31,7 +32,8 @@ trait BelongsToBillPeriod
      */
     public function getBillPeriodMonthAttribute()
     {
-        return empty($this->bill_period) ? '' : $this->bill_period->month;
+        $bill_period = $this->bill_period()->first();
+        return empty($bill_period) ? '' : $bill_period->month;
     }
 
     /**

@@ -109,6 +109,8 @@ class PeriodController extends Controller
             // 不需要加载导出按钮
             $grid->disableExport();
 
+            $grid->disableCreateButton();
+
             // 账期名称
             $grid->column('name', trans('bill.period.name'));
 

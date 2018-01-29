@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers\Pay;
 
-use App\Admin\Extensions\Tools\AuditPost;
 use App\Http\Controllers\Controller;
 use App\Models\BillPeriod;
 use App\Models\PaymentSchedule;
@@ -13,6 +12,8 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use League\Flysystem\Exception;
 
 /**
  * Class AuditController
@@ -267,76 +268,77 @@ SCRIPT;
 
             });
 
-            $data = $grid->model()->buildData();
-            $grid->footer(function(Grid\Tools\Footer $footer)use($data){
-                collect(array_column($data, 'supplier_balance'));
-                $row = [
-                    'supplier_balance' => collect(array_column($data, 'supplier_balance')),//$footer->column('supplier_balance'),
-                    'supplier_lpu_balance' =>  collect(array_column($data, 'supplier_lpu_balance')),//$footer->column('supplier_lpu_balance'),
-                    'plan_due_money'  =>  collect(array_column($data, 'plan_due_money')),//$footer->column('plan_due_money'),
-                    'audit_due_money'  =>  collect(array_column($data, 'audit_due_money')),//$footer->column('audit_due_money'),
-                    'final_due_money'  =>  collect(array_column($data, 'final_due_money')),//$footer->column('final_due_money'),
-                    'due_money'  =>  collect(array_column($data, 'due_money')),//$footer->column('due_money'),
-                    'cash_paid'  =>  collect(array_column($data, 'cash_paid')),//$footer->column('cash_paid'),
-                    'acceptance_paid'  =>  collect(array_column($data, 'acceptance_paid')),//$footer->column('acceptance_paid'),
-                ];
+            $count= $grid->model()->eloquent()->query()->count();
 
-                $count = $row['supplier_balance']->count();
-                $sum['supplier_balance'] = number_format($row['supplier_balance']->sum(), 2);
-                $sum['supplier_lpu_balance'] = number_format($row['supplier_lpu_balance']->sum(), 2);
-                $sum['plan_due_money'] = number_format($row['plan_due_money']->sum(), 2);
-                $sum['audit_due_money'] = number_format($row['audit_due_money']->sum(), 2);
-                $sum['final_due_money'] = number_format($row['final_due_money']->sum(), 2);
-                $sum['due_money']       = number_format($row['due_money']->sum(), 2);
-                $sum['cash_paid']       = number_format($row['cash_paid']->sum(), 2);
-                $sum['acceptance_paid'] = number_format($row['acceptance_paid']->sum(), 2);
-                $sum['paid_money']      = number_format($row['cash_paid']->sum() + $row['acceptance_paid']->sum(), 2);
+            $grid->footer(function(Grid\Tools\Footer $footer)use($count){
+                    $row = [
+                        'supplier_balance' => $count<=0?[]:$footer->column('supplier_balance'),
+                        'supplier_lpu_balance' =>  $count<=0?[]:$footer->column('supplier_lpu_balance'),
+                        'plan_due_money'  =>  $count<=0?[]:$footer->column('plan_due_money'),
+                        'audit_due_money'  =>  $count<=0?[]:$footer->column('audit_due_money'),
+                        'final_due_money'  =>  $count<=0?[]:$footer->column('final_due_money'),
+                        'due_money'  =>  $count<=0?[]:$footer->column('due_money'),
+                        'cash_paid'  =>  $count<=0?[]:$footer->column('cash_paid'),
+                        'acceptance_paid'  =>  $count<=0?[]:$footer->column('acceptance_paid'),
+                    ];
+                    $count = $count<=0?0:$row['supplier_balance']->count();
+                    $sum['supplier_balance'] = $count<=0?0:number_format($row['supplier_balance']->sum(), 2);
+                    $sum['supplier_lpu_balance'] = $count<=0?0:number_format($row['supplier_lpu_balance']->sum(), 2);
+                    $sum['plan_due_money'] = $count<=0?0:number_format($row['plan_due_money']->sum(), 2);
+                    $sum['audit_due_money'] = $count<=0?0:number_format($row['audit_due_money']->sum(), 2);
+                    $sum['final_due_money'] = $count<=0?0:number_format($row['final_due_money']->sum(), 2);
+                    $sum['due_money']       = $count<=0?0:number_format($row['due_money']->sum(), 2);
+                    $sum['cash_paid']       = $count<=0?0:number_format($row['cash_paid']->sum(), 2);
+                    $sum['acceptance_paid'] = $count<=0?0:number_format($row['acceptance_paid']->sum(), 2);
+                    $sum['paid_money']      = $count<=0?0:number_format($row['cash_paid']->sum() + $row['acceptance_paid']->sum(), 2);
 
-
-                $footer->td("合计[{$count}]")
-                       ->td()->td()
-                       ->td("<div><ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='总应付款总计'> <div>￥<label class='bg-white text-danger'>{$sum['supplier_balance']}</label> <i>总</i></div></li>
-                                    <!--<li class='text-right text-gray' data-toggle='tooltip' data-title='上期未付清余额总计'> ￥<label class='bg-white text-gray'>{$sum['supplier_balance']}</label> <i>余</i></li>-->
-                                </ul>
-                            </div>")
+                    $footer->td("合计[{$count}]")
+                        ->td()->td()
+                        ->td("<div><ul class='list-unstyled' style='margin: auto'>
+                                <li class='text-right' data-toggle='tooltip' data-title='总应付款总计'> <div>￥<label class='bg-white text-danger'>{$sum['supplier_balance']}</label> <i>总</i></div></li>
+                                <!--<li class='text-right text-gray' data-toggle='tooltip' data-title='上期未付清余额总计'> ￥<label class='bg-white text-gray'>{$sum['supplier_balance']}</label> <i>余</i></li>-->
+                            </ul>
+                        </div>")
                         ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划应付'> <div>￥<label class='bg-white text-red'>{$sum['plan_due_money']}</label> <i class='text-gray'>金额</i></div></li>
-                                </ul>
-                            </div>")
+                            <ul class='list-unstyled' style='margin: auto'>
+                                <li class='text-right' data-toggle='tooltip' data-title='本期计划应付'> <div>￥<label class='bg-white text-red'>{$sum['plan_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                            </ul>
+                        </div>")
                         ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期一核应付'> <div>￥<label class='bg-white text-red'>{$sum['audit_due_money']}</label> <i class='text-gray'>金额</i></div></li>
-                                </ul>
-                            </div>")
+                            <ul class='list-unstyled' style='margin: auto'>
+                                <li class='text-right' data-toggle='tooltip' data-title='本期一核应付'> <div>￥<label class='bg-white text-red'>{$sum['audit_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                            </ul>
+                        </div>")
                         ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期二核应付'> <div>￥<label class='bg-white text-red'>{$sum['final_due_money']}</label> <i class='text-gray'>金额</i></div></li>
-                                </ul>
-                            </div>")
+                            <ul class='list-unstyled' style='margin: auto'>
+                                <li class='text-right' data-toggle='tooltip' data-title='本期二核应付'> <div>￥<label class='bg-white text-red'>{$sum['final_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                            </ul>
+                        </div>")
                         ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='敲定都应付'> <div>￥<label class='bg-white text-green'>{$sum['due_money']}</label> <i class='text-gray'>金额</i></div></li>
-                                </ul>
-                            </div>")
+                            <ul class='list-unstyled' style='margin: auto'>
+                                <li class='text-right' data-toggle='tooltip' data-title='敲定都应付'> <div>￥<label class='bg-white text-green'>{$sum['due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                            </ul>
+                        </div>")
                         ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='现金({$sum['cash_paid']}), 承兑({$sum['acceptance_paid']})'> <div>￥<label class='bg-white text-red'>{$sum['paid_money']}</label> <i>总额</i></div></li>
-                                </ul>
-                            </div>");
+                            <ul class='list-unstyled' style='margin: auto'>
+                                <li class='text-right' data-toggle='tooltip' data-title='现金({$sum['cash_paid']}), 承兑({$sum['acceptance_paid']})'> <div>￥<label class='bg-white text-red'>{$sum['paid_money']}</label> <i>总额</i></div></li>
+                            </ul>
+                        </div>");
             });
 
+
+
             // 账期
-            $grid->column('bill_period.name', trans('payment.schedule.bill_period'))
+            $grid->column('billPeriodInfo', trans('payment.schedule.bill_period'))
                 ->display(function($value){
                     $title_billPeriodName = trans('payment.schedule.bill_period');
                     $title_typeName = trans('payment.schedule.payment_type');
                     return "<div>
-                                <label class=' badge-default' title='{$title_billPeriodName}'>{$this->bill_period['name']}</label><br>
-                                <label class=' label-' title='{$title_typeName}'>{$this->payment_type['name']}</label>
+                                <label class=' badge-default' title='{$title_billPeriodName}'>{$this->bill_period_name}</label><br>
+                                <label class=' label-' title='{$title_typeName}'>{$this->payment_type_name}</label>
                             </div>";
                 });
+
             /**
              * 导入信息汇总
              */
