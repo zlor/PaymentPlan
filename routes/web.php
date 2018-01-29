@@ -19,3 +19,7 @@
 //
 //     return view('layouts/default');
 // });
+
+Route::get('/', function(){
+    return redirect('/admin');
+});
