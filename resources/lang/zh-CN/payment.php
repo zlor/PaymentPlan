@@ -77,6 +77,7 @@ return [
     'schedule.is_locked.true'         => '已锁定',
     'schedule.is_locked.false'         => '未锁定',
 
+    'schedule.is_froze'   => '是否暂停付款',
     'schedule.is_froze.true'   => '暂停付款',
     'schedule.is_froze.false'  => '允许付款',
 
