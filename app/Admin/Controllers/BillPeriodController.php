@@ -278,7 +278,7 @@ class BillPeriodController extends Controller
 
             $form->ignore('status');
 
-            $form->saving(function($form){
+            $form->saved(function($form){
 
                 session()->flash('success', new MessageBag(['title'=>'更新成功！', 'message'=>'']));
 
