@@ -211,7 +211,7 @@ SCRIPT;
 
                     $actions->disableDelete();
 
-                    $actions->add('一次核定-批量排款', new AuditPost());
+                    // $actions->add('一次核定-批量排款', new AuditPost());
 
                 });
             });
