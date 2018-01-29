@@ -268,61 +268,61 @@ SCRIPT;
             });
 
             $grid->footer(function(Grid\Tools\Footer $footer){
-                $row = [
-                    'supplier_balance' => $footer->column('supplier_balance'),
-                    'supplier_lpu_balance' => $footer->column('supplier_lpu_balance'),
-                    'plan_due_money'  => $footer->column('plan_due_money'),
-                    'audit_due_money'  => $footer->column('audit_due_money'),
-                    'final_due_money'  => $footer->column('final_due_money'),
-                    'due_money'  => $footer->column('due_money'),
-                    'cash_paid'  => $footer->column('cash_paid'),
-                    'acceptance_paid'  => $footer->column('acceptance_paid'),
-                ];
-
-                $count = $row['supplier_balance']->count();
-                $sum['supplier_balance'] = number_format($row['supplier_balance']->sum(), 2);
-                $sum['supplier_lpu_balance'] = number_format($row['supplier_lpu_balance']->sum(), 2);
-                $sum['plan_due_money'] = number_format($row['plan_due_money']->sum(), 2);
-                $sum['audit_due_money'] = number_format($row['audit_due_money']->sum(), 2);
-                $sum['final_due_money'] = number_format($row['final_due_money']->sum(), 2);
-                $sum['due_money']       = number_format($row['due_money']->sum(), 2);
-                $sum['cash_paid']       = number_format($row['cash_paid']->sum(), 2);
-                $sum['acceptance_paid']       = number_format($row['acceptance_paid']->sum(), 2);
-                $sum['paid_money']       = number_format($row['cash_paid']->sum() + $row['acceptance_paid']->sum(), 2);
-
-
-                $footer->td("合计[{$count}]")
-                       ->td()->td()
-                       ->td("<div><ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='总应付款总计'> <div>￥<label class='bg-white text-danger'>{$sum['supplier_balance']}</label> <i>总</i></div></li>
-                                    <!--<li class='text-right text-gray' data-toggle='tooltip' data-title='上期未付清余额总计'> ￥<label class='bg-white text-gray'>{$sum['supplier_balance']}</label> <i>余</i></li>-->
-                                </ul>
-                            </div>")
-                        ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划应付'> <div>￥<label class='bg-white text-red'>{$sum['plan_due_money']}</label> <i class='text-gray'>金额</i></div></li>
-                                </ul>
-                            </div>")
-                        ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期一核应付'> <div>￥<label class='bg-white text-red'>{$sum['audit_due_money']}</label> <i class='text-gray'>金额</i></div></li>
-                                </ul>
-                            </div>")
-                        ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期二核应付'> <div>￥<label class='bg-white text-red'>{$sum['final_due_money']}</label> <i class='text-gray'>金额</i></div></li>
-                                </ul>
-                            </div>")
-                        ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='敲定都应付'> <div>￥<label class='bg-white text-green'>{$sum['due_money']}</label> <i class='text-gray'>金额</i></div></li>
-                                </ul>
-                            </div>")
-                        ->td("<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='现金({$sum['cash_paid']}), 承兑({$sum['acceptance_paid']})'> <div>￥<label class='bg-white text-red'>{$sum['paid_money']}</label> <i>总额</i></div></li>
-                                </ul>
-                            </div>");
+                // $row = [
+                //     'supplier_balance' => $footer->column('supplier_balance'),
+                //     'supplier_lpu_balance' => $footer->column('supplier_lpu_balance'),
+                //     'plan_due_money'  => $footer->column('plan_due_money'),
+                //     'audit_due_money'  => $footer->column('audit_due_money'),
+                //     'final_due_money'  => $footer->column('final_due_money'),
+                //     'due_money'  => $footer->column('due_money'),
+                //     'cash_paid'  => $footer->column('cash_paid'),
+                //     'acceptance_paid'  => $footer->column('acceptance_paid'),
+                // ];
+                //
+                // $count = $row['supplier_balance']->count();
+                // $sum['supplier_balance'] = number_format($row['supplier_balance']->sum(), 2);
+                // $sum['supplier_lpu_balance'] = number_format($row['supplier_lpu_balance']->sum(), 2);
+                // $sum['plan_due_money'] = number_format($row['plan_due_money']->sum(), 2);
+                // $sum['audit_due_money'] = number_format($row['audit_due_money']->sum(), 2);
+                // $sum['final_due_money'] = number_format($row['final_due_money']->sum(), 2);
+                // $sum['due_money']       = number_format($row['due_money']->sum(), 2);
+                // $sum['cash_paid']       = number_format($row['cash_paid']->sum(), 2);
+                // $sum['acceptance_paid'] = number_format($row['acceptance_paid']->sum(), 2);
+                // $sum['paid_money']      = number_format($row['cash_paid']->sum() + $row['acceptance_paid']->sum(), 2);
+                //
+                //
+                // $footer->td("合计[{$count}]")
+                //        ->td()->td()
+                //        ->td("<div><ul class='list-unstyled' style='margin: auto'>
+                //                     <li class='text-right' data-toggle='tooltip' data-title='总应付款总计'> <div>￥<label class='bg-white text-danger'>{$sum['supplier_balance']}</label> <i>总</i></div></li>
+                //                     <!--<li class='text-right text-gray' data-toggle='tooltip' data-title='上期未付清余额总计'> ￥<label class='bg-white text-gray'>{$sum['supplier_balance']}</label> <i>余</i></li>-->
+                //                 </ul>
+                //             </div>")
+                //         ->td("<div>
+                //                 <ul class='list-unstyled' style='margin: auto'>
+                //                     <li class='text-right' data-toggle='tooltip' data-title='本期计划应付'> <div>￥<label class='bg-white text-red'>{$sum['plan_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                //                 </ul>
+                //             </div>")
+                //         ->td("<div>
+                //                 <ul class='list-unstyled' style='margin: auto'>
+                //                     <li class='text-right' data-toggle='tooltip' data-title='本期一核应付'> <div>￥<label class='bg-white text-red'>{$sum['audit_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                //                 </ul>
+                //             </div>")
+                //         ->td("<div>
+                //                 <ul class='list-unstyled' style='margin: auto'>
+                //                     <li class='text-right' data-toggle='tooltip' data-title='本期二核应付'> <div>￥<label class='bg-white text-red'>{$sum['final_due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                //                 </ul>
+                //             </div>")
+                //         ->td("<div>
+                //                 <ul class='list-unstyled' style='margin: auto'>
+                //                     <li class='text-right' data-toggle='tooltip' data-title='敲定都应付'> <div>￥<label class='bg-white text-green'>{$sum['due_money']}</label> <i class='text-gray'>金额</i></div></li>
+                //                 </ul>
+                //             </div>")
+                //         ->td("<div>
+                //                 <ul class='list-unstyled' style='margin: auto'>
+                //                     <li class='text-right' data-toggle='tooltip' data-title='现金({$sum['cash_paid']}), 承兑({$sum['acceptance_paid']})'> <div>￥<label class='bg-white text-red'>{$sum['paid_money']}</label> <i>总额</i></div></li>
+                //                 </ul>
+                //             </div>");
             });
 
             // 账期
