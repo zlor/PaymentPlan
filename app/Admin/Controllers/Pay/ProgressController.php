@@ -309,10 +309,190 @@ class ProgressController extends Controller
         });
     }
 
+    // protected function form()
+    // {
+    //     return Admin::form(PaymentSchedule::class, function(Form $from){
+    //
+    //         $from->radio('is_froze', trans(''))
+    //              ->options(PaymentSchedule::getBooleanOptions('payment.schedule', 'is_froze'));
+    //         $from->textarea('froze_memo', trans('admin.memo'));
+    //     });
+    // }
+
+    /**
+     * 付款核定信息
+     * @return Form
+     */
     protected function form()
     {
-        return Admin::form(PaymentSchedule::class, function(Form $from){
+        return Admin::form(PaymentSchedule::class, function (Form $form) {
 
+            $form->row(function (Form\Row $row)use($form){
+                $row->width(12)
+                    ->radio('is_froze', trans('payment.schedule.is_froze'))
+                    ->options(PaymentSchedule::getBooleanOptions('payment.schedule', 'is_froze'));
+                $row->width(12)
+                    ->textarea('froze_memo', trans('admin.memo'));
+
+                $row->divide();
+            });
+
+            $form->row(function(Form\Row $row) use($form){
+                $row->width(6)
+                    ->display('id', 'ID');
+
+                $row->width(3)
+                    ->display('created_at', trans('admin.created_at'));
+                $row->width(3)
+                    ->display('updated_at', trans('admin.updated_at'));
+            });
+
+            // 显示导入的信息
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                $row->width(6)
+                    ->text('name', trans('payment.schedule.name'))
+                    ->readonly();
+
+                $row->width(3)
+                    ->select('bill_period_id', trans('payment.schedule.bill_period'))
+                    ->options(PaymentSchedule::getBillPeriodOptions())
+                    ->readonly();
+
+                $row->width(3)
+                    ->select('payment_type_id', trans('payment.schedule.payment_type'))
+                    ->options(PaymentSchedule::getPaymentTypeOptions())
+                    ->readonly();
+            });
+
+            // 供应商信息调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                //->rules('required|unique:empl_master,fiscal_id,');
+                $row->width(6)
+                    ->text('supplier_name', '导入数据:'.trans('payment.schedule.supplier_name'))
+                    ->readonly();
+                $row->width(6)
+                    ->select('supplier_id', '匹配:'.trans('payment.schedule.supplier'))
+                    ->options(PaymentSchedule::getSupplierOptions())
+                    ->readonly();
+
+            });
+            // 物料信息调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                //->rules('required');
+                $row->width(6)
+                    ->text('materiel_name', '导入数据:'.trans('payment.schedule.materiel_name'))
+                    ->readonly();
+                $row->width(6)
+                    ->select('payment_materiel_id', '匹配:'.trans('payment.schedule.payment_materiel'))
+                    ->options(PaymentSchedule::getPaymentMaterielOptions())
+                    ->readonly();
+            });
+            $form->divider();
+            // 其他导入信息
+            $form->row(function (Form\Row $row) use ($form)
+            {
+
+                $row->width(6)
+                    ->text('pay_cycle', trans('payment.schedule.pay_cycle'))
+                    ->readonly();
+                $row->width(6)
+                    ->text('charge_man', trans('payment.schedule.charge_man'))
+                    ->readonly();
+            });
+
+            //金额调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                $row->width(6)
+                    ->currency('supplier_balance', trans('payment.schedule.supplier_balance'))
+                    ->prepend('￥')
+                    ->readonly();
+                $row->width(6)
+                    ->currency('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'))
+                    ->prepend('￥')
+                    ->readonly();
+
+                $row->width(12)->divider();
+
+                $row->width(6)
+                    ->text('plan_man', trans('payment.schedule.plan_man'))
+                    ->readonly();
+                $row->width(3)
+                    ->date('plan_time', trans('payment.schedule.plan_time'))
+                    ->readonly();
+                $row->width(3)
+                    ->currency('plan_due_money', trans('payment.schedule.plan_due_money'))
+                    ->prepend('￥')
+                    ->readonly();
+                $row->width(12)
+                    ->textarea('memo', trans('admin.memo'))
+                    ->rows(1)
+                    ->readonly();
+            });
+
+            // 初稿核定调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+
+                $row->width(12)->divide();
+                $row->width(6)
+                    ->text('audit_man', trans('payment.schedule.audit_man'))
+                    ->readonly();
+                $row->width(3)
+                    ->date('audit_time', trans('payment.schedule.audit_time'))
+                    ->readonly();
+                $row->width(3)
+                    ->currency('audit_due_money', trans('payment.schedule.audit_due_money'))
+                    ->setWidth('100%')
+                    ->prepend('￥')
+                    ->readonly();
+                $row->width(12)
+                    ->textarea('memo_audit', trans('admin.memo'))
+                    ->rows(2)
+                    ->readonly();
+            });
+
+            // 终稿核定调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                $row->width(12)->divide();
+
+                $row->width(6)
+                    ->text('final_man', trans('payment.schedule.final_man'))
+                    ->readonly();
+                $row->width(3)
+                    ->date('final_time', trans('payment.schedule.final_time'))
+                    ->format('YYYY-MM-DD')
+                    ->readonly();
+                $row->width(3)
+                    ->currency('final_due_money', trans('payment.schedule.final_due_money'))
+                    ->prepend('￥')
+                    ->readonly();
+                $row->width(12)
+                    ->textarea('memo_final', trans('admin.memo'))
+                    ->readonly();
+
+            });
+
+            // 终稿核定调整
+            $form->row(function (Form\Row $row) use ($form)
+            {
+                $row->width(12)
+                    ->currency('due_money', trans('payment.schedule.due_money'))
+                    ->prepend('￥')
+                    ->rules('required');
+                $row->width(0)
+                    ->hidden('status');
+            });
+
+            $form->ignore(['bill_period_id','supplier_id', 'payment_type_id', 'payment_materiel_id']);
+
+            $form->saving(function(Form $form){
+                $form->status = PaymentSchedule::STATUS_PAY;
+            });
         });
     }
 }

@@ -16,6 +16,7 @@ class AddPaymentSchedulesColumns extends Migration
         //
         Schema::table('payment_schedules', function (Blueprint $table) {
             $table->boolean('is_froze')->comment('是否冻结付款')->default(0);
+            $table->text('memo_froze')->comment('冻结付款备注')->nullable();
         });
     }
 
@@ -28,6 +29,7 @@ class AddPaymentSchedulesColumns extends Migration
     {
         Schema::table('payment_schedules', function (Blueprint $table) {
             $table->dropColumn('is_froze');
+            $table->dropColumn('memo_froze');
         });
     }
 }
