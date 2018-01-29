@@ -333,7 +333,6 @@ class ProgressController extends Controller
                     ->options(PaymentSchedule::getBooleanOptions('payment.schedule', 'is_froze'));
                 $row->width(12)
                     ->textarea('froze_memo', trans('admin.memo'));
-
                 $row->divide();
             });
 
@@ -483,15 +482,21 @@ class ProgressController extends Controller
                 $row->width(12)
                     ->currency('due_money', trans('payment.schedule.due_money'))
                     ->prepend('￥')
-                    ->rules('required');
+                    ->readonly();
                 $row->width(0)
-                    ->hidden('status');
+                    ->hidden('status')
+                    ->readonly();
             });
 
             $form->ignore(['bill_period_id','supplier_id', 'payment_type_id', 'payment_materiel_id']);
 
             $form->saving(function(Form $form){
-                $form->status = PaymentSchedule::STATUS_PAY;
+                if($form->is_froze)
+                {
+                    $form->status = PaymentSchedule::STATUS_FROZE;
+                }else{
+                    $form->status = PaymentSchedule::STATUS_PAY;
+                }
             });
         });
     }

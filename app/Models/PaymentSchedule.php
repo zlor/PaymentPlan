@@ -50,6 +50,7 @@ class PaymentSchedule extends Model
     const STATUS_CHECK_FINAL= 'check_final';
     const STATUS_PAY= 'paying';
     const STATUS_LOCK= 'lock';
+    const STATUS_FROZE = 'froze';
 
     use CommonOptions;
     /**
