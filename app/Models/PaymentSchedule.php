@@ -8,6 +8,7 @@ use App\Models\Traits\BelongsToPaymentMateriel;
 use App\Models\Traits\BelongsToPaymentType;
 use App\Models\Traits\BelongsToSupplier;
 use App\Models\Traits\CommonOptions;
+use App\Models\Traits\HasManyBillPeriodFlow;
 use App\Models\Traits\HasManyPaymentDetail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -59,9 +60,9 @@ class PaymentSchedule extends Model
     use BelongsToBillPeriod, BelongsToAdministrator, BelongsToSupplier, BelongsToPaymentMateriel, BelongsToPaymentType;
 
     /**
-     * 拥有 付款明细
+     * 拥有 付款计划明细、资金流水明细
      */
-    use HasManyPaymentDetail;
+    use HasManyPaymentDetail, HasManyBillPeriodFlow;
 
 
 
@@ -158,13 +159,19 @@ class PaymentSchedule extends Model
 
 
     /**
-     * 同步现金池
+     * 同步现金池, 从资金流中同步统计
      */
-    public function syncMoney()
+    public function syncFlowMoney()
     {
-        $this->cash_paid = $this->payment_details()->where('pay_type', 'cash')->sum('money');
+        $this->cash_paid = -1 * $this->bill_period_flows()
+                ->where('type', 'pay')
+                ->where('kind', 'cash')
+                ->sum('money');
 
-        $this->acceptance_paid = $this->payment_details()->where('pay_type', 'acceptance')->sum('money');
+        $this->acceptance_paid = -1 * $this->bill_period_flows()
+                ->where('type', 'pay')
+                ->where('kind', 'acceptance')
+                ->sum('money');
 
         return $this->save();
     }

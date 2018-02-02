@@ -1,6 +1,7 @@
 <?php
 namespace App\Observers;
 
+use App\Models\BillPay;
 use App\Models\PaymentDetail;
 
 
@@ -14,11 +15,10 @@ class PaymentDetailObserver
 
     public function saved(PaymentDetail $paymentDetail)
     {
-        $res1 = empty($paymentDetail->bill_period) ? false
-                    : $paymentDetail->bill_period->syncMoney();
-        $res2 = empty($paymentDetail->payment_schedule) ? false
-                        : $paymentDetail->payment_schedule->syncMoney();
-        return $res1 && $res2;
+        $resPay = empty($paymentDetail->bill_period)?false
+                    :BillPay::syncPaymentDetail($paymentDetail);
+
+        return $resPay;
     }
 
     /**
@@ -28,11 +28,10 @@ class PaymentDetailObserver
      */
     public function deleted(PaymentDetail $paymentDetail)
     {
-        $res1 = empty($paymentDetail->bill_period) ? false
-                    : $paymentDetail->bill_period->syncMoney();
-        $res2 = empty($paymentDetail->payment_schedule) ? false
-                    : $paymentDetail->payment_schedule->syncMoney();
-        return $res1 && $res2;
+        $resPay = empty($paymentDetail->bill_period)?false
+            :BillPay::syncPaymentDetail($paymentDetail, true);
+
+        return $resPay;
     }
 
 }

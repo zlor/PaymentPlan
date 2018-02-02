@@ -9,6 +9,7 @@ use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class BatchController extends Controller
@@ -36,9 +37,15 @@ class BatchController extends Controller
 <style>
 td{
 }
-td>div>ul.list-unstyled>li>div{
+td>div>ul.list-unstyled>li.show-info>div{
     display:inline-flex;
-}            
+}
+td>div>ul.list-unstyled>li.edit-info{
+    float:right;
+}
+td>div>ul.list-unstyled>li.edit-info>div input{
+    width:6.8em;
+}
 td>div>ul.list-unstyled>li i.text-gray{
     display:none;
 }
@@ -153,82 +160,34 @@ SCRIPT;
              */
             $that = $this;
 
-            // $grid->actions(function(Grid\Displayers\Actions $actions)use($that){
-            //
-            //     $paymentSchedule = $this->row;
-            //
-            //     $actions->disableEdit();
-            //     $actions->disableDelete();
-            //
-            //
-            //     $action_audit_edit = _A(
-            //         '核定',
-            //         ['href'=>$that->getUrl('auditEdit', ['id'=>$paymentSchedule->id])],
-            //         ['title'=>'一次核定']
-            //     );
-            //     $action_final_edit = _A(
-            //         '终核',
-            //         ['href'=>$that->getUrl('finalEdit', ['id'=>$paymentSchedule->id])],
-            //         ['title'=>'终稿核定']
-            //     );
-            //     $action_lock_edit  = _A(
-            //         '应付款敲定',
-            //         ['href'=>$that->getUrl('lockEdit',  ['id'=>$paymentSchedule->id])],
-            //         ['title'=>'应付款敲定']
-            //     );
-            //
-            //     $actionList = [];
-            //     if($paymentSchedule->hasPayInfo())
-            //     {
-            //         array_push($actionList, $action_lock_edit);
-            //
-            //     }else if($paymentSchedule->hasLockInfo())
-            //     {
-            //         array_push($actionList, $action_lock_edit);
-            //     }
-            //     else if($paymentSchedule->hasFinalInfo())
-            //     {
-            //         array_push($actionList, $action_lock_edit);
-            //         array_push($actionList, $action_final_edit);
-            //
-            //     }else if($paymentSchedule->hasAuditInfo()){
-            //
-            //         array_push($actionList, $action_final_edit);
-            //         array_push($actionList, $action_audit_edit);
-            //
-            //     }else{
-            //         array_push($actionList, $action_audit_edit);
-            //     }
-            //
-            //     $actions->append(join("&nbsp;&nbsp;", array_reverse($actionList)));
-            //
-            // });
+            $grid->footer(function(Grid\Tools\Footer $footer)use($grid){
+                $rows = $grid->rows();
 
-            $grid->footer(function(Grid\Tools\Footer $footer){
-                $row = [
-                    'supplier_balance' => $footer->column('supplier_balance'),
-                    'supplier_lpu_balance' => $footer->column('supplier_lpu_balance'),
-                    'plan_due_money'  => $footer->column('plan_due_money'),
-                    'audit_due_money'  => $footer->column('audit_due_money'),
-                    'final_due_money'  => $footer->column('final_due_money'),
-                    'due_money'  => $footer->column('due_money'),
-                    'cash_paid'  => $footer->column('cash_paid'),
-                    'acceptance_paid'  => $footer->column('acceptance_paid'),
+                $count = count($rows);
+
+                $map = [
+                    'supplier_balance',
+                    'supplier_lpu_balance',
+                    'plan_due_money',
+                    'audit_due_money',
+                    'final_due_money',
+                    'due_money',
+                    'cash_paid',
+                    'acceptance_paid',
                 ];
 
-                $count = $row['supplier_balance']->count();
-                $sum['supplier_balance'] = number_format($row['supplier_balance']->sum(), 2);
-                $sum['supplier_lpu_balance'] = number_format($row['supplier_lpu_balance']->sum(), 2);
-                $sum['plan_due_money'] = number_format($row['plan_due_money']->sum(), 2);
-                $sum['audit_due_money'] = number_format($row['audit_due_money']->sum(), 2);
-                $sum['final_due_money'] = number_format($row['final_due_money']->sum(), 2);
-                $sum['due_money']       = number_format($row['due_money']->sum(), 2);
-                $sum['cash_paid']       = number_format($row['cash_paid']->sum(), 2);
-                $sum['acceptance_paid']       = number_format($row['acceptance_paid']->sum(), 2);
-                $sum['paid_money']       = number_format($row['cash_paid']->sum() + $row['acceptance_paid']->sum(), 2);
+                $row = [];
+                $sum = [];
 
+                foreach ($map as $item)
+                {
+                    $row[$item] = $count>0?$footer->column($item):(new Collection());
 
-                $footer->td("合计[{$count}]")
+                    $sum[$item] = number_format($row[$item]->sum(), 2);
+                }
+                $sum['paid_money'] = number_format($row['cash_paid']->sum() + $row['acceptance_paid']->sum(), 2);
+
+                $footer->td("共 <span>{$count}</span> 条")
                     ->td()->td()
                     ->td("<div><ul class='list-unstyled' style='margin: auto'>
                                     <li class='text-right' data-toggle='tooltip' data-title='总应付款总计'> <div>￥<label class='bg-white text-danger'>{$sum['supplier_balance']}</label> <i>总</i></div></li>
@@ -314,10 +273,12 @@ SCRIPT;
             $grid->column('planInfo', trans('payment.schedule.planInfo'))
                 ->display(function($value){
                     $plan  = number_format($this->plan_due_money, 2);
-                    return "<div>
+                    return "<div class='planArea'>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划应付'> <div>￥<label class='bg-white text-red'>{$plan}</label> <i class='text-gray'>金额</i></div></li>
-                                    <li class='text-right text-gray' data-toggle='tooltip' data-title='担当({$this->plan_man}),时间[{$this->plan_time}]'> <div><label class='bg-white text-gray'>{$this->plan_time}</label> <i class='text-gray'>时间</i></div></li>
+                                    <li class='show-info text-right' data-toggle='tooltip' data-title='本期计划应付'> <div>￥<label class='bg-white text-red'>{$plan}</label> <i class='text-gray'>金额</i></div></li>
+                                    <li class='show-info text-right text-gray' data-toggle='tooltip' data-title='担当({$this->plan_man}),时间[{$this->plan_time}]'> <div><label class='bg-white text-gray'>{$this->plan_time}</label> <i class='text-gray'>时间</i></div></li>
+                                    <li class='edit-info hide' data-change='' data-origin='{$this->plan_due_money}'></li>
+                                    <li class='edit-message-info hide'></li>
                                 </ul>
                             </div>";
                 });
@@ -331,7 +292,7 @@ SCRIPT;
                     if($this->hasAuditInfo())
                     {
                         $audit = number_format($this->audit_due_money, 2);
-                        $html  =  "<div>
+                        $html  =  "<div class='auditArea'>
                                 <ul class='list-unstyled' style='margin: auto'>
                                     <li class='text-right' data-toggle='tooltip' data-title='本期一核应付'> <div>￥<label class='bg-white text-red'>{$audit}</label> <i class='text-gray'>金额</i></div></li>
                                     <li class='text-right text-gray' data-toggle='tooltip' data-title='担当({$this->audit_man}),时间({$this->audit_time})'> <div><label class='bg-white text-gray'>{$this->audit_time}</label> <i class='text-gray'>时间</i></div></li>
@@ -350,7 +311,7 @@ SCRIPT;
                     if($this->hasFinalInfo())
                     {
                         $final  = number_format($this->final_due_money, 2);
-                        $html= "<div>
+                        $html= "<div class='finalArea'>
                                 <ul class='list-unstyled' style='margin: auto'>
                                     <li class='text-right' data-toggle='tooltip' data-title='本期二核应付'> 
                                         <div>￥<label class='bg-white text-red'>{$final}</label> <i class='text-gray'>金额</i></div>
@@ -373,7 +334,7 @@ SCRIPT;
                     {
                         $due_money  = number_format($value, 2);
 
-                        $html = "<div>
+                        $html = "<div class='lockArea'>
                                 <ul class='list-unstyled' style='margin: auto'>
                                     <li class='text-right text-green' data-toggle='tooltip' data-title='最终应付款'> 
                                         <div>￥<label class='bg-white'>{$due_money}</label> <i class='text-gray'>金额</i></div>

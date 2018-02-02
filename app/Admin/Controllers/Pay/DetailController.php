@@ -85,10 +85,12 @@ class DetailController extends Controller
             // 设置付款计划
             $paymentSchedule = PaymentSchedule::query()->findOrFail($payment_schedule_id);
 
+            $bill_period = $paymentSchedule->bill_period;
+
             // 获取付款模式
             $options = PaymentDetail::getPayTypeOptions();
 
-            $content->row(view('admin.bill.pay', compact('options', 'paymentSchedule')));
+            $content->row(view('admin.bill.pay', compact('options', 'paymentSchedule', 'bill_period')));
 
             $filter = [];
 
@@ -331,6 +333,9 @@ SCRIPT;
         // 设置提交路径
         $form->action($this->getUrl('store'));
 
+        $form->hidden('_token')
+            ->default(csrf_token());
+
         $form->hidden('payment_schedule_id')
             ->setWidth(8, 3)
             ->default($filter['payment_schedule_id']);
@@ -512,7 +517,7 @@ SCRIPT;
                         $audit = number_format($this->audit_due_money, 2);
                         $html  =  "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期核定付款'> ￥<label class='bg-white text-red'>{$audit}</label> <i>金额</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期一次核定付款'> ￥<label class='bg-white text-red'>{$audit}</label> <i>金额</i></li>
                                     <li class='text-right' data-toggle='tooltip' data-title='核定人'> <label class='bg-white text-defaut'>{$this->audit_man}</label> <i>担当</i></li>
                                     <li class='text-right' data-toggle='tooltip' data-title='核定时间'> <label class='bg-white text-warning'>{$this->audit_time}</label> <i>时间</i></li>
                                 </ul>
@@ -532,9 +537,9 @@ SCRIPT;
                         $final  = number_format($this->final_due_money, 2);
                         $html= "<div>
                                 <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期终核付款'> ￥<label class='bg-white text-red'>{$final}</label> <i>金额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='终核人'> <label class='bg-white text-defaut'>{$this->final_man}</label> <i>担当</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='终核时间'> <label class='bg-white text-warning'>{$this->final_time}</label> <i>时间</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='本期二次核定付款'> ￥<label class='bg-white text-red'>{$final}</label> <i>金额</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='核定人'> <label class='bg-white text-defaut'>{$this->final_man}</label> <i>担当</i></li>
+                                    <li class='text-right' data-toggle='tooltip' data-title='核定时间'> <label class='bg-white text-warning'>{$this->final_time}</label> <i>时间</i></li>
                                 </ul>
                             </div>";
                     }

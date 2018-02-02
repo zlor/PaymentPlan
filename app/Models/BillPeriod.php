@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\BelongsToAdministrator;
+use App\Models\Traits\HasManyBillPeriodFlow;
 use App\Models\Traits\HasManyPaymentDetail;
 use App\Models\Traits\HasManyPaymentFile;
 use App\Models\Traits\HasManyPaymentSchedule;
@@ -62,7 +63,7 @@ class BillPeriod extends Model
     /**
      * 拥有 付款计划、付款明细
      */
-    use HasManyPaymentSchedule, HasManyPaymentDetail, HasManyPaymentFile;
+    use HasManyPaymentSchedule, HasManyPaymentDetail, HasManyPaymentFile, HasManyBillPeriodFlow;
 
 
     public function isStandby()
@@ -88,13 +89,46 @@ class BillPeriod extends Model
     }
 
     /**
-     * 同步现金池
+     * 同步现金池（从资金流中汇总）
+     *
+     * @param $flowType
+     *
+     * @return bool
      */
-    public function syncMoney()
+    public function syncFlowMoney($flowType = '')
     {
-        $this->cash_paid = $this->payment_details()->where('pay_type', 'cash')->sum('money');
+        $checkMap = ['pay', 'collect'];
 
-        $this->acceptance_paid = $this->payment_details()->where('pay_type', 'acceptance')->sum('money');
+        if(!empty($flowType))
+        {
+            $checkMap = [$flowType];
+        }
+
+        if( in_array('pay', $checkMap))
+        {
+            $this->cash_paid = -1 * $this->bill_period_flows()
+                                    ->where('type', 'pay')
+                                    ->where('kind', 'cash')
+                                    ->sum('money');
+
+            $this->acceptance_paid = -1 * $this->bill_period_flows()
+                                            ->where('type', 'pay')
+                                            ->where('kind', 'acceptance')
+                                            ->sum('money');
+        }
+
+        if(in_array('collect', $checkMap))
+        {
+            $this->cash_collected = $this->bill_period_flows()
+                    ->where('type', 'collect')
+                    ->where('kind', 'cash')
+                    ->sum('money');
+
+            $this->acceptance_paid = $this->bill_period_flows()
+                    ->where('type', 'collect')
+                    ->where('kind', 'acceptance')
+                    ->sum('money');
+        }
 
         return $this->save();
     }

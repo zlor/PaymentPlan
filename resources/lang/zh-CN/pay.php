@@ -1,5 +1,11 @@
 <?php
 return [
+    'period.flow' => '按账期付款',
+
+    'kind' => '付款类型',
+    'kind.cash' => '现金',
+    'kind.acceptance'=> '承兑',
+
     'payment'=> '付款',
     'payment.schedule' => '付款计划',
 

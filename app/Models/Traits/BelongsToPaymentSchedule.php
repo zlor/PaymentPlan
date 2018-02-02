@@ -19,9 +19,21 @@ trait BelongsToPaymentSchedule
      * 付款计划-流水号
      * @return string
      */
-    public function getPaymentScheduleName()
+    public function getPaymentScheduleNameAttribute()
     {
-        return empty($this->payment_schedule) ? '' : $this->payment_schedule->name;
+        $paymentSchedule = $this->payment_schedule()->first();
+
+        return empty($paymentSchedule) ? '' : $paymentSchedule->name;
+    }
+
+    /**
+     * 付款类型ID
+     * @return int|mixed
+     */
+    public function getPaymentTypeIdAttribute()
+    {
+        $paymentSchedule = $this->payment_schedule()->first();
+        return empty($paymentSchedule) ? 0 : $paymentSchedule->payment_type_id;
     }
 
     /**

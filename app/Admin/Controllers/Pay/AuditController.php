@@ -109,12 +109,12 @@ SCRIPT;
         return Admin::content(function(Content $content)use($id){
 
             $content->header(trans('audit.payment.schedule'));
-            $content->description('初稿核定');
+            $content->description('一次核定');
 
             $content->breadcrumb(
                 ['text'=>'付款管理', 'url'=>'#'],
-                ['text'=>'计划审核', 'url'=> $this->getUrl('index')],
-                ['text'=>'初稿核定', 'url'=> $this->getUrl('auditEdit', ['id'=>$id])]
+                ['text'=>'计划调整', 'url'=> $this->getUrl('index')],
+                ['text'=>'一次核定', 'url'=> $this->getUrl('auditEdit', ['id'=>$id])]
             );
 
             $form = $this->formAudit()->edit($id);
@@ -133,12 +133,12 @@ SCRIPT;
         return Admin::content(function(Content $content)use($id){
 
             $content->header(trans('audit.payment.schedule'));
-            $content->description('付款核定');
+            $content->description('最终敲定');
 
             $content->breadcrumb(
                 ['text'=>'付款管理', 'url'=>'#'],
-                ['text'=>'计划审核', 'url'=> $this->getUrl('index')],
-                ['text'=>'付款核定', 'url'=> $this->getUrl('lockEdit', ['id'=>$id])]
+                ['text'=>'计划调整', 'url'=> $this->getUrl('index')],
+                ['text'=>'最终敲定', 'url'=> $this->getUrl('lockEdit', ['id'=>$id])]
             );
 
             $form = $this->formLock()->edit($id);
@@ -224,17 +224,17 @@ SCRIPT;
 
 
                 $action_audit_edit = _A(
-                    '核定',
+                    '一核',
                     ['href'=>$that->getUrl('auditEdit', ['id'=>$paymentSchedule->id])],
                     ['title'=>'一次核定']
                 );
                 $action_final_edit = _A(
-                    '终核',
+                    '二核',
                     ['href'=>$that->getUrl('finalEdit', ['id'=>$paymentSchedule->id])],
-                    ['title'=>'终稿核定']
+                    ['title'=>'二次核定']
                 );
                 $action_lock_edit  = _A(
-                    '应付款敲定',
+                    '敲定',
                     ['href'=>$that->getUrl('lockEdit',  ['id'=>$paymentSchedule->id])],
                     ['title'=>'应付款敲定']
                 );
@@ -437,7 +437,7 @@ SCRIPT;
                 ->display(function($value){
 
                     $html = '';
-                    if($this->hasPayInfo())
+                    if($this->hasPayInfo() || $this->hasLockInfo())
                     {
                         $due_money  = number_format($value, 2);
 

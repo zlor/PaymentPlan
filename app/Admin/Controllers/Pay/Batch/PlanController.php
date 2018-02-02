@@ -5,6 +5,7 @@ namespace App\Admin\Controllers\Pay\Batch;
 use App\Admin\Controllers\Pay\BatchController;
 use App\Admin\Extensions\Tools\BatchPost;
 use App\Admin\Extensions\Tools\Import;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid\Displayers\Actions;
 use Encore\Admin\Grid\Tools;
 use Illuminate\Http\Request;
@@ -78,6 +79,36 @@ class PlanController extends BatchController
             }
         });
 
+        $this->_adaptMultiCellEdit();
+
         return $grid;
+    }
+
+    /**
+     * 适配多行编辑更新
+     */
+    protected function _adaptMultiCellEdit()
+    {
+        $script = <<<SCRIPT
+    $('.planArea ul li.show-info').click(function(){
+        var ul = $(this).parent('ul');
+        ul.find('li.show-info').hide();
+        ul.find('li.edit-info').removeClass('hide');
+        ul.find('li.edit-message-info').removeClass('hide');
+        ul.find('li.edit-info').html('<div class="input-group"><span class="input-group-btn"><button type="button" class="cacheEdit btn btn-sm btn-default"><i class="fa fa-check" title="暂存"></i></button></span><input type="text" name="editPlanMoney" class="form-control input-sm"></div>');
+    });
+    
+    $('.planArea ul ').on('click', 'button.cacheEdit', function(){
+        $(this).parents('li.edit-info').addClass('hide');
+        $(this).parents('ul').find('li.edit-message-info').addClass('hide');
+        $(this).parents('ul').find('li.show-info').show();
+    });
+    $('.planArea ul ').on('change', 'input.editPlanMoney', function(){
+        var message = 'test';
+        $(this).parents('ul').find('li.edit-message-info').html(message);
+    });
+    
+SCRIPT;
+        Admin::script($script);
     }
 }

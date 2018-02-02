@@ -2,6 +2,8 @@
 return [
     'index' => '付款管理',
 
+    'period.pay' => '按账期付款',
+
     'types' => '类型',
     'type'  => '类型明细',
     'type.name' => '类型名称',
@@ -46,14 +48,14 @@ return [
     'schedule.plan_man' => '计划人',
 
     'schedule.audit_time' => '审核时间',
-    'schedule.audit_due_money' => '应付款(审核调整)',
+    'schedule.audit_due_money' => '应付款(一次核定)',
     'schedule.audit_man' => '审核人',
 
     'schedule.final_time' => '终稿时间',
-    'schedule.final_due_money' => '应付款(终稿调整)',
+    'schedule.final_due_money' => '应付款(二次核定)',
     'schedule.final_man' => '终稿人',
 
-    'schedule.due_money'   => '应付款(实际)',
+    'schedule.due_money'   => '应付款(最终敲定)',
     'schedule.paid_money'   => '已付款',
     'schedule.cash_paid'   => '已付现金',
     'schedule.acceptance_paid'   => '已付承兑',
@@ -64,9 +66,9 @@ return [
     'schedule.status.init'  => '初始化',
     'schedule.status.import_init'  => '初始化(导入)',
     'schedule.status.web_init'     => '初始化(web)',
-    'schedule.status.check_audit'      => '初稿核定',
-    'schedule.status.check_final'      => '终稿核定',
-    'schedule.status.checked'      => '已审核',
+    'schedule.status.check_audit'      => '一次核定',
+    'schedule.status.check_final'      => '二次核定',
+    'schedule.status.checked'      => '已核定',
 
     'schedule.status.paying'       => '付款中',
     'schedule.status.lock'         => '锁定',

@@ -28,7 +28,6 @@ Route::group([
     $router->post('/bill/period', 'PeriodController@store')->name('bill.period.store');
     $router->get('/bill/period/{id}/fire', 'PeriodController@fire')->name('bill.period.fire');
 
-
     ## 付款计划作成
     $router->get('/plan/schedule', 'Pay\ScheduleController@index')->name('payment.schedule.plan');
     $router->get('/plan/schedule/{id}/edit', 'Pay\ScheduleController@edit')->name('payment.plan.edit');
@@ -45,7 +44,6 @@ Route::group([
     $router->get('/plan/schedule/file/{id}/download', 'Pay\ExcelController@download')->name('payment.plan.file.download');
     $router->delete('/plan/schedule/file/{id}/delete', 'Pay\ExcelController@remove')->name('payment.plan.file.remove');
     $router->get('/plan/schedule/file/{id}/info', 'Pay\ExcelController@info')->name('payment.plan.file.info');
-
 
 
     ## 付款计划初稿审核
@@ -96,16 +94,35 @@ Route::group([
     ## 付款引导界面
     $router->get('/pay/schedule', 'Pay\DetailController@index')->name('payment.schedule.pay');
 
-    // 提交付款信息
+    // 按计划付款信息
     $router->get('/pay/schedule/detail', 'Pay\DetailController@detail')->name('pay.schedule.detail');
     $router->put('/pay/schedule/detail/{id}', 'Pay\DetailController@update')->name('pay.schedule.detail.update');
     $router->post('/pay/schedule/detail', 'Pay\DetailController@store')->name('pay.schedule.detail.store');
     $router->delete('/pay/schedule/detail/{id}', 'Pay\DetailController@destroy')->name('pay.schedule.detail.destroy');
     $router->get('/pay/schedule/detail/{id}/info', 'Pay\DetailController@info')->name('pay.schedule.detail.info');
 
-    // 获取付款相关信息
+    ## 按账期付款
+    // 引导付款
+    $router->get('/pay/period', 'Pay\PeriodController@index')->name('payment.period.pay');
+    // 付款界面
+    $router->get('/pay/period/flow', 'Pay\PeriodController@flow')->name('pay.period.flow');
+    $router->get('/pay/period/flow/{id}', 'Pay\PeriodController@edit')->name('pay.period.flow.edit');
+    $router->put('/pay/period/flow/{id}', 'Pay\PeriodController@update')->name('pay.period.flow.update');
+    $router->post('/pay/period/flow', 'Pay\PeriodController@store')->name('pay.period.flow.store');
+    $router->delete('/pay/period/flow/{id}', 'Pay\PeriodController@destroy')->name('pay.period.flow.destroy');
+    $router->get('/pay/period/flow/{id}/info', 'Pay\PeriodController@info')->name('pay.period.flow.info');
 
-
+    ### 收款管理
+    ## 按账期收款
+    // 引导收款
+    $router->get('/collect/period', 'Collect\PeriodController@index')->name('collection.period.pay');
+    // 收款界面
+    $router->get('/collect/period/flow', 'Collect\PeriodController@flow')->name('collect.period.flow');
+    $router->get('/collect/period/flow/{id}', 'Collect\PeriodController@edit')->name('collect.period.flow.edit');
+    $router->put('/collect/period/flow/{id}', 'Collect\PeriodController@update')->name('collect.period.flow.update');
+    $router->post('/collect/period/flow', 'Collect\PeriodController@store')->name('collect.period.flow.store');
+    $router->delete('/collect/period/flow/{id}', 'Collect\PeriodController@destroy')->name('collect.period.flow.destroy');
+    $router->get('/collect/period/flow/{id}/info', 'Collect\PeriodController@info')->name('collect.period.flow.info');
 
 
     // 基础档案
