@@ -25,7 +25,7 @@ class BillPeriodFlowObserver
         // 依据付款计划 执行的付款流水
         $paymentSchedule =  $billPeriodFlow->payment_schedule()->first();
 
-        if(!$paymentSchedule )
+        if(!empty($paymentSchedule))
         {
             $paymentSchedule->syncFlowMoney();
         }
@@ -45,7 +45,7 @@ class BillPeriodFlowObserver
         // 依据付款计划 执行的付款流水
         $paymentSchedule =  $billPeriodFlow->payment_schedule()->first();
 
-        if(!$paymentSchedule )
+        if(!empty($paymentSchedule))
         {
             $paymentSchedule->syncFlowMoney();
         }
