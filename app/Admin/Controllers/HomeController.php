@@ -289,7 +289,7 @@ SCRIPT;
         <h5>快速入口</h5>
         <div class='pre'>
                  <p>
-                    ".($focusBillPeriod->allowSetPool()?"<a href='{$url['set_cash_pool']}' target='_blank'>设置账期</a>":'设置账期(已锁定)')."
+                    ".($focusBillPeriod->allowSetPool()?"<a href='{$url['set_cash_pool']}' >设置账期</a>":'设置账期(已锁定)')."
                     <label class='label label-primary'>{$statusTxt}</label>
                  </p>
                  <hr>

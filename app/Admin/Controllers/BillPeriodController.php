@@ -281,17 +281,28 @@ class BillPeriodController extends Controller
             // 账期范围
             $form->dateRange('time_begin', 'time_end', trans('bill.period.time'));
 
+            ### 库存金额
+            $form->divider();
             // 现金余额
-            $form->currency('cash_balance', trans('bill.period.cash_balance'))->prepend('￥');
-
+            $form->currency('cash_balance', trans('bill.period.cash_balance'))
+                ->prepend('￥');
             // 确认收款(已收发票总额)
-            $form->currency('invoice_balance', trans('bill.period.invoice_balance'))->prepend('￥');
+            $form->currency('invoice_balance', trans('bill.period.invoice_balance'))
+                ->prepend('￥');
+            // 承兑额度
+            $form->currency('acceptance_line', trans('bill.period.acceptance_line'))
+                ->prepend('￥');
+            // 银行发放的贷款额度
+            $form->currency('loan_balance', trans('bill.period.loan_balance'))
+                ->prepend('￥');
+
+            ## 当期发生
+            $form->divider();
 
             // 预计收款
             $form->currency('except_balance', trans('bill.period.except_balance'))->prepend('￥');
 
-            // 承兑额度
-            $form->currency('acceptance_line', trans('bill.period.acceptance_line'))->prepend('￥');
+            $form->divider();
 
 
             // 负责人
@@ -310,7 +321,7 @@ class BillPeriodController extends Controller
 
                 session()->flash('success', new MessageBag(['title'=>'更新成功！', 'message'=>'']));
 
-                return redirect()->back();
+                return redirect()->to($this->getUrl('billGather'));
             });
 
         });
