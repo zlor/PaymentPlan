@@ -11,6 +11,8 @@ return [
      * Laravel-admin book name
      */
     'book_flag' => env('APP_ADMIN_BOOK_FLAG', 'ranto'),
+
+    'book_flag_txt' => env('APP_ADMIN_BOOK_FLAG_TXT', '蓝托'),
     /*
      * Logo in admin panel header.
      */
