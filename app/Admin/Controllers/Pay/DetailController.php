@@ -328,6 +328,9 @@ SCRIPT;
     }
 
     protected function schedule_detail_pay($filter){
+
+        $paymentSchedule = PaymentSchedule::query()->findOrNew($filter['payment_schedule_id']);
+
         $form = new Form();
 
         // 设置提交路径
@@ -340,12 +343,15 @@ SCRIPT;
             ->setWidth(8, 3)
             ->default($filter['payment_schedule_id']);
 
+        $form->select('supplier_id', '收款公司')
+            ->setWidth(8, 3)
+            ->options(PaymentSchedule::getSupplierOptions())
+            ->default(strval($paymentSchedule->supplier_id))
+            ->readOnly();
+
         $form->select('pay_type', '付款方式')
             ->setWidth(8, 3)
             ->options(PaymentDetail::getPayTypeOptions());
-
-        $form->text('collection_company', '收款公司')
-            ->setWidth(8, 3);
 
         $form->text('code', '付款凭证')
             ->setWidth(8, 3)

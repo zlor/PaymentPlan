@@ -15,13 +15,13 @@
 </h4>
 <div class="callout callout-success">
     <div class="pull-right" style="width: 25em">
-        <div class="pull-left" style="font-size: 18px; margin-right:1.5em"> 本期现金池  </div>
+        <div class="pull-left" style="font-size: 18px; margin-right:1.5em"> 本期资金池  </div>
         <fieldset>
-            余/现金总额 :   <span>{{$bill_period->current_cash_balance }} / {{$bill_period->cash_balance }}</span>
+            现金（ <span> 余 {{$bill_period->current_cash_balance }}</span>  <i>|</i> <span> 总额 {{$bill_period->cash_balance }}</span>）
             <br>
-            余/承兑总额 :   <span>{{$bill_period->current_acceptance_balance }} / {{$bill_period->acceptance_line}}</span>
+            承兑（ <span> 余 {{$bill_period->current_acceptance_balance }}</span> <i>|</i> <span>总额 {{$bill_period->acceptance_line}}</span>）
             <br>
-            余/现金池: <span>{{$bill_period->balance}} / {{$bill_period->cash_pool}} </span>
+            资金（ <span> 余 {{$bill_period->balance}}</span>  <i>|</i> <span> 总额 {{$bill_period->cash_pool}} </span>）
         </fieldset>
     </div>
     @if(isset($paymentSchedule))

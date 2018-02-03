@@ -66,6 +66,11 @@ class BillPeriod extends Model
     use HasManyPaymentSchedule, HasManyPaymentDetail, HasManyPaymentFile, HasManyBillPeriodFlow;
 
 
+    /**
+     * 是否为就绪状态
+     *
+     * @return bool
+     */
     public function isStandby()
     {
         return in_array($this->original['status'], [self::STATUS_STANDYBY]);
@@ -73,6 +78,7 @@ class BillPeriod extends Model
 
     /**
      * 是否激活中
+     *
      * @return bool
      */
     public function isActive()
@@ -81,6 +87,7 @@ class BillPeriod extends Model
     }
 
     /**
+     * 是否允许设置 资金池
      * @return bool
      */
     public function allowSetPool()
@@ -134,17 +141,18 @@ class BillPeriod extends Model
     }
 
     /**
-     * 现金总额 （ 现金余额 + 确认计划收款额 + 预计收款）
+     * 现金总额、库存现金 （ 现金余额 + 确认计划收款额 + 银行贷款）
      *
      * @return mixed
      */
     public function getCashTotalAttribute()
     {
-        return $this->cash_balance + $this->invoice_balance + $this->except_balance;
+        return $this->cash_balance + $this->invoice_balance + $this->loan_balance;
     }
 
     /**
      * 已支付总额 （支出的现金 + 支出的承兑）
+     *
      * @return mixed
      */
     public function getPaidTotalAttribute()
@@ -153,11 +161,11 @@ class BillPeriod extends Model
     }
 
     /**
-     * 现金池
+     * 期初今个
      *
      * @return mixed
      */
-    public function getCashPoolAttribute()
+    public function getInitTotalAttribute()
     {
         return $this->cash_total + $this->acceptance_line;
     }
@@ -169,7 +177,7 @@ class BillPeriod extends Model
      */
     public function getBalanceAttribute()
     {
-        return $this->cash_pool - $this->paid_total;
+        return $this->init_total - $this->paid_total;
     }
 
     /**
@@ -190,6 +198,37 @@ class BillPeriod extends Model
     {
         return $this->acceptance_line - $this->acceptance_paid;
     }
+
+    /**
+     * 现金池
+     *
+     * @return mixed
+     */
+    public function getCashPoolAttribute()
+    {
+        return $this->current_cash_balance;
+    }
+
+    /**
+     * 承兑池
+     *
+     * @return mixed
+     */
+    public function getAcceptancePoolAttribute()
+    {
+        return $this->current_acceptance_balance;
+    }
+
+    /**
+     * 资金池
+     *
+     * @return mixed
+     */
+    public function getPoolAttribute()
+    {
+        return $this->balance;
+    }
+
 
     /**
      * 当前总应付
@@ -272,14 +311,17 @@ class BillPeriod extends Model
      */
     public function sumCashPaid($filter)
     {
-        $query = $this->payment_schedules();
+        $query = $this->bill_period_flows();
+
+        $query->where('type', 'pay')
+              ->where('kind', 'cash');
 
         if(!empty($filter['payment_type_id']))
         {
             $query->where('payment_type_id', $filter['payment_type_id']);
         }
 
-        return $query->sum('cash_paid');
+        return -1 * $query->sum('money');
     }
     /**
      * 当前支付的承兑
@@ -289,14 +331,17 @@ class BillPeriod extends Model
      */
     public function sumAcceptancePaid($filter)
     {
-        $query = $this->payment_schedules();
+        $query = $this->bill_period_flows();
+
+        $query->where('type','pay')
+            ->where('kind', 'acceptance');
 
         if(!empty($filter['payment_type_id']))
         {
             $query->where('payment_type_id', $filter['payment_type_id']);
         }
 
-        return $query->sum('acceptance_paid');
+        return -1 * $query->sum('money');
     }
 
     /**
@@ -308,14 +353,16 @@ class BillPeriod extends Model
      */
     public function sumPaidMoney($paymentTypeId = 0)
     {
-        $query = $this->payment_schedules();
+        $query = $this->bill_period_flows();
+
+        $query->where('type','pay');
 
         if(!empty($paymentTypeId))
         {
             $query->where('payment_type_id', $paymentTypeId);
         }
 
-        return $query->sum('cash_paid')+ $query->sum('acceptance_paid');
+        return -1 * $query->sum('money');
     }
 
     /**
