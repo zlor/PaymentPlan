@@ -145,6 +145,7 @@
             <div class="container">
                     <div class="content">
                         <h1>{{config('admin.name')}}</h1>
+                        <h3>{{config('admin.book_flag')}}</h3>
                         <p>&nbsp;</p>
                     </div>
                     <div class="callouts">
