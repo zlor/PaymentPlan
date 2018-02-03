@@ -105,22 +105,39 @@ class PaymentFile extends File
             $data = $reader->toArray();
         });
 
+        ## 抓取有效数据
+        $validData = $this->validExcelData($data, $options);
+
+        $headMap =[
+                '科目编号'=>'name',
+                '供应商名称'=>'supplier_name',
+                '物品名称'=>'materiel_name',
+                '付款确认人'=>'charge_man',
+                '付款周期'=>'pay_cycle',
+                '总应付款'=>'supplier_balance',
+                '前期未付清余额'=>'supplier_lpu_balance',
+                // 计划付款
+                '计划付款金额'=>'plan_due_money',
+                '备注' => 'memo',
+        ];
+
         // 默认预设
         $columnMap = [
             'name' => 1,
             'supplier_name' =>2,
             'materiel_name' =>3,
             'charge_man' => 4,
-            'pay_cycle'  => 5,
+            'pay_cycle'  => 8,
             'supplier_balance' =>6,
-            'supplier_lpy_balance' =>7,
-            // 计划付款
-            'plan_due_money' => 8,
-            // 下月付款
-            'plan_next_month_money'=>9,
+            'supplier_lpu_balance' =>7,
+            // // 计划付款
+            // 'plan_due_money' => 8,
+            // // 下月付款
+            // 'plan_next_month_money'=>9,
         ];
-        $fromRowNumber = 5;
-        $fromColumnNumber = 1;
+
+        $fromRowNumber = 6 - 1;
+        $fromColumnNumber = 2 - 1;
 
         // 加载外部预设配置
         if(isset($options['heads']))
@@ -140,32 +157,146 @@ class PaymentFile extends File
 
         $user =  Admin::user();
 
-        // 预加载到 payment_schedule_file 中
-        for($rowIndex = $fromRowNumber; $rowIndex< count($data); $rowIndex++)
+        foreach ($validData['heads'] as $areaIndex => $head)
         {
-
-            $import_source = [];
-
-            $import_source['all'] = $data[$rowIndex];
-
-            $import_source['filter']['plan_time'] = date('Y-m-d h:i:s');
-            $import_source['filter']['plan_man'] = $user->name;
-
-            foreach ($columnMap as $key => $value)
+            // 识别有效列
+            foreach ($head as $key => $item)
             {
-                $import_source['filter'][$key] = isset($data[$rowIndex][$value]) ? $data[$rowIndex][$value] : '';
+                // 若存在
+                if( isset($headMap[$item]) )
+                {
+                    $columnMap[$headMap[$item]] = $key;
+                }
             }
 
-            $schedule_files[] = [
-                'user_id'       => $user->id,
-                'number'        => $rowIndex,
-                'is_success'    => false,
-                'is_overwrite'  => false,
-                'import_source' => $import_source,
-            ];
+            $map = $validData['map'][$areaIndex]['row'];
+            $map_source = $validData['map'][$areaIndex]['source'];
+            $rows = $validData['rows'][$areaIndex];
+
+
+            $fromRowNumber = isset($map[$fromRowNumber])?($map[$fromRowNumber] - 1):0;
+
+            // 识别原文件的行号
+
+            // 预加载到 payment_schedule_file 中
+            for($rowIndex = $fromRowNumber; $rowIndex< count($rows); $rowIndex++)
+            {
+
+                $import_source = [];
+
+                $import_source['all'] = $rows[$rowIndex];
+
+                $import_source['filter']['plan_time'] = date('Y-m-d h:i:s');
+                $import_source['filter']['plan_man'] = $user->name;
+
+                foreach ($columnMap as $key => $value)
+                {
+                    $import_source['filter'][$key] = isset($rows[$rowIndex][$value]) ? $rows[$rowIndex][$value] : '';
+                }
+
+                $schedule_files[] = [
+                    'user_id'       => $user->id,
+                    'number'        => $map_source[$rowIndex],
+                    'is_success'    => false,
+                    'is_overwrite'  => false,
+                    'import_source' => $import_source,
+                ];
+            }
+
+            // 只识别第一块区域
+            break;
         }
 
         return $file->payment_schedule_files()->createMany($schedule_files);
+    }
+
+    /**
+     *
+     * 界定有效数据行
+     *  - 确定表头(有效表头所在行)， 若表头不符，不允许导入数据
+     *  - 确定计划数据范围，
+     *
+     * @param array $data
+     * @param array $options
+     *
+     * @return array
+     */
+    protected function validExcelData($data = [], $options = [])
+    {
+        $validHead = [];
+        $validData = [];
+        $validRow  = [];
+
+        $areaIndex = -1;
+        // 未指定时,按如下条件确认
+        //  - A列 value == '序号' 的行，视作表头
+        //  - A列 value is int   的行，视作有效数据行
+
+        // 每个「序号」后紧跟的行，视作一个有效数据块。再次出现的数据块，不在考虑范围内。
+        // 通常表头占据了两行
+        $preWasFirstHead = false;
+
+        $rowIndex = 0;
+        $headIndex = 0;
+        // 识别表头所在行
+        foreach($data as $key => $item)
+        {
+            $index = $item[0];
+
+            // 未避免错过 第二行的表头
+            if($preWasFirstHead)
+            {
+                // 重置
+                $preWasFirstHead = false;
+
+                if( (empty($index) || '序号' == $index))
+                {
+                    // 若首行无值，则取用第二行的值
+                    $validHead[$areaIndex]= array_map(function($validCell, $itemCell){
+                        return empty($validCell)?$itemCell:$validCell;
+                    }, $validHead[$areaIndex], $item);
+
+                    $validRow[$areaIndex]['head'][$key] = $headIndex++;
+
+                    continue;
+                }
+            }
+            // 自动识别表头
+            if( '序号' == $index)
+            {
+                $areaIndex ++;
+
+                $validHead[$areaIndex] = $item;
+
+                $validRow[$areaIndex]['head'][$key] = $headIndex++;
+
+                $preWasFirstHead = true;
+
+                continue;
+            }
+
+            // 若当前行A列为空，则视作无效数据行
+            if(empty($index))
+            {
+                // 存放上一个有效数据行-行号
+                $validRow[$areaIndex]['row'][$key] = $rowIndex;
+
+                continue;
+            }
+
+            // 序列有效，为数据行
+            if( is_numeric($index) )
+            {
+                // 获得有效数据行
+                $validData[$areaIndex][$rowIndex++] = $item;
+
+                // 存放有效数据行 -行号
+                $validRow[$areaIndex]['row'][$key] = $rowIndex;
+                $validRow[$areaIndex]['source'][$rowIndex] = $key;
+            }
+        }
+
+        return ['heads'=>$validHead, 'rows'=>$validData, 'map'=>$validRow];
     }
 
     /**
@@ -233,10 +364,10 @@ class PaymentFile extends File
             $newRow = $row;
 
             // 设置格式
-            $newRow['supplier_balance']      = empty($newRow['supplier_balance'])? 0 : doubleval(str_replace(',', '', $newRow['supplier_balance']));
-            $newRow['supplier_lpu_balance']  = empty($newRow['supplier_lpu_balance'])? 0 : doubleval(str_replace(',', '', $newRow['supplier_lpu_balance']));
-            $newRow['plan_next_month_money'] = empty($newRow['plan_next_month_money'])? 0 : doubleval(str_replace(',', '', $newRow['plan_next_month_money']));
-            $newRow['plan_due_money']        = empty($newRow['plan_due_money'])? 0 : doubleval(str_replace(',', '', $newRow['plan_due_money']));
+            $newRow['supplier_balance']      = $this->readMoney($newRow['supplier_balance']);
+            $newRow['supplier_lpu_balance']  = $this->readMoney($newRow['supplier_lpu_balance']);
+            $newRow['plan_next_month_money'] = $this->readMoney($newRow['plan_next_month_money']);
+            $newRow['plan_due_money']        = $this->readMoney($newRow['plan_due_money']);
 
             // 设置账期
             $newRow['bill_period_id']  = $bill_period->id;
@@ -386,6 +517,40 @@ class PaymentFile extends File
 
         // 统计导入信息
         return $result;
+    }
+
+
+    /**
+     * 识别金额,
+     *  区分正负，并去除格式
+     *
+     * @param $sourceMoney
+     *
+     * @return double
+     */
+    protected function readMoney($sourceMoney)
+    {
+        if(empty($sourceMoney))
+        {
+            return 0;
+        }
+
+        $isMinus = false;
+        // 去除空格
+        $sourceMoney =  trim($sourceMoney);
+
+        // 识别正负
+        $len = strlen($sourceMoney);
+
+        $money = trim($sourceMoney, '()（）');
+
+        // 负数
+        if($len != strlen($money))
+        {
+            $isMinus = true;
+        }
+
+        return ($isMinus?-1:1) * doubleval(str_replace(',', '', $money));
     }
 
     /**
