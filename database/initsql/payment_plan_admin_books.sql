@@ -1,0 +1,2 @@
+INSERT INTO payment_plan.admin_books (code, begin, end, title, url, memo, sync_at, created_at, updated_at) VALUES ('ranto', '2018-02-01', null, '蓝托', 'http://192.168.2.156', ' ', '2018-02-03 05:50:32', null, null);
+INSERT INTO payment_plan.admin_books (code, begin, end, title, url, memo, sync_at, created_at, updated_at) VALUES ('sunfen', '2018-02-01', null, '顺丰', 'http://192.168.2.156:8081', ' ', '2018-02-03 05:50:32', null, null);

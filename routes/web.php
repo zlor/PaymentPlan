@@ -14,5 +14,8 @@
 Route::get('/', function(){
 
     // 选择账套
-    return view('bill_books');
+    $books = \Encore\Admin\Book\BookModel::query()->get();
+
+
+    return view('bill_books', compact($books));
 });
