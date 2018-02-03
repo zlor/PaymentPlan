@@ -149,7 +149,8 @@
                     </div>
                     <div class="callouts">
                         @foreach($books as $book)
-                            <a href="{{$book->url}}" class="callout minimal third">
+
+                            <a href="{{$book->url.($book->code ==config('admin.book_flag')?'/admin':'')}}" class="callout minimal third">
                                 <div class="callout-head">
                                     <div class="callout-title">{{$book->title}}</div>
                                     <div class="callout-icon"></div>
