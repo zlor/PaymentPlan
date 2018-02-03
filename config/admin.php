@@ -7,6 +7,10 @@ return [
      */
     'name' => env('APP_ADMIN_NAME', 'Ranto-Payment'),
 
+    /**
+     * Laravel-admin book name
+     */
+    'book_flag' => env('APP_ADMIN_BOOK_FLAG', 'ranto'),
     /*
      * Logo in admin panel header.
      */

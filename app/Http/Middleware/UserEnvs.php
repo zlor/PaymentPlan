@@ -18,6 +18,11 @@ class UserEnvs
     public function handle($request, Closure $next)
     {
         /**
+         * 读取账套信息
+         * 1. 若无账套信息，返回首页选择
+         */
+
+        /**
          * 读取账期信息
          * 1. 若无账期信息,创建一条,并激活。
          */

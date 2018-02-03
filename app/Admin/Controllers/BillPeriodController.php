@@ -12,10 +12,26 @@ use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use Illuminate\Support\MessageBag;
 
+/**
+ * Class BillPeriodController
+ *
+ * 账期档案管理
+ *
+ * @package App\Admin\Controllers
+ */
 class BillPeriodController extends Controller
 {
     use ModelForm;
 
+    /**
+     * 路由映射表
+     *
+     * - 账期总览
+     * -- 账期-资金池-编辑
+     * -- 账期-资金池-更新
+     *
+     * @var array
+     */
     protected $routeMap = [
         'billGather' => 'bill.gather',
         'editCashPool' => 'bill.pool.edit',
@@ -23,8 +39,9 @@ class BillPeriodController extends Controller
     ];
 
     /**
-     * Index interface.
+     * 账期总览
      *
+     * @route_name bill.gather
      * @return Content
      */
     public function index()
@@ -192,19 +209,30 @@ class BillPeriodController extends Controller
             // 账期范围
             $form->dateRange('time_begin', 'time_end', trans('bill.period.time'));
 
+            ### 库存金额
+            $form->divider();
             // 现金余额
-            $form->currency('cash_balance', trans('bill.period.cash_balance'))->prepend('￥');
-
+            $form->currency('cash_balance', trans('bill.period.cash_balance'))
+                  ->prepend('￥');
             // 确认收款(已收发票总额)
-            $form->currency('invoice_balance', trans('bill.period.invoice_balance'))->prepend('￥');
+            $form->currency('invoice_balance', trans('bill.period.invoice_balance'))
+                 ->prepend('￥');
+            // 承兑额度
+            $form->currency('acceptance_line', trans('bill.period.acceptance_line'))
+                 ->prepend('￥');
+            // 银行发放的贷款额度
+            $form->currency('loan_balance', trans('bill.period.loan_balance'))
+                 ->prepend('￥');
+
+            ## 当期发生
+            $form->divider();
 
             // 预计收款
             $form->currency('except_balance', trans('bill.period.except_balance'))->prepend('￥');
 
-            // 承兑额度
-            $form->currency('acceptance_line', trans('bill.period.acceptance_line'))->prepend('￥');
-
             $form->divider();
+
+
 
             // 状态
             $form->select('status', trans('bill.period.status'))

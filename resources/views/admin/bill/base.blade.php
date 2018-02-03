@@ -2,11 +2,17 @@
     tr.focus{
         background: #efefef;
     }
+    .bill-period{
+        min-width: 1000px;
+    }
     .bill-period .right-item{
         width: 10em;
         text-align: right;
         float: right;
-        margin-left:3em;
+        margin-left:1em;
+    }
+    .bill-period .right-item label{
+        font-size: 16px;
     }
     .bill-period .right-item label{
         float: left;
@@ -18,9 +24,11 @@
 
     <h4>
         <span>期初余额: {{ $billPeriod->cash_pool }}</span>
-        <span class="pull-right">
-            <div class="right-item"><label>现金:</label> {{ number_format($billPeriod->cash_balance, 2) }} </div>
-            <div class="right-item"><label>承兑:</label> {{ number_format($billPeriod->acceptance_line, 2) }} </div>
+        <span class="">
+            <div class="right-item"><label>{{ __('bill.period.cash_balance') }}:</label> {{ number_format($billPeriod->cash_balance, 2) }} </div>
+            <div class="right-item"><label>{{ __('bill.period.invoice_balance') }}:</label> {{ number_format($billPeriod->invoice_balance, 2) }} </div>
+            <div class="right-item"><label>{{ __('bill.period.acceptance_line') }}:</label> {{ number_format($billPeriod->acceptance_line, 2) }} </div>
+            <div class="right-item"><label>{{ __('bill.period.loan_balance') }}:</label> {{ number_format($billPeriod->loan_balance, 2) }} </div>
         </span>
     </h4>
     <h4>
