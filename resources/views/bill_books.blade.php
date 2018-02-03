@@ -148,20 +148,15 @@
                         <p>&nbsp;</p>
                     </div>
                     <div class="callouts">
-                        <a href="{{ config('app.url').'/ranto/admin'  }}" class="callout minimal third">
-                            <div class="callout-head">
-                                <div class="callout-title">蓝托</div>
-                                <div class="callout-icon"></div>
-                            </div>
-                            <p>登录入口</p>
-                        </a>
-                        <a href="{{ config('app.url').'/sunfen/admin'  }}" class="callout minimal third">
-                            <div class="callout-head">
-                                <div class="callout-title">顺丰</div>
-                                <div class="callout-icon"></div>
-                            </div>
-                            <p>登录入口</p>
-                        </a>
+                        @foreach($books as $book)
+                            <a href="{{$book->url}}" class="callout minimal third">
+                                <div class="callout-head">
+                                    <div class="callout-title">{{$book->title}}</div>
+                                    <div class="callout-icon"></div>
+                                </div>
+                                <p>登录入口</p>
+                            </a>
+                        @endforeach
                         <a class="callout minimal third unlink">
                             <div class="callout-head">
                                 <div class="callout-title">创舰</div>

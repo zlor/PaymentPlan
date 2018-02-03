@@ -16,6 +16,11 @@ Route::get('/', function(){
     // 选择账套
     $books = \Encore\Admin\Book\BookModel::query()->get();
 
+    $map = [
+        'ranto' => $books->where('code', 'ranto')->first(),
+        'sunfen' =>$books->where('code', 'sunfen')->first(),
+        'cj' => [],
+    ];
 
-    return view('bill_books', compact($books));
+    return view('bill_books', compact('books', 'map'));
 });
