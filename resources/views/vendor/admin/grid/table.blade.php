@@ -1,3 +1,10 @@
+<style>
+    .table th,.table td{
+        white-space: nowrap;
+        border:1px solid #efefef;
+        padding:.3em!important;
+    }
+</style>
 <div class="box">
     <div class="box-header">
 

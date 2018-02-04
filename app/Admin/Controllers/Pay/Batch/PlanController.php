@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers\Pay\Batch;
 
 use App\Admin\Controllers\Pay\BatchController;
+use App\Admin\Extensions\Tools\AreaEdit;
 use App\Admin\Extensions\Tools\BatchPost;
 use App\Admin\Extensions\Tools\Import;
 use Encore\Admin\Facades\Admin;
@@ -24,7 +25,11 @@ class PlanController extends BatchController
         'store' => 'plan.schedule.store.batch',
 
         'excel'  => 'payment.plan.excel',
+
+        'editPlan' => 'plan.schedule.update.batch',
     ];
+
+    protected $batch_column = 'plan_due_money';
 
     public function index(Request $request)
     {
@@ -49,20 +54,19 @@ class PlanController extends BatchController
 
             ## 导入链接
             $tool_import = new Import();
-
             $tool_import->setAction($this->getUrl('excel'));
-
             $tools->append($tool_import);
+            ##
+            $tool_open_edit = new AreaEdit('planArea', 'planHead');
+            $tools->append($tool_open_edit);
 
-            ## 批量操作调整
-            $tools->batch(function(Tools\BatchActions $actions){
-
-                $actions->disableDelete();
-
-                // 增加批量修改计划金额操作
-                $actions->add('保存-计划金额调整', new BatchPost());
-
-            });
+            // ## 批量操作调整
+            $tools->disableBatchActions();
+            // $tools->batch(function(Tools\BatchActions $actions){
+            //     $actions->disableDelete();
+            //     // 增加批量修改计划金额操作
+            //     $actions->add('保存-计划金额调整', new BatchPost());
+            // });
 
         });
 
@@ -72,9 +76,12 @@ class PlanController extends BatchController
             // 当已存在其他核定信息时，不可编辑
             $paymentSchedule = $this->row;
 
+            // 快速调整界面取消，编辑操作
+            $actions->disableEdit();
+
+            // 有权限编辑时，可以允许删除
             if( ! $paymentSchedule->allowPlanEdit())
             {
-                $actions->disableEdit();
                 $actions->disableDelete();
             }
         });
@@ -89,25 +96,8 @@ class PlanController extends BatchController
      */
     protected function _adaptMultiCellEdit()
     {
+
         $script = <<<SCRIPT
-    $('.planArea ul li.show-info').click(function(){
-        var ul = $(this).parent('ul');
-        ul.find('li.show-info').hide();
-        ul.find('li.edit-info').removeClass('hide');
-        ul.find('li.edit-message-info').removeClass('hide');
-        ul.find('li.edit-info').html('<div class="input-group"><span class="input-group-btn"><button type="button" class="cacheEdit btn btn-sm btn-default"><i class="fa fa-check" title="暂存"></i></button></span><input type="text" name="editPlanMoney" class="form-control input-sm"></div>');
-    });
-    
-    $('.planArea ul ').on('click', 'button.cacheEdit', function(){
-        $(this).parents('li.edit-info').addClass('hide');
-        $(this).parents('ul').find('li.edit-message-info').addClass('hide');
-        $(this).parents('ul').find('li.show-info').show();
-    });
-    $('.planArea ul ').on('change', 'input.editPlanMoney', function(){
-        var message = 'test';
-        $(this).parents('ul').find('li.edit-message-info').html(message);
-    });
-    
 SCRIPT;
         Admin::script($script);
     }

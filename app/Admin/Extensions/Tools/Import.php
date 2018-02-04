@@ -12,19 +12,6 @@ class Import extends AbstractTool
 
     protected function script()
     {
-        $url = Request::fullUrlWithQuery(['gender' => '_gender_']);
-
-        return <<<EOT
-
-$('input:radio.user-gender').change(function () {
-
-    var url = "$url".replace('_gender_', $(this).val());
-
-    $.pjax({container:'#pjax-container', url: url });
-
-});
-
-EOT;
     }
 
     public function setAction($action)

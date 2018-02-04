@@ -64,17 +64,21 @@ Route::group([
     $router->put('/lock/schedule/{id}', 'Pay\AuditController@lockUpdate')->name('lock.schedule.update');
 
     ## 付款计划-排款功能页面
-    $router->get('/plan/schedule/batch', 'Pay\Batch\PlanController@index')->name('payment.schedule.plan.batch');
-    $router->post('/plan/schedule/batch', 'Pay\Batch\PlanController@store')->name('plan.schedule.store.batch');
+    $router->get('/plan/batch/schedule/', 'Pay\Batch\PlanController@index')->name('payment.schedule.plan.batch');
+    $router->put('/plan/batch/schedule/{id}', 'Pay\Batch\PlanController@update')->name('plan.schedule.update.batch');
+    $router->post('/plan/batch/schedule', 'Pay\Batch\PlanController@store')->name('plan.schedule.store.batch');
 
-    $router->get('/audit/schedule/batch', 'Pay\Batch\AuditController@index')->name('payment.schedule.audit.batch');
-    $router->post('/audit/schedule/batch', 'Pay\Batch\AuditController@store')->name('audit.schedule.store.batch');
+    $router->get('/audit/batch/schedule', 'Pay\Batch\AuditController@index')->name('payment.schedule.audit.batch');
+    $router->put('/audit/batch/schedule/{id}', 'Pay\Batch\AuditController@update')->name('audit.schedule.update.batch');
+    $router->post('/audit/batch/schedule', 'Pay\Batch\AuditController@store')->name('audit.schedule.store.batch');
 
-    $router->get('/final/schedule/batch', 'Pay\Batch\FinalController@index')->name('payment.schedule.final.batch');
-    $router->post('/final/schedule/batch', 'Pay\Batch\FinalController@store')->name('final.schedule.store.batch');
+    $router->get('/final/batch/schedule', 'Pay\Batch\FinalController@index')->name('payment.schedule.final.batch');
+    $router->put('/final/batch/schedule/{id}', 'Pay\Batch\FinalController@update')->name('final.schedule.update.batch');
+    $router->post('/final/batch/schedule', 'Pay\Batch\FinalController@store')->name('final.schedule.store.batch');
 
-    $router->get('/lock/schedule/batch', 'Pay\Batch\FinalController@index')->name('payment.schedule.lock.batch');
-    $router->post('/lock/schedule/batch', 'Pay\Batch\FinalController@store')->name('lock.schedule.store.batch');
+    $router->get('/lock/batch/schedule', 'Pay\Batch\LockController@index')->name('payment.schedule.lock.batch');
+    $router->put('/lock/batch/schedule/{id}', 'Pay\Batch\LockController@update')->name('lock.schedule.update.batch');
+    $router->post('/lock/batch/schedule', 'Pay\Batch\LockController@store')->name('lock.schedule.store.batch');
 
     ## 付款计划进度(用于锁定付款)
     $router->get('/progress/schedule', 'Pay\ProgressController@index')->name('payment.schedule.progress');

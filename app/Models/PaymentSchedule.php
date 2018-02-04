@@ -10,6 +10,7 @@ use App\Models\Traits\BelongsToSupplier;
 use App\Models\Traits\CommonOptions;
 use App\Models\Traits\HasManyBillPeriodFlow;
 use App\Models\Traits\HasManyPaymentDetail;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use League\Flysystem\Exception;
@@ -174,6 +175,76 @@ class PaymentSchedule extends Model
                 ->sum('money');
 
         return $this->save();
+    }
+
+    /**
+     * 批量修改界面，更新属性值
+     *
+     * @param $field
+     * @param $params
+     *
+     * @return array
+     */
+    public function updateByBatch($field, $params)
+    {
+        $money = $params['money'];
+        $time  = date('Y-m-d h:i:s', time());
+        $user  = Admin::user();
+        $man  = $user->name;
+        $memo  = "[快速修改{$money},{$time},{$user->id}:{$man}]";
+
+        switch ($field)
+        {
+            case 'plan_due_money':
+                $this->plan_due_money = $money;
+                $this->plan_time = $time;
+                $this->plan_man  = $man;
+                $this->memo .="(计划调整:$memo)";
+                break;
+            case 'audit_due_money':
+                $this->audit_due_money = $money;
+                $this->audit_time = $time;
+                $this->audit_man  = $man;
+                $this->memo_audit .= "(一次核定调整:$memo)";
+                break;
+            case 'final_due_money':
+                $this->final_due_money = $money;
+                $this->final_time = $time;
+                $this->final_man  = $man;
+                $this->memo_final .= "(二次核定调整:$memo)";
+                break;
+            case 'due_money':
+                $this->due_money = $money;
+                $this->memo .= "(敲定应付款:$memo)";
+                break;
+
+            default:break;
+        }
+
+        $data = [
+            'success' =>false,
+            'msg' => '',
+        ];
+
+        try{
+
+            $res = $this->save();
+
+            if($res){
+                $data['success'] = true;
+            }else{
+                $data['msg'] = '更新失败';
+            }
+
+        }catch (Exception $e)
+        {
+            $msg = $e->getMessage();
+
+            $data['msg'] = $msg;
+        }
+
+        return $data;
+
     }
 
     /**
