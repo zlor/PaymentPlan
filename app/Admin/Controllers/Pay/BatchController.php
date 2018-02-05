@@ -43,9 +43,9 @@ class BatchController extends Controller
             $css = <<<STYLE
 <style>
 .table th,.table td{
-white-space: nowrap;
-border:1px solid #efefef;
-padding:2px!important;
+    white-space: nowrap;
+    border:1px solid #efefef;
+    padding:2px!important;
 }
 
 .ul-area .action{

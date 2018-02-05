@@ -107,8 +107,18 @@
     .table td p a{
         margin: 0;
     }
+    .table th,.table td{
+        white-space: nowrap;
+    }
+    .gather-info{
+        overflow-x: auto;
+        max-width:900px;
+    }
+    .gather-info>div{
+        min-width:850px;
+    }
 </style>
-<div class="box">
+<div class="box gather-info">
     <div class="box-header with-border">
 
         <ul class="clearfix type-list list-unstyled" style="margin: auto;">

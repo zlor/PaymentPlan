@@ -109,6 +109,11 @@ class HomeController extends Controller
 
         return Admin::content(function(Content $content)use($focusBillPeriod, $focusPaymentType){
 
+            $style =<<<STYLE
+
+STYLE;
+
+
             $content->header('账期');
 
             $content->description('汇总信息');
