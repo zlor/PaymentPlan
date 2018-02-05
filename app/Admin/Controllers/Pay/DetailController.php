@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers\Pay;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\GetSpanMoney;
 use App\Models\BillPeriod;
 use App\Models\PaymentDetail;
 use App\Models\PaymentSchedule;
@@ -30,6 +31,8 @@ class DetailController extends Controller
 {
     use ModelForm;
 
+    use GetSpanMoney;
+
     protected $routeMap = [
         'index' => 'payment.schedule.pay',
         'detail' => 'pay.schedule.detail',
@@ -46,6 +49,41 @@ class DetailController extends Controller
     public function index()
     {
         return Admin::content(function(Content $content){
+            $css = <<<STYLE
+<style>
+.table th,.table td{
+white-space: nowrap;
+border:1px solid #efefef;
+padding:2px!important;
+}
+.ul-area .action{
+    display:none;
+}
+
+td>div>ul.list-unstyled>li.show-info>div{
+    
+    white-space: nowrap;
+}
+td .text-money{
+    color:black;
+}
+td .text-money.text-unfocus{
+    color:#777777;
+}
+td .text-money.text-money-minius{
+    color:red;
+}
+td .text-money.text-money-zero{
+    color:gray;
+}
+td .coin{
+    color:#bfbfbf;
+    color:white;
+    margin-right:.3em;
+}
+</style>
+STYLE;
+            $content->row($css);
 
             $content->header(trans('pay.payment.schedule'));
 
@@ -457,127 +495,87 @@ SCRIPT;
             // 物料类型
             $grid->column('payment_type.name', trans('payment.schedule.payment_type'));
 
+            $that = $this;
             /**
              * 导入信息汇总
              */
-            $grid->column('import_info', trans('payment.schedule.importInfo'))
-                ->display(function(){
-                    // 科目编号
-                    $title_name = trans('payment.schedule.name');
-                    // 供应商名称
-                    $title_supplierName = trans('payment.schedule.supplier_name');
-                    // 物料名称
-                    $title_materiel = trans('payment.schedule.payment_materiel');
-                    // 付款周期
-                    $title_pay_cycle = trans('payment.schedule.pay_cycle');
-                    // 付款确认人
-                    $title_charge_man = trans('payment.schedule.charge_man');
-
-                    return "<div>
-                                <label class='badge badge-default' title='{$title_supplierName}'>{$this->supplier_name}</label><br>
-                                <label class='label label-default' title='$title_name'>{$this->name}</label>
-                                <label class='label label-default' title='{$title_materiel}'>{$this->payment_materiel_name}</label>
-                                <label class='label label-default' title='{$title_charge_man}'>{$this->charge_man}</label> <label class='label label-default' title='{$title_pay_cycle}'>{$this->pay_cycle}</label>
-                                
-                           </div>";
+            // 供应商
+            $grid->column('supplier_name', trans('payment.schedule.supplier_name'))
+                ->display(function($value){
+                    // $txt = mb_strlen($value)>10?(mb_substr($value, 0, 10).'...'):$value;
+                    return "<span data-toggle='tooltip' data-title='{$value}'>{$value}</span>";
                 });
-            $grid->column('supplierBalanceInfo', trans('payment.schedule.supplierBalanceInfo'))
-                ->display(function(){
-                    $total = number_format($this->supplier_balance, 2);
-                    $last  = number_format($this->supplier_lpu_balance, 2);
-                    $money  = number_format($this->due_money, 2);
-                    return "<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='总应付款'> ￥<label class='bg-white text-danger'>{$total}</label> <i>总</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='上期未付清余额'> ￥<label class='bg-white text-warning'>{$last}</label> <i>余</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期应付款'> ￥<label class='bg-white text-red'>{$money}</label> <i>本</i></li>
-                                </ul>
-                            </div>";
+            // 科目
+            $grid->column('name', trans('payment.schedule.name'));
+            // 物料名称
+            $grid->column('materiel_name', trans('payment.schedule.payment_materiel'))
+                ->display(function($value){
+                    // $txt =  mb_strlen($value)>4?(mb_substr($value, 0, 4).'..'):$value;
+                    return "<span data-toggle='tooltip' data-title='{$value}'>{$value}</span>";
+                });
+            // 付款确认人
+            $grid->column('charge_man', trans('payment.schedule.charge_man'));
+
+            // 付款周期
+            $grid->column('pay_cycle', trans('payment.schedule.pay_cycle'))
+                ->display(function($value){
+                    // $txt =  mb_strlen($value)>6?(mb_substr($value, 0, 6).'..'):$value;
+                    return "<span data-toggle='tooltip' data-title='{$value}'>{$value}</span>";
                 });
 
-            // // 供应商余额(总应付款)
-            // $grid->column('supplier_balance', trans('payment.schedule.supplier_balance'))
-            //     ->currency();
+            // 上期未付清
+            $grid->column('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'))
+                ->display(function()use($that){
+                    return $that->_getMoneySpan($this->supplier_lpu_balance, ['moneyClass'=>'text-unfocus']);
+                });
+
+            // 供应商全款余额
+            $grid->column('supplier_balance', trans('payment.schedule.supplier_balance'))
+                ->display(function()use($that){
+                    return $that->_getMoneySpan($this->supplier_balance, ['title'=>'']);
+                });
 
             // 计划相关信息
             $grid->column('planInfo', trans('payment.schedule.planInfo'))
-                ->display(function($value){
-                    $plan  = number_format($this->plan_due_money, 2);
-                    return "<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期计划付款'> ￥<label class='bg-white text-red'>{$plan}</label> <i>金额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='计划人'> <label class='bg-white text-defaut'>{$this->plan_man}</label> <i>担当</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='计划时间'> <label class='bg-white text-warning'>{$this->plan_time}</label> <i>时间</i></li>
-                                </ul>
-                            </div>";
+                ->display(function($value)use($that){
+                    return  $that->_getMoneySpan($this->plan_due_money, ['title'=>"{$this->plan_man},{$this->plan_time}", 'moneyClass'=>'text-unfocus']);
                 });
 
             // 核定相关信息
             $grid->column('auditInfo', trans('payment.schedule.auditInfo'))
-                ->display(function($value){
-
-                    $html = '';
-
-                    if($this->hasAuditInfo())
-                    {
-                        $audit = number_format($this->audit_due_money, 2);
-                        $html  =  "<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期一次核定付款'> ￥<label class='bg-white text-red'>{$audit}</label> <i>金额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='核定人'> <label class='bg-white text-defaut'>{$this->audit_man}</label> <i>担当</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='核定时间'> <label class='bg-white text-warning'>{$this->audit_time}</label> <i>时间</i></li>
-                                </ul>
-                            </div>";
-                    }
-                    return $html;
+                ->display(function($value)use($that){
+                    return $that->_getMoneySpan($this->audit_due_money, ['title'=>"{$this->audit_man},{$this->audit_time}",'moneyClass'=>'text-unfocus']);
                 });
 
             // 终核相关信息
             $grid->column('finalInfo', trans('payment.schedule.finalInfo'))
-                ->display(function($value){
-
-                    $html = '';
-
-                    if($this->hasFinalInfo())
-                    {
-                        $final  = number_format($this->final_due_money, 2);
-                        $html= "<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期二次核定付款'> ￥<label class='bg-white text-red'>{$final}</label> <i>金额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='核定人'> <label class='bg-white text-defaut'>{$this->final_man}</label> <i>担当</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='核定时间'> <label class='bg-white text-warning'>{$this->final_time}</label> <i>时间</i></li>
-                                </ul>
-                            </div>";
-                    }
-
-                    return $html;
+                ->display(function($value)use($that){
+                    return $that->_getMoneySpan($this->final_due_money, ['title'=>"{$this->final_man},{$this->final_time}", 'moneyClass'=>'text-unfocus']);
                 });
 
-            $grid->column('payInfo', trans('payment.schedule.payInfo'))
-                ->display(function($value){
+            // 应付款
+            $grid->column('due_money', trans('payment.schedule.due_money'))
+                ->display(function($value)use($that){
+                    return $that->_getMoneySpan($value);
+                });
+
+            // 已付款
+            $grid->column('paid_money', trans('payment.schedule.paid_money'))
+                ->display(function($value)use($that){
 
                     $html = '';
+
                     if($this->hasPayInfo())
                     {
-                        $paid  = number_format($this->paid_money, 2);
                         $cash_paid = number_format($this->cash_paid, 2);
                         $acceptance_paid = number_format($this->acceptance_paid, 2);
 
-                        $html = "<div>
-                                <ul class='list-unstyled' style='margin: auto'>
-                                    <li class='text-right' data-toggle='tooltip' data-title='本期已付款'> ￥<label class='bg-white text-red'>{$paid}</label> <i>总额</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='已付现金'> <label class='bg-white text-defaut'>{$cash_paid}</label> <i>现金</i></li>
-                                    <li class='text-right' data-toggle='tooltip' data-title='已付承兑'> <label class='bg-white text-warning'>{$acceptance_paid}</label> <i>承兑</i></li>
-                                </ul>
-                            </div>";
+                        $options['title'] = "现金:{$cash_paid},承兑:{$acceptance_paid}";
+
+                        $html = $that->_getMoneySpan($this->paid_money, $options);
                     }
 
                     return $html;
-                });
-            // 已付金额
-            $grid->column('paid_money', trans('payment.schedule.paid_money'))
-                ->display(function(){
-                    return $this->paid_money;
                 });
             // 状态
             $grid->column('status', trans('payment.schedule.status'))

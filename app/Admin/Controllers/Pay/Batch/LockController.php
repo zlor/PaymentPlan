@@ -49,6 +49,9 @@ class LockController extends BatchController
 
             ##
             $tool_open_edit = new AreaEdit('dueArea', 'dueHead');
+
+            $tool_open_edit->setInputType();
+
             $tools->append($tool_open_edit);
 
             // ## 批量操作调整

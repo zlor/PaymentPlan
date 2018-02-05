@@ -1,6 +1,6 @@
 <?php
 return [
-    'page.batch' => '第一次核定',
+    'page.batch' => '第二次核定',
 
     'payment'=> '付款',
     'payment.schedule' => '应付款核定',

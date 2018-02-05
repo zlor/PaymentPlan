@@ -50,6 +50,9 @@ class FinalController extends BatchController
 
             ##
             $tool_open_edit = new AreaEdit('finalArea', 'finalHead');
+
+            $tool_open_edit->setInputType();
+
             $tools->append($tool_open_edit);
 
             // ## 批量操作调整

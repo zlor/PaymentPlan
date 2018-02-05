@@ -50,6 +50,9 @@ class AuditController extends BatchController
 
             ##
             $tool_open_edit = new AreaEdit('auditArea', 'auditHead');
+
+            $tool_open_edit->setInputType();
+
             $tools->append($tool_open_edit);
 
             // ## 批量操作调整

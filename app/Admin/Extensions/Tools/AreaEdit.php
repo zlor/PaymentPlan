@@ -14,6 +14,8 @@ class AreaEdit extends AbstractTool
 
     protected $head_name;
 
+    protected $input_type;
+
     public function __construct($areaName = 'area', $headName = 'head')
     {
         $this->area_name = $areaName;
@@ -25,6 +27,32 @@ class AreaEdit extends AbstractTool
         // $url = Request::fullUrlWithQuery(['gender' => '_gender_']);
         $areaClass = $this->area_name;
         $headClass = $this->head_name;
+
+        $inputType = $this->input_type;
+
+        $options = [];
+
+        if(!empty($inputType))
+        {
+            if($inputType == 'currency')
+            {
+                $options = [
+                    'alias'              => 'currency',
+                    'radixPoint'         => '.',
+                    'prefix'             => '',
+                    'removeMaskOnSubmit' => true,
+                ];
+            }
+        }
+
+        Admin::js(asset('/vendor/laravel-admin/AdminLTE/plugins/input-mask/jquery.inputmask.bundle.min.js'));
+
+        $options = json_encode($options);
+
+        $sub_init_script =<<<SCRIPT
+            $('td span.edit.{$areaClass} input[name="offset[]"]').inputmask($options);
+SCRIPT;
+
         // 开启栏目编辑模式
         return <<<EOT
 var initMode = 0;
@@ -45,7 +73,7 @@ $('.btn-area-edit').click(function(){
 // 实时保存反馈
 var postCell = function(target){
     var url = target.find('div.action').data('url'),
-        offset = target.find('div.action input[name="offset[]"]').val(),
+        offset = target.find('div.action input[name="offset[]"]').inputmask('unmaskedvalue'),
         origin = target.find('div.info').data('origin'),
         params = {};
     
@@ -98,7 +126,10 @@ var reCount = function(){
 function initEdit(){
     if(!initMode)
     {
+        {$sub_init_script}
+        
         initTabSwitch();
+        
         initMode = true;
     }
 };
@@ -196,6 +227,11 @@ EOT;
 //     $.pjax({container:'#pjax-container', url: url });
 //
 // });
+    }
+
+    public function setInputType($type = 'currency')
+    {
+        $this->input_type = $type;
     }
 
     public function setAction($action)

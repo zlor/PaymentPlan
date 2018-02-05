@@ -58,6 +58,9 @@ class PlanController extends BatchController
             $tools->append($tool_import);
             ##
             $tool_open_edit = new AreaEdit('planArea', 'planHead');
+
+            $tool_open_edit->setInputType();
+
             $tools->append($tool_open_edit);
 
             // ## 批量操作调整

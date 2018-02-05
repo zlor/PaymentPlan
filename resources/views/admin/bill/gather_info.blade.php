@@ -104,6 +104,9 @@
         color: red;
         margin: .3em;
     }
+    .table td p a{
+        margin: 0;
+    }
 </style>
 <div class="box">
     <div class="box-header with-border">
@@ -139,13 +142,14 @@
     </div>
     <div class="box-body period-info">
         <div class="row">
-            <div class="col-sm-6">
-                {!! $html['schedule'] !!}
-            </div>
-            <div class="divide"></div>
-            <div class="col-sm-6">
-                {!! $html['detail']!!}
-            </div>
+            {!! $html['table'] !!}
+            {{--<div class="col-sm-6">--}}
+                {{--{!! $html['schedule'] !!}--}}
+            {{--</div>--}}
+            {{--<div class="divide"></div>--}}
+            {{--<div class="col-sm-6">--}}
+                {{--{!! $html['detail']!!}--}}
+            {{--</div>--}}
         </div>
     </div>
 

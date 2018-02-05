@@ -72,31 +72,35 @@ STYLE;
             Admin::js(asset('/vendor/laravel-admin/ele-fixed/eleFixed.js'));
 
             $script =<<<SCRIPT
-        $(function(){
-            var filterHeight = 29;
-            
-            var initFixed = function(){
-                var headHeight = $('.ele-fixed').offset().top;
-                eleFixed.push({
-                    target: document.getElementsByClassName('ele-fixed')[0], // it must be a HTMLElement
-                    offsetTop: (headHeight - filterHeight + 30) // height from window offsetTop
-                });
-                eleFixed.push({
-                    target: document.getElementsByClassName('counter')[0], // it must be a HTMLElement
-                    offsetTop: (headHeight + 4 - filterHeight + 30) // height from window offsetTop
-                });
-                
-                var height = $('#filter_div').height();
-                filterHeight = height;
-            };
-            $('#filter_btn').click(function(){
-                eleFixed.delete(document.getElementsByClassName('ele-fixed')[0]);
-                eleFixed.delete(document.getElementsByClassName('counter')[0]);
-                initFixed();
-            });
-            initFixed();
-            
+    var filterHeight = $('#filter_div').height();
+    var headHeight = $('.ele-fixed').offset().top;
+    var offset = 0;
+    
+    var initFixed = function(){
+        eleFixed.push({
+            target: document.getElementsByClassName('ele-fixed')[0], // it must be a HTMLElement
+            offsetTop: (headHeight + offset) // height from window offsetTop
         });
+        eleFixed.push({
+            target: document.getElementsByClassName('counter')[0], // it must be a HTMLElement
+            offsetTop: (headHeight + 4 + offset) // height from window offsetTop
+        });
+        
+    };
+    $('#filter_btn').click(function(){
+        
+        eleFixed.delete(document.getElementsByClassName('ele-fixed')[0]);
+        eleFixed.delete(document.getElementsByClassName('counter')[0]);
+        
+        if( $('.custom-filter').hasClass('collapsed-box'))
+        {
+            offset = 0;
+        }else{
+            offset = -filterHeight + 29;
+        }
+        initFixed();
+    });
+    initFixed();
         
 SCRIPT;
             Admin::script($script);

@@ -37,10 +37,10 @@ class HomeController extends Controller
 
 
         'excel_page'    => 'payment.plan.excel',
-        'schedule_plan_page'=> 'payment.schedule.plan',
-        'schedule_audit_page'=> 'payment.schedule.audit',
-        'schedule_final_page'=> 'payment.schedule.final',
-        'schedule_lock_page'=> 'payment.schedule.lock',
+        'schedule_plan_page'=> 'payment.schedule.plan.batch',
+        'schedule_audit_page'=> 'payment.schedule.audit.batch',
+        'schedule_final_page'=> 'payment.schedule.final.batch',
+        'schedule_lock_page'=> 'payment.schedule.lock.batch',
         'schedules_manage' => 'payment_schedules.index',
 
         'details_manage'  => 'payment_details.index',
@@ -223,11 +223,14 @@ SCRIPT;
 
             // 应付款管理-计划录入
             'schedule_plan_page'=> $this->getUrl('schedule_plan_page'),
-            // 应付款管理-初稿审核
+            // 应付款管理-一次审核
             'schedule_audit_page'=> $this->getUrl('schedule_audit_page'),
+            // 应付款管理-二次审核
+            'schedule_final_page'=> $this->getUrl('schedule_final_page'),
+            // 应付款管理-应付款敲定
+            'schedule_lock_page'=> $this->getUrl('schedule_lock_page'),
             // 档案管理-应付款计划
             'schedules_manage'  => $this->getUrl('schedules_manage'),
-
             // 档案管理-付款明细
             'details_manage'  => $this->getUrl('details_manage'),
             'detail_page'     => $this->getUrl('detail_page')
@@ -258,58 +261,58 @@ SCRIPT;
         ];
 
         $html = [];
-        $html['schedule'] ="
-        <h5>期初: <span class='money text-black' data-toggle='tooltip' data-title='总额'>{$count['init_balance']}  = </span>
-                 <span class='money text-blue' data-toggle='tooltip' data-title='现金-存款'>({$count['cash_balance']}</span>
-                 <span class='money text-light-blue' data-toggle='tooltip' data-title='现金-确认应收款'> + {$count['invoice_balance']} </span>
-                 <span class='money text-green' data-toggle='tooltip' data-title='现金-贷款'> + {$count['loan_balance']} )</span>
-                 <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + {$count['acceptance_balance']}</span>
-        </h5>
-        <hr>
-        <h5>
-            当前: <span class='money text-black' data-toggle='tooltip' data-title='余额'>{$count['balance']}  = </span>
-                 <span class='money text-blue' data-toggle='tooltip' data-title='现金'>{$count['current_cash_balance']}</span>
-                 <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + {$count['current_acceptance_balance']}</span>
-        </h5>
-        
-        <div class='pre'>
-            <p>文件数量({$count['uploadNum']}) / 导入数量({$count['importNum']})</p>
-            <hr>
-            <p>计划( {$count['planNum']} ) => 一次核定( {$count['auditNum']} ) => 二次核定( {$count['finalNum']} ) =>付款中( {$count['payingNum']} ) => 完成付款({$count['paidNum']})</p>
-            <hr>
-             <p>
-            支付: <span class='money text-black' data-toggle='tooltip' data-title='总额'>{$count['paid']}  = </span>
-                 <span class='money text-blue' data-toggle='tooltip' data-title='现金'>{$count['cash_paid']}</span>
-                 <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + {$count['acceptance_paid']}</span>
-            </p>
-        </div>
-        ";
-
-        $html['detail'] = "
-        <h5>快速入口</h5>
-        <div class='pre'>
-                 <p>
-                    ".($focusBillPeriod->allowSetPool()?"<a href='{$url['set_cash_pool']}' >设置账期</a>":'设置账期(已锁定)')."
-                    <label class='label label-primary'>{$statusTxt}</label>
-                 </p>
-                 <hr>
-                 <p>
-                    <a href='{$url['file_page']}' target='_blank'>文件导入管理</a>
-                 </p>
-                 <hr>
-                 <p>
-                    <a href='{$url['schedules_manage']}' target='_blank'>档案-付款计划</a>&nbsp;
-                    <a href='{$url['schedule_plan_page']}' target='_blank'>计划录入</a>&nbsp;
-                    <a href='{$url['schedule_audit_page']}' target='_blank'>一次核定</a>&nbsp;
-                    <a href='{$url['schedule_audit_page']}' target='_blank'>二次核定</a>&nbsp;
-                    <a href='{$url['schedule_audit_page']}' target='_blank'>应付款敲定</a>&nbsp;
-                 </p>
-                 <hr>
-                 <p>
-                    <a href='{$url['details_manage']}' target='_blank'>档案-付款详情</a>&nbsp;
-                    <a href='{$url['detail_page']}' target='_blank'>付款录入</a>&nbsp;
-                 </p>
-        </div>";
+        // $html['schedule'] ="
+        // <h5>期初: <span class='money text-black' data-toggle='tooltip' data-title='总额'>{$count['init_balance']}  = </span>
+        //          <span class='money text-blue' data-toggle='tooltip' data-title='现金-存款'>({$count['cash_balance']}</span>
+        //          <span class='money text-light-blue' data-toggle='tooltip' data-title='现金-确认应收款'> + {$count['invoice_balance']} </span>
+        //          <span class='money text-green' data-toggle='tooltip' data-title='现金-贷款'> + {$count['loan_balance']} )</span>
+        //          <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + {$count['acceptance_balance']}</span>
+        // </h5>
+        // <hr>
+        // <h5>
+        //     当前: <span class='money text-black' data-toggle='tooltip' data-title='余额'>{$count['balance']}  = </span>
+        //          <span class='money text-blue' data-toggle='tooltip' data-title='现金'>{$count['current_cash_balance']}</span>
+        //          <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + {$count['current_acceptance_balance']}</span>
+        // </h5>
+        //
+        // <div class='pre'>
+        //     <p>文件数量({$count['uploadNum']}) / 导入数量({$count['importNum']})</p>
+        //     <hr>
+        //     <p>计划( {$count['planNum']} ) => 一次核定( {$count['auditNum']} ) => 二次核定( {$count['finalNum']} ) =>付款中( {$count['payingNum']} ) => 完成付款({$count['paidNum']})</p>
+        //     <hr>
+        //      <p>
+        //     支付: <span class='money text-black' data-toggle='tooltip' data-title='总额'>{$count['paid']}  = </span>
+        //          <span class='money text-blue' data-toggle='tooltip' data-title='现金'>{$count['cash_paid']}</span>
+        //          <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + {$count['acceptance_paid']}</span>
+        //     </p>
+        // </div>
+        // ";
+        //
+        // $html['detail'] = "
+        // <h5>快速入口</h5>
+        // <div class='pre'>
+        //          <p>
+        //             ".($focusBillPeriod->allowSetPool()?"<a href='{$url['set_cash_pool']}' >设置账期</a>":'设置账期(已锁定)')."
+        //             <label class='label label-primary'>{$statusTxt}</label>
+        //          </p>
+        //          <hr>
+        //          <p>
+        //             <a href='{$url['file_page']}' target='_blank'>文件导入管理</a>
+        //          </p>
+        //          <hr>
+        //          <p>
+        //             <a href='{$url['schedules_manage']}' target='_blank'>档案-付款计划</a>&nbsp;
+        //             <a href='{$url['schedule_plan_page']}' target='_blank'>计划录入</a>&nbsp;
+        //             <a href='{$url['schedule_audit_page']}' target='_blank'>一次核定</a>&nbsp;
+        //             <a href='{$url['schedule_audit_page']}' target='_blank'>二次核定</a>&nbsp;
+        //             <a href='{$url['schedule_audit_page']}' target='_blank'>应付款敲定</a>&nbsp;
+        //          </p>
+        //          <hr>
+        //          <p>
+        //             <a href='{$url['details_manage']}' target='_blank'>档案-付款详情</a>&nbsp;
+        //             <a href='{$url['detail_page']}' target='_blank'>付款录入</a>&nbsp;
+        //          </p>
+        // </div>";
 
         $script =<<<SCRIPT
         $(function(){
@@ -325,6 +328,70 @@ SCRIPT;
 SCRIPT;
         Admin::script($script);
 
+
+        $table = new Table();
+
+        $table->setHeaders([
+            'status' => '状态',
+            'type'=> '分类',
+            'money'   => '资金= 现金(存款+确认应收款+贷款) + 承兑',
+            'schedule' => '计划',
+            'import' => '文件(已载入/总数)',
+
+        ]);
+
+        $table->setRows([
+            [
+                'status' => "<label class='badge label-primary'>{$statusTxt}</label>"
+
+                ,'type'  => $focusPaymentType->id?$focusPaymentType->name:'总计'
+                ,'money'=>"<span>期初：
+                         <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['init_balance'],2)."  = </span>
+                         <span class='money text-blue' data-toggle='tooltip' data-title='现金-存款'>( ".number_format($count['cash_balance'],2)."</span>
+                         <span class='money text-light-blue' data-toggle='tooltip' data-title='现金-确认应收款'>  + ".number_format($count['invoice_balance'],2)." </span>
+                         <span class='money text-green' data-toggle='tooltip' data-title='现金-贷款'> + ".number_format($count['loan_balance'], 2)." )</span>
+                         <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + ".number_format($count['acceptance_balance'], 2)."</span>
+                         </span>
+                         <br>
+                         <span>当前： 
+                         <span class='money text-black' data-toggle='tooltip' data-title='余额'>".number_format($count['balance'], 2)."  = </span>
+                         <span class='money text-blue' data-toggle='tooltip' data-title='现金'>( ".number_format($count['current_cash_balance'], 2)." )</span>
+                         <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + ".number_format($count['current_acceptance_balance'], 2)."</span>
+                         </span>
+                         <br>
+                          <p>支付：
+                            <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['paid'],2)."  = </span>
+                            <span class='money text-blue' data-toggle='tooltip' data-title='现金'>( ".number_format($count['cash_paid'],2)." )</span>
+                            <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + ".number_format($count['acceptance_paid'], 2)."</span>
+                          </p>"
+                ,'schedule'=>"<p>
+                                <span class='text-right'> {$count['planNum']} <i class='text-gray'>计划</i></span><br>
+                                <span class='text-right'> {$count['payingNum']} <i class='text-gray'>付款</i></span><br>
+                                <span class='text-right'> {$count['paidNum']} <i class='text-gray'>完成</i></span><br>
+                              </p>"
+                ,'import'=>"<p>{$count['importNum']}/{$count['uploadNum']}</p>"
+            ],
+            [
+                'status' => "<p>"
+                            .($focusBillPeriod->allowSetPool()?"<a href='{$url['set_cash_pool']}' >设置账期</a>":'设置账期(已锁定)')
+                            ."</p>"
+
+                ,'type'  => '<p>'._A('档案:付款计划', ['href'=>$url['schedules_manage'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'
+                           .'<p>'._A('档案:付款详情', ['href'=>$url['details_manage'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'
+
+                ,'money' => '<p>'._A('付款录入', ['href'=>$url['detail_page'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'
+
+                ,'schedule'=> '<p>'._A('计划录入', ['href'=>$url['schedule_plan_page'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'
+                             .'<p>'._A('一次核定', ['href'=>$url['schedule_audit_page'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'
+                             .'<p>'._A('二次核定', ['href'=>$url['schedule_final_page'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'
+                             .'<p>'._A('应付款敲定', ['href'=>$url['schedule_lock_page'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'
+
+                ,'import'=>'<p>'._A('文件导入管理', ['href'=>$url['file_page'], 'target'=>'_blank', 'class'=>"btn btn-default"]).'</p>'
+            ]
+        ]);
+
+
+        $html['table'] = $table->render();
 
         return view('admin.bill.gather_info', compact('paymentTypes', 'html', 'page'));
     }

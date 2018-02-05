@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: juli
- * Date: 2017/09/30
- * Time: 下午1:47
- */
-
 namespace App\Http\Controllers\Traits;
 
 
