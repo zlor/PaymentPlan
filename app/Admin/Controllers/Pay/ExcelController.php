@@ -34,6 +34,7 @@ class ExcelController extends Controller
         'paymentIndex' => 'payment.schedule.plan',
 
         'upload' => 'payment.plan.excel.upload',
+        'uploadTotal' => 'payment.plan.excel.upload.total',
         'remove' => 'payment.plan.file.remove',
         'import' => 'payment.plan.file.import',
         'download' => 'payment.plan.file.download',
@@ -107,6 +108,8 @@ class ExcelController extends Controller
                         $tabPanel->add('已上传的文件',$this->schedule_file_list($filter).('<hr><h6>相关信息</h6><pre id="aboutFile"></pre>'), true);
 
                         $tabPanel->add('上传文件',    $this->schedule_file_form($filter), false);
+
+                        // $tabPanel->add('上传文件(自动切分)', $this->schedule_file_total($filter), false);
 
                         $column->append($tabPanel);
                     });
@@ -261,6 +264,44 @@ SCRIPT;
 
         $form->select('payment_type_id', '物料类型')
             ->options(PaymentSchedule::getPaymentTypeOptions());
+
+        $form->file('file', '上传文件');
+
+        $form->text('name', '文件重命名')->rules('nullable');
+
+        $form->textarea('memo', '备注');
+
+        $form->hidden('_token')->default(csrf_token());
+
+        return $form;
+    }
+
+    /**
+     * 付款计划-导入总数据文件, 按照指定的分类自动切分为多个小文件。
+     *
+     *
+     * @param $filter
+     */
+    protected function schedule_file_total($filter)
+    {
+        $form = new Form();
+
+        // 设置上传路径
+        $form->action($this->getUrl('uploadTotal'));
+
+        // 当前账期
+        $bill_period_id = $form->select('bill_period_id', '账期')
+            ->options(PaymentSchedule::getBillPeriodOptions($filter['is_current_bill_period']));
+
+        if($filter['bill_period_id'])
+        {
+            $bill_period_id->default($filter['bill_period_id']);
+        }
+
+        // 多选，选择需要切分成文件的sheets
+        $form->multipleSelect('payment_type_id', 'Excel Sheets')
+            ->options(PaymentSchedule::getPaymentTypeSheetOptions())
+            ->help('选择需要切分为文件的 sheet 名称');
 
         $form->file('file', '上传文件');
 
@@ -560,6 +601,72 @@ SCIPRT;
         $paymentFile->save();
 
         session()->flash('success', new MessageBag(['title'=>'上传成功！', 'message'=>'']));
+
+        return response()->redirectTo($this->getUrl('index', ['default_bill_period_id'=>$billPeriod->id]));
+    }
+
+    /**
+     * 上传文件, 按照指定的 sheet 切分为多个 excel 文件
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function uploadTotal(Request $request)
+    {
+        // 验证上传信息
+        $this->validate($request, [
+            'name' => 'nullable|max:50',
+            'file' => 'required|mimes:xlsx,xls',
+            'bill_period_id'=>'required',
+            'payment_type_id'=>'required',
+        ], [],
+            [
+                'name'              => '重命名',
+                'file'              => '文件',
+                'bill_period_id'    => '账期',
+                'payment_type_id'   => '物料类型'
+            ]);
+
+        // 识别账期
+        $billPeriod = BillPeriod::query()->findOrNew($request->bill_period_id);
+
+        if(empty($billPeriod->id))
+        {
+            session()->flash('exception', new MessageBag(['title'=>'异常', 'message'=>'账期未选择！']));
+
+            return redirect()->back();
+        }
+
+        // 识别类型
+        $paymentTypes = PaymentType::query()->whereIn('id', $request->payment_type_id)->get();
+        if($paymentTypes->count()<=0)
+        {
+            session()->flash('exception', new MessageBag(['title'=>'异常', 'message'=>'物料类型未选择(要自动获取的sheet未选择)！']));
+
+            return redirect()->back();
+        }
+
+
+
+        // 构造 PaymentFile (已将临时文件转移到)
+        $paymentFile = PaymentFile::makeFile($billPeriod, $request->name, $request->file);
+
+        // 加入备注信息
+        $paymentFile->memo = $request->memo;
+
+        // 关联账期
+        $paymentFile->bill_period()->associate($billPeriod);
+
+        // 保存文件
+        $paymentFile->save();
+
+        session()->flash('success', new MessageBag(['title'=>'上传成功！', 'message'=>'']));
+
+        // 识别缓存数据，切分为多个文件
+        $paymentFile->cuttingFile($paymentTypes);
+
+        session()->flash('success', new MessageBag(['title'=>'切分成功！', 'message'=>'']));
 
         return response()->redirectTo($this->getUrl('index', ['default_bill_period_id'=>$billPeriod->id]));
     }

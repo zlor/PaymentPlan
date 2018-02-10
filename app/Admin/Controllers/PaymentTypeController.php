@@ -85,6 +85,9 @@ class PaymentTypeController extends Controller
             // 类型标识
             $grid->column('icon', trans('payment.type.icon'));
 
+            // map_sheet
+            $grid->column('sheet_slug', trans('payment.type.sheet_slug'));
+
 
             $grid->created_at();
             $grid->updated_at();
@@ -109,6 +112,11 @@ class PaymentTypeController extends Controller
                 ->rules('required');
 
             $form->icon('icon', trans('payment.type.icon'));
+
+            $form->radio('map_sheet', trans('payment.type.map_sheet'))
+                ->options(PaymentType::getBooleanOptions('payment.type.map_sheet', 'bool', true));
+
+            $form->text('sheet_slug', trans('payment.type.sheet_slug'));
 
             $form->textarea('memo', trans('admin.memo'));
 

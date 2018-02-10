@@ -28,3 +28,4 @@ app('view')->prependNamespace('admin', resource_path('views/vendor/admin'));
 
 Column::extend('popover', Popover::class);
 Column::extend('currency', Currency::class);
+// Admin::extend('hansontable', HansonTable::class);

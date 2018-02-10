@@ -9,10 +9,12 @@ use App\Models\Traits\HasManyPaymentSchedule;
 use App\Models\Traits\UploadFileTool;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Readers\LaravelExcelReader;
 
 class PaymentFile extends File
 {
@@ -174,7 +176,7 @@ class PaymentFile extends File
             $rows = $validData['rows'][$areaIndex];
 
 
-            $fromRowNumber = isset($map[$fromRowNumber])?($map[$fromRowNumber] - 1):0;
+            $fromRowNumber = isset($map[$fromRowNumber])?$map[$fromRowNumber]:0;
 
             // 识别原文件的行号
 
@@ -287,12 +289,13 @@ class PaymentFile extends File
             // 序列有效，为数据行
             if( is_numeric($index) )
             {
-                // 获得有效数据行
-                $validData[$areaIndex][$rowIndex++] = $item;
-
                 // 存放有效数据行 -行号
                 $validRow[$areaIndex]['row'][$key] = $rowIndex;
                 $validRow[$areaIndex]['source'][$rowIndex] = $key;
+                // 获得有效数据行
+                $validData[$areaIndex][$rowIndex] = $item;
+
+                $rowIndex++;
             }
         }
 
@@ -586,6 +589,19 @@ class PaymentFile extends File
         return $this->is_import_success;
     }
 
+    /**
+     * 获取文件名前缀
+     * @return mixed
+     */
+    public function getNamePre()
+    {
+        $files = explode('.', $this->name);
+
+        $names = array_slice($files, 0, -1);
+
+        return join('.', $names);
+    }
+
 
 
     /**
@@ -609,6 +625,116 @@ class PaymentFile extends File
     {
         return Storage::disk('import')->path(substr($this->path, 1));
     }
+
+
+    public static function makeFiles(BillPeriod $billPeriod, $namePre = '', UploadedFile $file, $choosePaymentTypeIds = [])
+    {
+        $user = Admin::user();
+
+        $paymentFile  = new PaymentFile([
+            'ext'     => $file->extension(),
+            'size'    => $file->getSize(),
+            'user_id' => $user->id,
+            'type'    => self::TYPE_PAYMENT,
+        ]);
+        // 指定盘符
+        $paymentFile->disk('import');
+
+        // 指定文件名
+        if(!empty($name))
+        {
+            $paymentFile->rename();
+
+            $paymentFile->name($name.'.'.$file->extension());
+
+        }else{
+
+            $paymentFile->name($file->getClientOriginalName());
+        }
+
+        // 上传文件
+        $paymentFile->path = $paymentFile->upload($file);
+
+        // 设置上传成功
+        $paymentFile->is_upload_success = true;
+
+        // 获取实际文件名
+        $paymentFile->name = $paymentFile->getFileName();
+
+        return $paymentFile;
+    }
+
+    /**
+     * 切分原始文件
+     *
+     * @param Collection $paymentTypes 切分出来的物料类型
+     *
+     * @param bool $keepTotal 是否保留被切分的文件
+     *
+     * @return bool
+     */
+    public function cuttingFile(Collection $paymentTypes = null, $name = '', $keepTotal = true)
+    {
+        if(empty($choosePaymentTypeIds))
+        {
+            return false;
+        }
+        // 识别当前的系统账套
+        $bookName = config('book_flag_txt');
+
+        $file = $this;
+
+        $name = empty($name)?$this->getNamePre():$name;
+
+        $typeSheets = [];
+        $mapSheets  = [];
+        // 创建要生成的文件对象
+        foreach ($paymentTypes as $paymentType)
+        {
+            if(!$paymentType->map_sheet)
+            {
+                continue;
+            }
+
+            $typeSheets[] = $paymentType->sheet_slug;
+            $mapSheets[$paymentType->sheet_slug] = $paymentType->id;
+        }
+
+        Excel::selectSheets($typeSheets)->load($file->getLocalPath(), function ($reader) use (& $data, $typeSheets) {
+            foreach ($typeSheets as $key => $sheet)
+            {
+                $reader = $reader->getSheet($key);
+                $data[$sheet] = $reader->toArray();
+            }
+        });
+
+        foreach ($data as $sheetName => $sheetData)
+        {
+            $excelName = $name . '_' . $sheetName;
+
+            $paymentFile = clone $this;
+
+            $paymentFile->payment_type_id = $mapSheets[$sheetName];
+
+            $paymentFile->name = $excelName;
+
+            Excel::create($sheetName, function($excel)use($sheetData, $sheetName){
+
+                $excel->sheet($sheetName, function($sheet)use($sheetData) {
+
+                    $sheet->fromArray($sheetData);
+                });
+            })->store('xls', storage_path());
+        }
+
+
+        // 构建生成对象的数据
+
+        // 创建实体文件
+
+        return true;
+    }
+
 
 
     /**

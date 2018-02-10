@@ -6,6 +6,7 @@ use App\Models\Traits\BelongsToAdministrator;
 use App\Models\Traits\BelongsToBillPeriod;
 use App\Models\Traits\BelongsToPaymentSchedule;
 use App\Models\Traits\BelongsToSupplier;
+use App\Models\Traits\CommonOptions;
 use App\Models\Traits\HasManyPaymentSchedule;
 use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PaymentType extends Model
 {
     use SoftDeletes;
+
+    use CommonOptions;
 
     protected $table = 'payment_types';
 

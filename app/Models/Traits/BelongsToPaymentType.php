@@ -42,4 +42,23 @@ trait BelongsToPaymentType
 
         return $query->get()->pluck('name', 'id');
     }
+
+    /**
+     * 获取付款物料Excel_Sheet-备选
+     *
+     * @param Closure|null $callable
+     *
+     * @return \Illuminate\Support\Collection|mixed
+     */
+    public static function getPaymentTypeSheetOptions(Closure $callable = null)
+    {
+        $query = PaymentType::query();
+
+        if(! is_null($callable))
+        {
+            return call_user_func($callable, $query);
+        }
+
+        return $query->where('map_sheet', true)->get()->pluck('sheet_slug', 'id');
+    }
 }

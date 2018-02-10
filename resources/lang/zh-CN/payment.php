@@ -9,6 +9,10 @@ return [
     'type.name' => '类型名称',
     'type.code' => '类型编号',
     'type.icon' => '类型标识',
+    'type.map_sheet'  => '是否映射Sheet',
+    'type.map_sheet.bool.1'  => '是',
+    'type.map_sheet.bool.0'  => '否',
+    'type.sheet_slug' => '映射标记',
 
     'materiels' => '物料',
     'materiel'  => '物料明细',
