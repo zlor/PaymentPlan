@@ -263,62 +263,11 @@ SCRIPT;
             'current_acceptance_balance' => $focusBillPeriod->current_acceptance_balance,
             'cash_paid' => $focusBillPeriod->sumCashPaid(['payment_type_id'=>$focusTypeId]),
             'acceptance_paid' => $focusBillPeriod->sumAcceptancePaid(['payment_type_id'=>$focusTypeId]),
+            'cash_paid_total' => $focusBillPeriod->cash_paid,
+            'acceptance_paid_total' => $focusBillPeriod->acceptance_paid,
         ];
 
         $html = [];
-        // $html['schedule'] ="
-        // <h5>期初: <span class='money text-black' data-toggle='tooltip' data-title='总额'>{$count['init_balance']}  = </span>
-        //          <span class='money text-blue' data-toggle='tooltip' data-title='现金-存款'>({$count['cash_balance']}</span>
-        //          <span class='money text-light-blue' data-toggle='tooltip' data-title='现金-确认应收款'> + {$count['invoice_balance']} </span>
-        //          <span class='money text-green' data-toggle='tooltip' data-title='现金-贷款'> + {$count['loan_balance']} )</span>
-        //          <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + {$count['acceptance_balance']}</span>
-        // </h5>
-        // <hr>
-        // <h5>
-        //     当前: <span class='money text-black' data-toggle='tooltip' data-title='余额'>{$count['balance']}  = </span>
-        //          <span class='money text-blue' data-toggle='tooltip' data-title='现金'>{$count['current_cash_balance']}</span>
-        //          <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + {$count['current_acceptance_balance']}</span>
-        // </h5>
-        //
-        // <div class='pre'>
-        //     <p>文件数量({$count['uploadNum']}) / 导入数量({$count['importNum']})</p>
-        //     <hr>
-        //     <p>计划( {$count['planNum']} ) => 一次核定( {$count['auditNum']} ) => 二次核定( {$count['finalNum']} ) =>付款中( {$count['payingNum']} ) => 完成付款({$count['paidNum']})</p>
-        //     <hr>
-        //      <p>
-        //     支付: <span class='money text-black' data-toggle='tooltip' data-title='总额'>{$count['paid']}  = </span>
-        //          <span class='money text-blue' data-toggle='tooltip' data-title='现金'>{$count['cash_paid']}</span>
-        //          <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + {$count['acceptance_paid']}</span>
-        //     </p>
-        // </div>
-        // ";
-        //
-        // $html['detail'] = "
-        // <h5>快速入口</h5>
-        // <div class='pre'>
-        //          <p>
-        //             ".($focusBillPeriod->allowSetPool()?"<a href='{$url['set_cash_pool']}' >设置账期</a>":'设置账期(已锁定)')."
-        //             <label class='label label-primary'>{$statusTxt}</label>
-        //          </p>
-        //          <hr>
-        //          <p>
-        //             <a href='{$url['file_page']}' target='_blank'>文件导入管理</a>
-        //          </p>
-        //          <hr>
-        //          <p>
-        //             <a href='{$url['schedules_manage']}' target='_blank'>档案-付款计划</a>&nbsp;
-        //             <a href='{$url['schedule_plan_page']}' target='_blank'>计划录入</a>&nbsp;
-        //             <a href='{$url['schedule_audit_page']}' target='_blank'>一次核定</a>&nbsp;
-        //             <a href='{$url['schedule_audit_page']}' target='_blank'>二次核定</a>&nbsp;
-        //             <a href='{$url['schedule_audit_page']}' target='_blank'>应付款敲定</a>&nbsp;
-        //          </p>
-        //          <hr>
-        //          <p>
-        //             <a href='{$url['details_manage']}' target='_blank'>档案-付款详情</a>&nbsp;
-        //             <a href='{$url['detail_page']}' target='_blank'>付款录入</a>&nbsp;
-        //          </p>
-        // </div>";
-
         $script =<<<SCRIPT
         $(function(){
             $('.type-list li').click(function(){
@@ -342,33 +291,35 @@ SCRIPT;
             'money'   => '资金= 现金(存款+确认应收款+贷款) + 承兑',
             'schedule' => '计划',
             'import' => '文件(已载入/总数)',
-
         ]);
 
+        $typeName = $focusPaymentType->id?$focusPaymentType->name:'总计';
+        $sub_money = $focusPaymentType->id?"<h5><{$typeName}></h5><p>支付：
+                            <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['cash_paid'] + $count['acceptance_paid'],2)."  = </span>
+                            <span class='money text-blue' data-toggle='tooltip' data-title='现金'>( ".number_format($count['cash_paid'],2)." )</span>
+                            <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + ( ".number_format($count['acceptance_paid'], 2)." )</span>
+                       </p>":'';
         $table->setRows([
-            [
-                'status' => "<label class='badge label-primary'>{$statusTxt}</label>"
-
-                ,'type'  => $focusPaymentType->id?$focusPaymentType->name:'总计'
-                ,'money'=>"<span>期初：
+            [   'status' => "<label class='badge label-primary'>{$statusTxt}</label>"
+                ,'type'  => $typeName
+                ,'money'=>$sub_money."<h5><总计></h5>
+                        <p>期初：
                          <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['init_balance'],2)."  = </span>
                          <span class='money text-blue' data-toggle='tooltip' data-title='现金-存款'>( ".number_format($count['cash_balance'],2)."</span>
-                         <span class='money text-light-blue' data-toggle='tooltip' data-title='现金-确认应收款'>  + ".number_format($count['invoice_balance'],2)." </span>
                          <span class='money text-green' data-toggle='tooltip' data-title='现金-贷款'> + ".number_format($count['loan_balance'], 2)." )</span>
-                         <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + ".number_format($count['acceptance_balance'], 2)."</span>
-                         </span>
-                         <br>
-                         <span>当前： 
+                         <span class='money text-green' data-toggle='tooltip' data-title='额度-承兑'> + （".number_format($count['acceptance_balance'], 2)."</span>
+                         <span class='money text-light-blue' data-toggle='tooltip' data-title='额度-确认应收款'>  + ".number_format($count['invoice_balance'],2)."） </span>
+                         </p>
+                         <p>支付：
+                            <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['paid'],2)."  = </span>
+                            <span class='money text-blue' data-toggle='tooltip' data-title='现金'>( ".number_format($count['cash_paid_total'],2)." )</span>
+                            <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + ( ".number_format($count['acceptance_paid_total'], 2)." )</span>
+                          </p>
+                         <p>当前： 
                          <span class='money text-black' data-toggle='tooltip' data-title='余额'>".number_format($count['balance'], 2)."  = </span>
                          <span class='money text-blue' data-toggle='tooltip' data-title='现金'>( ".number_format($count['current_cash_balance'], 2)." )</span>
-                         <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + ".number_format($count['current_acceptance_balance'], 2)."</span>
-                         </span>
-                         <br>
-                          <p>支付：
-                            <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['paid'],2)."  = </span>
-                            <span class='money text-blue' data-toggle='tooltip' data-title='现金'>( ".number_format($count['cash_paid'],2)." )</span>
-                            <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + ".number_format($count['acceptance_paid'], 2)."</span>
-                          </p>"
+                         <span class='money text-green' data-toggle='tooltip' data-title='承兑'> + ( ".number_format($count['current_acceptance_balance'], 2)." ）</span>
+                         </p>"
                 ,'schedule'=>"<p>
                                 <span class='text-right'> {$count['planNum']} <i class='text-gray'>计划</i></span><br>
                                 <span class='text-right'> {$count['payingNum']} <i class='text-gray'>付款</i></span><br>

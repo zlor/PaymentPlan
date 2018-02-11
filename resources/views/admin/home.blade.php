@@ -17,7 +17,7 @@
 <div class="callout callout-success panel-default bill-period">
 
     <h4>
-        <span>期初余额: {{ $billPeriod->cash_pool }}</span>
+        <span>期初余额: {{ $billPeriod->init_total }}</span>
         <span class="pull-right">
             <div class="right-item"><label>现金:</label> {{ number_format($billPeriod->cash_balance, 2) }} </div>
             <div class="right-item"><label>承兑:</label> {{ number_format($billPeriod->acceptance_line, 2) }} </div>

@@ -88,10 +88,10 @@ class PeriodController extends Controller
 
             // dd($bill_period);
             $bill_period_other = [
-                'paid_money' => BillPay::query()->where('bill_period_id', $bill_period_id)->sum('money'),
-                'cash_paid'  => BillPay::query()->where('bill_period_id', $bill_period_id)
+                'paid_money' => BillPay::query()->where('payment_schedule_id', 0)->where('bill_period_id', $bill_period_id)->sum('money'),
+                'cash_paid'  => BillPay::query()->where('payment_schedule_id', 0)->where('bill_period_id', $bill_period_id)
                                                 ->where('kind', 'cash')->sum('money'),
-                'acceptance_paid'  => BillPay::query()->where('bill_period_id', $bill_period_id)
+                'acceptance_paid'  => BillPay::query()->where('payment_schedule_id', 0)->where('bill_period_id', $bill_period_id)
                     ->where('kind', 'acceptance')->sum('money'),
             ];
 

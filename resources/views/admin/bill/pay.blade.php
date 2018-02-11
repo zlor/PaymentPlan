@@ -14,35 +14,79 @@
     @endif
 </h4>
 <div class="callout callout-success">
-    <div class="pull-right" style="width: 25em">
-        <div class="pull-left" style="font-size: 18px; margin-right:1.5em"> 本期资金池  </div>
+    <div class="pull-right" style="width: 15em">
+        <div class="pull-left" style="font-size: 18px; margin-right:0">资金</div>
         <fieldset>
-            现金（ <span> 余 {{$bill_period->current_cash_balance }}</span>  <i>|</i> <span> 总额 {{$bill_period->cash_balance }}</span>）
-            <br>
-            承兑（ <span> 余 {{$bill_period->current_acceptance_balance }}</span> <i>|</i> <span>总额 {{$bill_period->acceptance_line}}</span>）
-            <br>
-            资金（ <span> 余 {{$bill_period->balance}}</span>  <i>|</i> <span> 总额 {{$bill_period->cash_pool}} </span>）
+            <p>
+            <ul>
+                <li>现金:<span> + {{$bill_period->current_cash_balance }}</span></li>
+                <hr style="margin: 0">
+                <li>额度:<span> + {{$bill_period->quota_total }}</span></li>
+            </ul>
+            </p>
+        </fieldset>
+    </div>
+    <div class="pull-right" style="width: 15em">
+        <div class="pull-left" style="font-size: 18px; margin-right:0"> + 收款
+        </div>
+        <fieldset>
+            <p>
+            <ul>
+                <li>现金:<span> + {{$bill_period->cash_collected }}</span></li>
+                <hr style="margin: 0">
+                <li>承兑:<span> + {{$bill_period->acceptance_collected }}</span></li>
+            </ul>
+            </p>
+        </fieldset>
+    </div>
+    <div class="pull-right" style="width: 15em">
+        <div class="pull-left" style="font-size: 18px; margin-right:0"> - 支付
+        </div>
+        <fieldset>
+            <p>
+            <ul>
+                <li>现金:<span> - {{ $bill_period->cash_paid }}</span></li>
+                <hr style="margin: 0">
+                <li>承兑:<span> - {{ $bill_period->acceptance_paid }}</span></li>
+            </ul>
+            </p>
+        </fieldset>
+    </div>
+    <div class="pull-right" style="width: 15em">
+        <div class="pull-left" style="font-size: 18px; margin-right:0"> 期初  </div>
+        <fieldset>
+            <p>
+                <ul>
+                    <li>现金: {{$bill_period->cash_balance }}</li>
+                    <li>贷款: {{$bill_period->loan_balance }}</li>
+                <hr style="margin: 0">
+                    <li>承兑: {{$bill_period->acceptance_line }}</li>
+                    <li>来款: {{$bill_period->invoice_balance }}</li>
+                </ul>
+            </p>
         </fieldset>
     </div>
     @if(isset($paymentSchedule))
-        <h4>
-            <span>应付款: {{ $paymentSchedule->due_money }} </span>
-        </h4>
-        <h4>
-            <span>已付款: {{ $paymentSchedule->paid_money }} [现金: {{ $paymentSchedule->cash_paid }},承兑: {{ $paymentSchedule->acceptance_paid }}] </span>
-
-            <span style="margin-left:2em"></span>
-            <span style="margin-left:2em"></span>
-        </h4>
+        <p>
+            <h5>应付款: </h5>
+            <ul>
+                <li class="list-unstyle"><span>{{ $paymentSchedule->due_money }}</span></li>
+            </ul>
+        </p>
+        <p>
+            <h5>已付款</h5>
+            <ul>
+                <li><span>现金: {{ $paymentSchedule->cash_paid }}</span></li>
+                <li><span>承兑: {{ $paymentSchedule->acceptance_paid }}</span></li>
+            </ul>
+        </p>
     @else
-        <h4>
-            <span>已付款(其他): {{ $bill_period_other['paid_money']}}  </span>
-
-        </h4>
-        <h4>
-            <span style="margin-left:2em">现金: {{ $bill_period_other['cash_paid'] }},</span>
-            <span style="margin-left:2em">承兑: {{ $bill_period_other['acceptance_paid'] }}</span>
-        </h4>
-
+        <p>
+            <h5>已付款(其他): {{ $bill_period_other['paid_money']}}  </h5>
+            <ul>
+                <li><span>现金: {{ $bill_period_other['cash_paid'] }}</span></li>
+                <li><span>承兑: {{ $bill_period_other['acceptance_paid'] }}</span></li>
+            </ul>
+        </p>
     @endif
 </div>

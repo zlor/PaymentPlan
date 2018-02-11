@@ -353,9 +353,9 @@ SCRIPT;
             ->setWidth(8, 3)
             ->options(BillPay::getL5Options('collect',['cash', 'acceptance'], 'kind'));
 
-        $form->select('supplier_id', '供应商')
-             ->setWidth(8,3)
-             ->options(BillPay::getSupplierOptions());
+        // $form->select('supplier_id', '供应商')
+        //      ->setWidth(8,3)
+        //      ->options(BillPay::getSupplierOptions());
 
         $form->text('company', '付款公司')
             ->setWidth(8, 3);

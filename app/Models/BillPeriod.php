@@ -141,13 +141,90 @@ class BillPeriod extends Model
     }
 
     /**
-     * 现金总额、库存现金 （ 现金余额 + 确认计划收款额 + 银行贷款）
+     * 现金初期值 (现金余额[银行存款] + 银行贷款)
+     *
+     * @return mixed
+     */
+    public function getInitCashAttribute()
+    {
+        return $this->cash_balance + $this->loan_balance;
+    }
+
+    /**
+     * 现金总额、库存现金 （ 现金余额 + 已收款额 + 银行贷款）[确认收款-额度]
      *
      * @return mixed
      */
     public function getCashTotalAttribute()
     {
-        return $this->cash_balance + $this->invoice_balance + $this->loan_balance;
+        return $this->cash_balance + $this->loan_balance + $this->cash_collected;
+    }
+
+    /**
+     * cash_paid
+     */
+    // $this->cash_paid
+
+    /**
+     * 当前现金余额
+     *
+     * @return mixed
+     */
+    public function getCurrentCashBalanceAttribute()
+    {
+        return $this->cash_total - $this->cash_paid;
+    }
+
+    /**
+     * 额度初期值 (信用额度 + 确认到款额度)
+     *
+     * @return mixed
+     */
+    public function getInitQuotaAttribute()
+    {
+        return $this->acceptance_line + $this->invoice_balance;
+    }
+
+    /**
+     * 已支付的额度
+     *
+     * @return mixed
+     */
+    public function getQuotaPaidAttribute()
+    {
+        return $this->acceptance_paid;
+    }
+
+    /**
+     * 已收到的额度
+     *
+     * @return mixed
+     */
+    public function getQuotaCollectedAttribute()
+    {
+        return $this->acceptance_collected;
+    }
+
+    /**
+     * 额度总额 (银行承兑 + 已收承兑)
+     *
+     * @return mixed
+     */
+    public function getQuotaTotalAttribute()
+    {
+        return $this->init_quota + $this->acceptance_collected;
+    }
+
+
+
+    /**
+     * 期初金额 (期初现金 + 期初额度)
+     *
+     * @return mixed
+     */
+    public function getInitTotalAttribute()
+    {
+        return $this->init_cash + $this->init_quota;
     }
 
     /**
@@ -161,13 +238,13 @@ class BillPeriod extends Model
     }
 
     /**
-     * 期初今个
+     * 收款总额
      *
      * @return mixed
      */
-    public function getInitTotalAttribute()
+    public function getCollectTotalAttribute()
     {
-        return $this->cash_total + $this->acceptance_line;
+        return $this->cash_collected + $this->acceptance_collected;
     }
 
     /**
@@ -177,18 +254,19 @@ class BillPeriod extends Model
      */
     public function getBalanceAttribute()
     {
-        return $this->init_total - $this->paid_total;
+        return $this->init_total - $this->paid_total + $this->collect_total;
     }
 
     /**
-     * 当前现金余额
-     *
+     * 当前额度余额
      * @return mixed
      */
-    public function getCurrentCashBalanceAttribute()
+    public function getCurrentQuotaBalanceAttribute()
     {
-        return $this->cash_total - $this->cash_paid;
+        return $this->quota_total - $this->quota_paid;
     }
+
+
 
     /**
      * 当前承兑余额
@@ -196,7 +274,7 @@ class BillPeriod extends Model
      */
     public function getCurrentAcceptanceBalanceAttribute()
     {
-        return $this->acceptance_line - $this->acceptance_paid;
+        return $this->acceptance_line - $this->acceptance_paid + $this->acceptance_collected;
     }
 
     /**
