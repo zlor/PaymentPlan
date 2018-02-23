@@ -294,7 +294,7 @@ SCRIPT;
         ]);
 
         $typeName = $focusPaymentType->id?$focusPaymentType->name:'总计';
-        $sub_money = $focusPaymentType->id?"<h5><{$typeName}></h5><p>支付：
+        $sub_money = $focusPaymentType->id?"<h5>{$typeName}</h5><p>支付：
                             <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['cash_paid'] + $count['acceptance_paid'],2)."  = </span>
                             <span class='money text-blue' data-toggle='tooltip' data-title='现金'>( ".number_format($count['cash_paid'],2)." )</span>
                             <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + ( ".number_format($count['acceptance_paid'], 2)." )</span>
@@ -302,7 +302,7 @@ SCRIPT;
         $table->setRows([
             [   'status' => "<label class='badge label-primary'>{$statusTxt}</label>"
                 ,'type'  => $typeName
-                ,'money'=>$sub_money."<h5><总计></h5>
+                ,'money'=>$sub_money."<h5>总计</h5>
                         <p>期初：
                          <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['init_balance'],2)."  = </span>
                          <span class='money text-blue' data-toggle='tooltip' data-title='现金-存款'>( ".number_format($count['cash_balance'],2)."</span>

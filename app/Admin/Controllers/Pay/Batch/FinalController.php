@@ -36,7 +36,7 @@ class FinalController extends BatchController
 
         $content->breadcrumb(
             ['text'=>'付款管理', 'url'=>'#'],
-            ['text'=>'一次核定-批量调整', 'url'=> $this->getUrl('index')]
+            ['text'=>'二次核定-批量调整', 'url'=> $this->getUrl('index')]
         );
 
         return $content;

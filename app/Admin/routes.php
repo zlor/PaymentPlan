@@ -131,6 +131,13 @@ Route::group([
     $router->get('/collect/period/flow/{id}/info', 'Collect\PeriodController@info')->name('collect.period.flow.info');
 
 
+    #### 发票管理
+     ##  应付款发票
+    $router->resource('/pay/invoice', 'Pay\InvoiceController');
+     ##  应收款发票
+    $router->resource('/collect/invoice', 'Collect\InvoiceController');
+
+
     // 基础档案
 
     // --  供应商

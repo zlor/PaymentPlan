@@ -121,7 +121,7 @@ STYLE;
         {
             offset = 0;
         }else{
-            offset = -filterHeight + 29;
+            offset = -filterHeight + 29.5;
         }
         initFixed();
     });
@@ -219,7 +219,7 @@ SCRIPT;
     {
         return Admin::grid(PaymentSchedule::class, function (Grid $grid) {
 
-            $grid->id('ID')->sortable();
+            // $grid->id('ID')->sortable();
 
             /**
              * 暂不提供的按钮
@@ -228,6 +228,7 @@ SCRIPT;
              */
             $grid->disableCreateButton();
             $grid->disableExport();
+            $grid->disableRowSelector();
 
             // 设置默认账期
             $defaultBillPeriod = BillPeriod::envCurrent();
@@ -287,7 +288,7 @@ SCRIPT;
                 }
                 $sum['paid_money'] = $row['cash_paid']->sum() + $row['acceptance_paid']->sum();
 
-                $footer->td("共 <span>{$count}</span> 条", 7)
+                $footer->td("共 <span>{$count}</span> 条", 12)
                     ->td( $this->_getMoneySpan($sum['supplier_lpu_balance'], ['title'=>'上期未付清']) )
                     ->td( $this->_getMoneySpan($sum['supplier_balance'], ['title'=>'总应付款总计']) )
                     ->td( $this->_getMoneySpan($sum['plan_due_money'], ['title'=>'本期计划应付', 'spanClass'=>'planHead']) )
@@ -298,14 +299,14 @@ SCRIPT;
             });
 
             // 账期
-            $grid->column('bill_period.name', trans('payment.schedule.bill_period'))
+            $grid->column('bill_period.name', trans('payment.schedule.payment_type'))
                 ->display(function($value){
                     $title_billPeriodName = trans('payment.schedule.bill_period');
                     $title_typeName = trans('payment.schedule.payment_type');
                     return "<span>
-                                <label class=' badge-default' title='{$title_billPeriodName}'>{$this->bill_period['name']}</label>
                                 <label class=' label-' title='{$title_typeName}'>{$this->payment_type['name']}</label>
                             </span>";
+                    //<label class=' badge-default' title='{$title_billPeriodName}'>{$this->bill_period['name']}</label>
                 });
 
             // 供应商
@@ -328,11 +329,23 @@ SCRIPT;
             // 付款周期
             $grid->column('pay_cycle', trans('payment.schedule.pay_cycle'))
                 ->display(function($value){
-                    $txt =  mb_strlen($value)>6?(mb_substr($value, 0, 6).'..'):$value;
+                    $txt =  mb_strlen($value)>5?(mb_substr($value, 0, 5).'..'):$value;
                     return "<span data-toggle='tooltip' data-title='{$value}'>{$txt}</span>";
                 });
 
             $that = $this;
+
+            // 应付款发票
+            // 按照当前的账期月份进行排序
+            $defaultMonthMap = $defaultBillPeriod->getMonthNumber(true);
+            foreach ($defaultMonthMap as $item)
+            {
+                $grid->column($item, trans('payment.schedule.'.$item))
+                     ->display(function($value)use($that,$item){
+                         return $that->_getMoneySpan($value, ['title'=>trans('payment.schedule.'.$item).'发票', 'noCoin'=>true]);
+                     });
+            }
+
             // 客户初期应付
             $grid->column('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'))
                 ->display(function()use($that){
@@ -364,7 +377,7 @@ SCRIPT;
                             // 'title'=>"担当({$this->plan_man}),时间[{$this->plan_time}]",
                             'title'=>"{$this->plan_man}:{$this->plan_time}",
                             'action' => 'open',
-                            'url' => $that->getUrl('editPlan', ['id'=>$this->getKey()]),
+                            'url' => $that->getUrl('editPlan', ['id'=>$this->getKey()], '', true),
                         ]
                     );
                 });
@@ -382,7 +395,7 @@ SCRIPT;
                             // 'title'=>"担当({$this->audit_man}),时间({$this->audit_time})",
                             'title'=>"{$this->audit_man}:{$this->audit_time}",
                             'action' => 'open',
-                            'url' => $that->getUrl('editAudit', ['id'=>$this->getKey()]),
+                            'url' => $that->getUrl('editAudit', ['id'=>$this->getKey()], '', true),
                         ]
                     );
 
@@ -401,7 +414,7 @@ SCRIPT;
                             // 'title'=>"担当人({$this->final_man}),时间({$this->final_time})",
                             'title'=>"{$this->final_man}:{$this->final_time}",
                             'action' => 'open',
-                            'url' => $that->getUrl('editFinal', ['id'=>$this->getKey()]),
+                            'url' => $that->getUrl('editFinal', ['id'=>$this->getKey()], '', true),
                         ]
                     );
 
@@ -418,7 +431,7 @@ SCRIPT;
                             'liClass'=>'due_money',
                             // 'title'=>"最终应付款",
                             'action' => 'open',
-                            'url' => $that->getUrl('editDue', ['id'=>$this->getKey()]),
+                            'url' => $that->getUrl('editDue', ['id'=>$this->getKey()], '', true),
                         ]
                     );
 

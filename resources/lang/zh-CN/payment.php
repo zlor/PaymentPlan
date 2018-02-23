@@ -59,6 +59,20 @@ return [
     'schedule.final_due_money' => '应付款(二次核定)',
     'schedule.final_man' => '终稿人',
 
+    'schedule.invoice_m_1' => '1月',
+    'schedule.invoice_m_2' => '2月',
+    'schedule.invoice_m_3' => '3月',
+    'schedule.invoice_m_4' => '4月',
+    'schedule.invoice_m_5' => '5月',
+    'schedule.invoice_m_6' => '6月',
+    'schedule.invoice_m_7' => '7月',
+    'schedule.invoice_m_8' => '8月',
+    'schedule.invoice_m_9' => '9月',
+    'schedule.invoice_m_10' => '10月',
+    'schedule.invoice_m_11' => '11月',
+    'schedule.invoice_m_12' => '12月',
+
+
     'schedule.due_money'   => '应付款(最终敲定)',
     'schedule.paid_money'   => '已付款',
     'schedule.cash_paid'   => '已付现金',

@@ -96,6 +96,39 @@ class BillPeriod extends Model
     }
 
     /**
+     * 获取当前账期的月份数字
+     *
+     * @param  boolean $needReturnInvoiceMonthMap 是否需要返回按当前账期排列好的发票月份字段
+     *
+     * @return integer|array
+     */
+    public function getMonthNumber($needReturnInvoiceMonthMap = false)
+    {
+        $month = $this->original['month'];
+        $number = intval(date('m', strtotime($month)));
+
+        if(!$needReturnInvoiceMonthMap)
+        {
+            return $number;
+        }
+
+        $map = [];
+
+        for($i = $number-1; $i>$number-7; $i--)
+        {
+            $key = 'invoice_m_' . ($i<1 ? (12 + $i): $i );
+
+            $map[$key] = $i;
+        }
+
+        asort($map);
+
+        $map =  array_keys($map);
+
+        return $map;
+    }
+
+    /**
      * 同步现金池（从资金流中汇总）
      *
      * @param $flowType

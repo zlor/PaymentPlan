@@ -26,6 +26,8 @@ trait GetSpanMoney
 
         $classArea = isset($options['spanClass'])?$options['spanClass']:' ';
 
+        $coin  = isset($options['noCoin'])?'':'￥';
+
         $title = isset($options['title'])?$options['title']:'';
 
         $url = isset($options['url'])?$options['url']:'';
@@ -37,7 +39,7 @@ trait GetSpanMoney
         return "<span class='{$classArea}'><ul class='ul-area list-unstyled' style='margin: auto'>
                         <li class='text-right {$classLi}'>
                             <div class='info' data-origin='{$money}' data-toggle='tooltip' data-title='{$title}'>
-                                <i class='coin'>￥</i>
+                                <i class='coin'>{$coin}</i>
                                 <label class='bg-white {$classMoney} {$classPriority}'>{$txt}</label>
                             </div>
                 ".

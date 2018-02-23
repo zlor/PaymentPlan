@@ -28,6 +28,10 @@ class PaymentSchedule extends Model
         'audit_time', 'audit_due_money', 'audit_man',
         'final_time', 'final_due_money', 'final_man',
         'cash_paid', 'acceptance_paid',
+        'invoice_m_1','invoice_m_2','invoice_m_3',
+        'invoice_m_4','invoice_m_5','invoice_m_6',
+        'invoice_m_7','invoice_m_8','invoice_m_9',
+        'invoice_m_10','invoice_m_11','invoice_m_12',
         'is_checked', 'is_locked',
     ];
 

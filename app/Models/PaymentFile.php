@@ -111,16 +111,28 @@ class PaymentFile extends File
         $validData = $this->validExcelData($data, $options);
 
         $headMap =[
-                '科目编号'=>'name',
-                '供应商名称'=>'supplier_name',
-                '物品名称'=>'materiel_name',
-                '付款确认人'=>'charge_man',
-                '付款周期'=>'pay_cycle',
-                '总应付款'=>'supplier_balance',
-                '前期未付清余额'=>'supplier_lpu_balance',
-                // 计划付款
-                '计划付款金额'=>'plan_due_money',
-                '备注' => 'memo',
+            '科目编号'=>'name',
+            '供应商名称'=>'supplier_name',
+            '物品名称'=>'materiel_name',
+            '付款确认人'=>'charge_man',
+            '付款周期'=>'pay_cycle',
+            '总应付款'=>'supplier_balance',
+            '前期未付清余额'=>'supplier_lpu_balance',
+            '1月'=>'invoice_m_1',
+            '2月'=>'invoice_m_2',
+            '3月'=>'invoice_m_3',
+            '4月'=>'invoice_m_4',
+            '5月'=>'invoice_m_5',
+            '6月'=>'invoice_m_6',
+            '7月'=>'invoice_m_7',
+            '8月'=>'invoice_m_8',
+            '9月'=>'invoice_m_9',
+            '10月'=>'invoice_m_10',
+            '11月'=>'invoice_m_11',
+            '12月'=>'invoice_m_12',
+            // 计划付款
+            '计划付款金额'=>'plan_due_money',
+            '备注' => 'memo',
         ];
 
         // 默认预设
@@ -164,7 +176,7 @@ class PaymentFile extends File
             // 识别有效列
             foreach ($head as $key => $item)
             {
-                // 若存在
+                // 若存在,或者表头被包含
                 if( isset($headMap[$item]) )
                 {
                     $columnMap[$headMap[$item]] = $key;
@@ -369,8 +381,19 @@ class PaymentFile extends File
             // 设置格式
             $newRow['supplier_balance']      = $this->readMoney($newRow['supplier_balance']);
             $newRow['supplier_lpu_balance']  = $this->readMoney($newRow['supplier_lpu_balance']);
-            $newRow['plan_next_month_money'] = $this->readMoney($newRow['plan_next_month_money']);
+            // $newRow['plan_next_month_money'] = $this->readMoney($newRow['plan_next_month_money']);
             $newRow['plan_due_money']        = $this->readMoney($newRow['plan_due_money']);
+
+            // 设置十二月份的发票金额
+            for($monthIndex=1; $monthIndex<=12; $monthIndex++)
+            {
+                $key = 'invoice_m_' . $monthIndex;
+
+                if(isset($newRow[$key]))
+                {
+                    $newRow[$key]        = $this->readMoney($newRow[$key]);
+                }
+            }
 
             // 设置账期
             $newRow['bill_period_id']  = $bill_period->id;
