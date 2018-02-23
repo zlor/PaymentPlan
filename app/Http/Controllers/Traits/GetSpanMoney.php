@@ -7,7 +7,7 @@ trait GetSpanMoney
 
     protected function _getMoneySpan($money, $options = [])
     {
-        $zeroFlag = intval(100 * $money);
+        $zeroFlag = bcsub($money, 0, 2);
 
         $classMoney = 'text-money';
 
