@@ -723,6 +723,7 @@ class PaymentFile extends File
             $mapSheets[$paymentType->sheet_slug] = $paymentType->id;
         }
 
+        // 读取原始文件，并按照给定的 sheets name 来切分出单一类型的 excel 文件
         Excel::selectSheets($typeSheets)->load($file->getLocalPath(), function ($reader) use (& $data, $typeSheets) {
             foreach ($typeSheets as $key => $sheet)
             {

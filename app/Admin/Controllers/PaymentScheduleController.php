@@ -46,8 +46,28 @@ class PaymentScheduleController extends Controller
             $content->header(trans('payment.schedule'));
             $content->description(trans('admin.edit'));
 
-            $content->body($this->form()->edit($id));
+            $paymentSchedule = PaymentSchedule::query()->findOrFail($id);
+
+            $bill_period_id = $paymentSchedule->bill_period_id;
+
+            $content->body($this->form($bill_period_id)->edit($id));
         });
+    }
+
+    /**
+     * Update interface.
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function update($id)
+    {
+        $paymentSchedule = PaymentSchedule::query()->findOrFail($id);
+
+        $bill_period_id = $paymentSchedule->bill_period_id;
+
+        return $this->form($bill_period_id)->update($id);
     }
 
     /**
@@ -165,18 +185,36 @@ class PaymentScheduleController extends Controller
      *
      * @return Form
      */
-    protected function form()
+    protected function form($billPeriodId = 0)
     {
-        return Admin::form(PaymentSchedule::class, function (Form $form) {
+        return Admin::form(PaymentSchedule::class, function (Form $form) use ($billPeriodId){
 
             $form->display('id', 'ID');
 
-            $billPeriodId = BillPeriod::getCurrentId();
+            $currentBillPeriodId = BillPeriod::getCurrentId();
+
+            $isEdit = false;
+
+            // 若未带具体值，则获取默认值
+            if(empty($billPeriodId))
+            {
+                $billPeriodId = $currentBillPeriodId;
+
+                $billPeriodOptions = PaymentSchedule::getBillPeriodOptions(false, ['standby', 'active']);
+
+            }else{
+
+                $isEdit = true;
+
+                $billPeriodOptions = PaymentSchedule::getBillPeriodOptions(false, ['standby', 'active', 'lock', 'close']);
+            }
+
+            $billPeriod = BillPeriod::query()->findOrFail($billPeriodId);
 
             // 账期
             $form->select('bill_period_id', trans('payment.schedule.bill_period'))
-                 ->options(PaymentSchedule::getBillPeriodOptions())
-                 ->default($billPeriodId)
+                 ->options($billPeriodOptions)
+                 ->default($currentBillPeriodId)
                  ->rules('required');
 
             // 供应商(系统匹配)
@@ -206,27 +244,50 @@ class PaymentScheduleController extends Controller
                 ->options(PaymentSchedule::getStatusOptions('payment.schedule', ['init','import_init', 'web_init', 'checked','paying','lock' ]))
                 ->default('web_init');
 
+            if($isEdit)
+            {
+                $form->divider();
+                // // 按照当前的账期月份进行排序
+                $defaultMonthMap = $billPeriod->getMonthNumber(true);
+                foreach ($defaultMonthMap as $item)
+                {
+                    $form->currency($item, trans('payment.schedule.'.$item).'(发票)')
+                        ->symbol('￥');
+                }
+
+            }
+
             $form->divider();
 
             // 供应商余额
-            $form->currency('supplier_balance', trans('payment.schedule.supplier_balance'));
+            $form->currency('supplier_balance', trans('payment.schedule.supplier_balance'))
+                ->symbol('￥');
+
+            // 供应商余额
+            $form->currency('supplier_balance', trans('payment.schedule.supplier_balance'))
+                 ->symbol('￥');
 
             // 上期未付清余款
-            $form->currency('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'));
+            $form->currency('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'))
+                 ->symbol('￥');
 
             // 应付款
-            $form->currency('due_money', trans('payment.schedule.due_money'));
+            $form->currency('due_money', trans('payment.schedule.due_money'))
+                 ->symbol('￥');
 
             $form->divider();
 
             // 已支付
             $form->currency('paid_money', trans('payment.schedule.paid_money'))
+                ->symbol('￥')
                 ->readOnly();
             // 已支付现金
             $form->currency('cash_paid', trans('payment.schedule.cash_paid'))
+                ->symbol('￥')
                 ->readOnly();
             // 已支付承兑
             $form->currency('acceptance_paid', trans('payment.schedule.acceptance_paid'))
+                ->symbol('￥')
                 ->readOnly();
 
             $form->ignore(['paid_money','cash_paid', 'acceptance_paid']);
