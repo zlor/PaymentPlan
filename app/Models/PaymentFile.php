@@ -299,7 +299,7 @@ class PaymentFile extends File
             }
 
             // 序列有效，为数据行
-            if( is_numeric($index) )
+            if( is_numeric(trim($index)) )
             {
                 // 存放有效数据行 -行号
                 $validRow[$areaIndex]['row'][$key] = $rowIndex;
