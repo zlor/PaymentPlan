@@ -26,7 +26,7 @@ class ChangeAdminConfigColumns extends Migration
     public function down()
     {
         Schema::table('admin_config', function (Blueprint $table) {
-            $table->string('value', 255)->default('')->comment('值')->change();
+            $table->text('value')->nullable()->comment('值')->change();
         });
     }
 }

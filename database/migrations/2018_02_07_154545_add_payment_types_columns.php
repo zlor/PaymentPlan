@@ -27,7 +27,7 @@ class AddPaymentTypesColumns extends Migration
      */
     public function down()
     {
-        Schema::table('bill_periods', function (Blueprint $table) {
+        Schema::table('payment_types', function (Blueprint $table) {
             $table->dropColumn('sheet_slug');
             $table->dropColumn('map_sheet');
         });

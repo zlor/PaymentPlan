@@ -17,6 +17,7 @@ class AddBillPeriodsColumns extends Migration
         Schema::table('bill_periods', function (Blueprint $table) {
             $table->decimal('cash_collected', 12, 2)->default(0)->comment('已收款现金额度');
             $table->decimal('acceptance_collected', 12, 2)->default(0)->comment('已收款承兑额度');
+            $table->decimal('loan_balance', 12, 2)->default(0)->comment('贷款额度');
         });
     }
 
@@ -30,6 +31,7 @@ class AddBillPeriodsColumns extends Migration
         Schema::table('bill_periods', function (Blueprint $table) {
             $table->dropColumn('cash_collected');
             $table->dropColumn('acceptance_collected');
+            $table->dropColumn('loan_balance');
         });
     }
 }

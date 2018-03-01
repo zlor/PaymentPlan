@@ -37,7 +37,7 @@ class AddPaymentScheduleColumns extends Migration
      */
     public function down()
     {
-        Schema::table('bill_periods', function (Blueprint $table) {
+        Schema::table('payment_schedules', function (Blueprint $table) {
             $table->dropColumn('invoice_m_1');
             $table->dropColumn('invoice_m_2');
             $table->dropColumn('invoice_m_3');
