@@ -110,6 +110,7 @@ class PaymentFile extends File
         ## 抓取有效数据
         $validData = $this->validExcelData($data, $options);
 
+
         $headMap =[
             '科目编号'=>'name',
             '供应商名称'=>'supplier_name',
@@ -117,23 +118,24 @@ class PaymentFile extends File
             '付款确认人'=>'charge_man',
             '付款周期'=>'pay_cycle',
             '总应付款'=>'supplier_balance',
-            '前期未付清余额'=>'supplier_lpu_balance',
-            '1月'=>'invoice_m_1',
-            '2月'=>'invoice_m_2',
-            '3月'=>'invoice_m_3',
-            '4月'=>'invoice_m_4',
-            '5月'=>'invoice_m_5',
-            '6月'=>'invoice_m_6',
-            '7月'=>'invoice_m_7',
-            '8月'=>'invoice_m_8',
-            '9月'=>'invoice_m_9',
-            '10月'=>'invoice_m_10',
-            '11月'=>'invoice_m_11',
-            '12月'=>'invoice_m_12',
+            //'前期未付清余额'=>'supplier_lpu_balance',
             // 计划付款
             '计划付款金额'=>'plan_due_money',
             '备注' => 'memo',
         ];
+        //            '1月'=>'invoice_m_1',
+        //            '2月'=>'invoice_m_2',
+        //            '3月'=>'invoice_m_3',
+        //            '4月'=>'invoice_m_4',
+        //            '5月'=>'invoice_m_5',
+        //            '6月'=>'invoice_m_6',
+        //            '7月'=>'invoice_m_7',
+        //            '8月'=>'invoice_m_8',
+        //            '9月'=>'invoice_m_9',
+        //            '10月'=>'invoice_m_10',
+        //            '11月'=>'invoice_m_11',
+        //            '12月'=>'invoice_m_12',
+        $headMap = array_merge($headMap, $this->bill_period->getMonthHead()) ;
 
         // 默认预设
         $columnMap = [
@@ -326,7 +328,10 @@ class PaymentFile extends File
     public function setupSchedule($allowOverwrite = false, $useLastWhenRepeat = false)
     {
         // 从预设的文件中开始生成计划
-        // 账期
+        /**
+         * 账期
+         * @type BillPeriod $bill_period
+         */
         $bill_period = $this->bill_period;
         // 类型
         $payment_type = $this->payment_type;
@@ -421,6 +426,16 @@ class PaymentFile extends File
             $materiel = $mapping['materiel'][$row['materiel_name']];
 
             $newRow['payment_materiel_id'] = $materiel->id;
+
+            /**
+             * 识别 应付款截止月
+             */
+            $newRow['pay_cycle_month'] = $bill_period->guestCycleMonth($newRow['pay_cycle']);
+
+            /**
+             * 推算建议应付款数额
+             */
+            $newRow['suggest_due_money'] = $bill_period->guestSuggestDueMoney($newRow, $newRow['pay_cycle_month']);
 
             /**
              * 验证数据有效性

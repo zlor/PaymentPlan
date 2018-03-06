@@ -288,7 +288,7 @@ SCRIPT;
         $table->setHeaders([
             'status' => '状态',
             'type'=> '分类',
-            'money'   => '资金= 现金(存款+确认应收款+贷款) + 承兑',
+            'money'   => '资金= 现金(存款+贷款) + 额度(承兑+确认应收款)',
             'schedule' => '计划',
             'import' => '文件(已载入/总数)',
         ]);
@@ -305,10 +305,10 @@ SCRIPT;
                 ,'money'=>$sub_money."<h5>总计</h5>
                         <p>期初：
                          <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['init_balance'],2)."  = </span>
-                         <span class='money text-blue' data-toggle='tooltip' data-title='现金-存款'>( ".number_format($count['cash_balance'],2)."</span>
-                         <span class='money text-green' data-toggle='tooltip' data-title='现金-贷款'> + ".number_format($count['loan_balance'], 2)." )</span>
-                         <span class='money text-green' data-toggle='tooltip' data-title='额度-承兑'> + （".number_format($count['acceptance_balance'], 2)."</span>
-                         <span class='money text-light-blue' data-toggle='tooltip' data-title='额度-确认应收款'>  + ".number_format($count['invoice_balance'],2)."） </span>
+                         <span class='money text-blue' data-toggle='tooltip' data-title='现金(存款)'>( ".number_format($count['cash_balance'],2)."</span>
+                         <span class='money text-green' data-toggle='tooltip' data-title='现金(贷款)'> + ".number_format($count['loan_balance'], 2)." )</span>
+                         <span class='money text-green' data-toggle='tooltip' data-title='额度(承兑)'> + （".number_format($count['acceptance_balance'], 2)."</span>
+                         <span class='money text-light-blue' data-toggle='tooltip' data-title='额度(确认应收款)'>  + ".number_format($count['invoice_balance'],2)."） </span>
                          </p>
                          <p>支付：
                             <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['paid'],2)."  = </span>

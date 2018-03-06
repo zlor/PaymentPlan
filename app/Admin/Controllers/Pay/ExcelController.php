@@ -437,6 +437,9 @@ SCIPRT;
      */
     public function import($id)
     {
+        /**
+         * @type PaymentFile $file
+         */
         $file = PaymentFile::query()->find($id);
 
         if(empty($file)){

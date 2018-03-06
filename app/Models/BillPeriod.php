@@ -11,6 +11,7 @@ use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Class BillPeriod
@@ -127,6 +128,88 @@ class BillPeriod extends Model
 
         return $map;
     }
+
+    /**
+     * 获取当前月份关联的发票月份表头
+     */
+    public function getMonthHead()
+    {
+        $ex =  "2017年12月发票";
+        $month = $this->original['month'];
+        $number = intval(date('m', strtotime($month)));
+        $year      = intval(date('Y', strtotime($month)));
+
+        $map = [];
+
+        for($i = $number-1; $i>$number-12; $i--)
+        {
+            $key = 'invoice_m_' . ($i<1 ? (12 + $i): $i );
+
+            $map[$key] = $i;
+        }
+
+        asort($map);
+
+        $heads = [];
+
+        foreach ($map as $field => $month)
+        {
+            $key = '';
+            if($month<0)
+            {
+                $key =  ($year-1).'年'.abs($month).'月发票';
+            }else{
+                $key =  ($year).'年'.abs($month).'月发票';
+            }
+            $heads[$key] = $field;
+        }
+
+        return $heads;
+    }
+
+    /**
+     * 从给定的文本中猜测出，应付款付款周期的月的值
+     *
+     * @param $txt
+     * @return  Integer
+     */
+    public function guestCycleMonth($txt)
+    {
+        $month = $this->original['month'];
+
+        $number = intval(date('m', strtotime($month)));
+
+        //默认为全要计算
+        $default =  1;
+
+        // 什么都没解析到,使用 90天，即前三个月的因付款可以不用计算
+        //$default =  3;
+
+        // 从 $txt 中解析文本
+        // 中文+数字 分词获取月份
+        //str_contains($txt, ['票到']);
+        return $number - $default;
+    }
+
+     public function guestSuggestDueMoney($data, $month)
+     {
+         //  获得参与计算的 发票金额字段
+         $map = $this->getMonthNumber(true);
+
+         $sum = 0;
+         // 循环合计金额字段
+         foreach ($map as $item)
+         {
+             $sum += isset($data[$item]) ? $data[$item] : 0;
+
+             if( $item == "invoice_m_{$month}")
+             {
+                 break;
+             }
+         }
+         return $sum;
+     }
+
 
     /**
      * 同步现金池（从资金流中汇总）

@@ -7,6 +7,7 @@ use App\Models\Traits\BelongsToBillPeriod;
 use App\Models\Traits\BelongsToPaymentSchedule;
 use App\Models\Traits\BelongsToSupplier;
 use App\Models\Traits\CommonOptions;
+use App\Models\Traits\HasManyBillPay;
 use App\Models\Traits\HasManyPaymentSchedule;
 use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Database\Eloquent\Model;
@@ -21,11 +22,17 @@ class PaymentType extends Model
     protected $table = 'payment_types';
 
     protected $fillable = [
-        'name', 'code', 'memo'
+        'name', 'code', 'memo',
+        'is_plan', 'is_closed', 'parent_id'
     ];
 
     /**
      * 拥有 付款计划
      */
     use HasManyPaymentSchedule;
+
+    /**
+     * 拥有 付款明细
+     */
+    use HasManyBillPay;
 }
