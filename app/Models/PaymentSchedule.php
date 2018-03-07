@@ -22,7 +22,7 @@ class PaymentSchedule extends Model
     protected $fillable = [
         'bill_period_id', 'supplier_id', 'payment_type_id', 'payment_materiel_id',
         'name', 'supplier_name', 'supplier_balance', 'supplier_lpu_balance', 'materiel_name', 'pay_cycle', 'charge_man',
-        'batch', 'suggest_due_money',
+        'batch', 'suggest_due_money','pay_cycle_month',
         'status', 'memo',
         'plan_time', 'plan_due_money', 'plan_man',
         'audit_time', 'audit_due_money', 'audit_man',

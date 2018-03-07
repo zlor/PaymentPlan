@@ -134,7 +134,6 @@ class BillPeriod extends Model
      */
     public function getMonthHead()
     {
-        $ex =  "2017年12月发票";
         $month = $this->original['month'];
         $number = intval(date('m', strtotime($month)));
         $year      = intval(date('Y', strtotime($month)));
@@ -155,9 +154,9 @@ class BillPeriod extends Model
         foreach ($map as $field => $month)
         {
             $key = '';
-            if($month<0)
+            if($month<=0)
             {
-                $key =  ($year-1).'年'.abs($month).'月发票';
+                $key =  ($year-1).'年'.abs(12 + $month).'月发票';
             }else{
                 $key =  ($year).'年'.abs($month).'月发票';
             }
@@ -171,10 +170,21 @@ class BillPeriod extends Model
      * 从给定的文本中猜测出，应付款付款周期的月的值
      *
      * @param $txt
+     * @param $monthTxt
      * @return  Integer
      */
-    public function guestCycleMonth($txt)
+    public function guestCycleMonth($txt = '', $monthTxt = '')
     {
+        if(str_contains($monthTxt, ['月']))
+        {
+            $targetMonthNum = intval( substr(trim($monthTxt), 0, -1));
+
+            if($targetMonthNum>0 && $targetMonthNum<13)
+            {
+                return $targetMonthNum;
+            }
+        }
+
         $month = $this->original['month'];
 
         $number = intval(date('m', strtotime($month)));
@@ -184,10 +194,10 @@ class BillPeriod extends Model
 
         // 什么都没解析到,使用 90天，即前三个月的因付款可以不用计算
         //$default =  3;
-
         // 从 $txt 中解析文本
         // 中文+数字 分词获取月份
-        //str_contains($txt, ['票到']);
+        //TODO 增加 payment_cycle 模型,对所有周期的描述性文字进行归档识别
+
         return $number - $default;
     }
 

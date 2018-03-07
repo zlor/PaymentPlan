@@ -269,6 +269,7 @@ SCRIPT;
                 $map = [
                     'supplier_balance',
                     'supplier_lpu_balance',
+                    'suggest_due_money',
                     'plan_due_money',
                     'audit_due_money',
                     'final_due_money',
@@ -289,8 +290,9 @@ SCRIPT;
                 $sum['paid_money'] = $row['cash_paid']->sum() + $row['acceptance_paid']->sum();
 
                 $footer->td("共 <span>{$count}</span> 条", 12)
-                    ->td( $this->_getMoneySpan($sum['supplier_lpu_balance'], ['title'=>'上期未付清']) )
+                    //->td( $this->_getMoneySpan($sum['supplier_lpu_balance'], ['title'=>'上期未付清']) )
                     ->td( $this->_getMoneySpan($sum['supplier_balance'], ['title'=>'总应付款总计']) )
+                    ->td( $this->_getMoneySpan($sum['suggest_due_money'], ['title'=>'建议应付款总计']) )
                     ->td( $this->_getMoneySpan($sum['plan_due_money'], ['title'=>'本期计划应付', 'spanClass'=>'planHead']) )
                     ->td( $this->_getMoneySpan($sum['audit_due_money'], ['title'=>'本期一核应付', 'spanClass'=>'auditHead']) )
                     ->td( $this->_getMoneySpan($sum['final_due_money'], ['title'=>'本期二核应付', 'spanClass'=>'finalHead']) )
@@ -345,14 +347,14 @@ SCRIPT;
                          return $that->_getMoneySpan($value, ['title'=>trans('payment.schedule.'.$item).'发票', 'noCoin'=>true]);
                      });
             }
+// TODO 上期未结清余额 公式不明
+//            // 客户初期应付
+//            $grid->column('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'))
+//                ->display(function()use($that){
+//                    return $that->_getMoneySpan($this->supplier_lpu_balance, ['title'=>'上期未结清']);
+//                });
 
-            // 客户初期应付
-            $grid->column('supplier_lpu_balance', trans('payment.schedule.supplier_lpu_balance'))
-                ->display(function()use($that){
-                    return $that->_getMoneySpan($this->supplier_lpu_balance, ['title'=>'上期未结清']);
-                });
-
-            // 应付金额
+            // 总应付金额
             $grid->column('supplier_balance', trans('payment.schedule.supplier_balance'))
                 ->display(function()use($that){
                     return $that->_getMoneySpan(
@@ -362,6 +364,10 @@ SCRIPT;
                         ]
                     );
                 });
+            $grid->column('suggest_due_money', trans('payment.schedule.suggest_due_money'))
+            ->display(function()use($that){
+                return $that->_getMoneySpan($this->suggest_due_money, ['title'=>'建议应付']);
+            });
 
             // 计划相关信息
             $grid->column('planInfo', trans('payment.schedule.planInfo'))

@@ -117,6 +117,7 @@ class PaymentFile extends File
             '物品名称'=>'materiel_name',
             '付款确认人'=>'charge_man',
             '付款周期'=>'pay_cycle',
+            '到期月份' => 'pay_cycle_month',
             '总应付款'=>'supplier_balance',
             //'前期未付清余额'=>'supplier_lpu_balance',
             // 计划付款
@@ -145,7 +146,7 @@ class PaymentFile extends File
             'charge_man' => 4,
             'pay_cycle'  => 8,
             'supplier_balance' =>6,
-            'supplier_lpu_balance' =>7,
+            //'supplier_lpu_balance' =>7,
             // // 计划付款
             // 'plan_due_money' => 8,
             // // 下月付款
@@ -178,10 +179,12 @@ class PaymentFile extends File
             // 识别有效列
             foreach ($head as $key => $item)
             {
+                // 去除两端空格干扰
+                $title = trim($item);
                 // 若存在,或者表头被包含
-                if( isset($headMap[$item]) )
+                if( isset($headMap[$title]) )
                 {
-                    $columnMap[$headMap[$item]] = $key;
+                    $columnMap[$headMap[$title]] = $key;
                 }
             }
 
@@ -385,11 +388,10 @@ class PaymentFile extends File
 
             // 设置格式
             $newRow['supplier_balance']      = $this->readMoney($newRow['supplier_balance']);
-            $newRow['supplier_lpu_balance']  = $this->readMoney($newRow['supplier_lpu_balance']);
-            // $newRow['plan_next_month_money'] = $this->readMoney($newRow['plan_next_month_money']);
             $newRow['plan_due_money']        = $this->readMoney($newRow['plan_due_money']);
 
             // 设置十二月份的发票金额
+            $_tmpSumMonthMoney = 0;
             for($monthIndex=1; $monthIndex<=12; $monthIndex++)
             {
                 $key = 'invoice_m_' . $monthIndex;
@@ -397,8 +399,12 @@ class PaymentFile extends File
                 if(isset($newRow[$key]))
                 {
                     $newRow[$key]        = $this->readMoney($newRow[$key]);
+
+                    $_tmpSumMonthMoney += $newRow[$key];
                 }
             }
+            // 上期未付清金额：
+            $newRow['supplier_lpu_balance'] = 0; //$this->readMoney($newRow['supplier_balance'] - $_tmpSumMonthMoney);
 
             // 设置账期
             $newRow['bill_period_id']  = $bill_period->id;
@@ -427,10 +433,11 @@ class PaymentFile extends File
 
             $newRow['payment_materiel_id'] = $materiel->id;
 
+            $tmpCycleMonth =  isset($newRow['pay_cycle_month']) ? $newRow['pay_cycle_month'] : '';
             /**
              * 识别 应付款截止月
              */
-            $newRow['pay_cycle_month'] = $bill_period->guestCycleMonth($newRow['pay_cycle']);
+            $newRow['pay_cycle_month'] = $bill_period->guestCycleMonth($newRow['pay_cycle'], $tmpCycleMonth);
 
             /**
              * 推算建议应付款数额
