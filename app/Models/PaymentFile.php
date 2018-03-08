@@ -387,8 +387,8 @@ class PaymentFile extends File
             $newRow = $row;
 
             // 设置格式
-            $newRow['supplier_balance']      = $this->readMoney($newRow['supplier_balance']);
-            $newRow['plan_due_money']        = $this->readMoney($newRow['plan_due_money']);
+            $newRow['supplier_balance']      = $this->readMoney(isset($newRow['supplier_balance'])?$newRow['supplier_balance']:0);
+            $newRow['plan_due_money']        = $this->readMoney(isset($newRow['plan_due_money'])?$newRow['plan_due_money']:0);
 
             // 设置十二月份的发票金额
             $_tmpSumMonthMoney = 0;
