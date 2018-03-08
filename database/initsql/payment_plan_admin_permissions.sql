@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- 正在导出表  payment_plan.admin_permissions 的数据：~30 rows (大约)
-TRANSLATE FROM `admin_permissions`;
+TRUNCATE  FROM `admin_permissions`;
 /*!40000 ALTER TABLE `admin_permissions` DISABLE KEYS */;
 INSERT INTO `admin_permissions` (`id`, `name`, `slug`, `http_method`, `http_path`, `created_at`, `updated_at`) VALUES
 	(1, 'All permission', '*', '', '*', NULL, NULL),
