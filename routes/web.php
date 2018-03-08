@@ -26,6 +26,25 @@ Route::get('/', function(){
     return view('bill_books', compact('books', 'map'));
 });
 
+Route::get('offset/suggestDueMoney/{id}', function($id){
+    $billPeriod = \App\Models\BillPeriod::query()->findOrFail($id);
+
+    $schedules = \App\Models\PaymentSchedule::query()->where('bill_period_id', $billPeriod->id)->get();
+
+    $month = $billPeriod->getMonthNumber();
+
+    foreach ($schedules as $schedule)
+    {
+        if( $schedule->pay_cycle_month<=12 &&  $schedule->pay_cycle_month>=1)
+        {
+            $month = $schedule->pay_cycle_month;
+        }
+        $schedule->suggest_due_money = $billPeriod->guestSuggestDueMoney($schedule->toArray(), $month);
+
+        $schedule->save();
+    }
+});
+
 Route::get('getExcel/{id}', function($id){
 
     $billPeriod = \App\Models\BillPeriod::query()->findOrFail($id);

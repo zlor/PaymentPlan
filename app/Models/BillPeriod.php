@@ -207,17 +207,25 @@ class BillPeriod extends Model
          $map = $this->getMonthNumber(true);
 
          $sum = 0;
+         $offsetSum = 0;
          // 循环合计金额字段
+         $isUsed =  false;
          foreach ($map as $item)
          {
-             $sum += isset($data[$item]) ? $data[$item] : 0;
-
-             if( $item == "invoice_m_{$month}")
+             if($isUsed)
              {
-                 break;
+                 $offsetSum += isset($data[$item]) ? $data[$item] : 0;
+
+             }else{
+
+                 $sum += isset($data[$item]) ? $data[$item] : 0;
+                 if( $item == "invoice_m_{$month}")
+                 {
+                     $isUsed = true;
+                 }
              }
          }
-         return $sum;
+         return $offsetSum;
      }
 
 
