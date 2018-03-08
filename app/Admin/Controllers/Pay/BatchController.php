@@ -153,6 +153,9 @@ SCRIPT;
             'money_format' => '',
         ];
         // 更新数据
+        /**
+         * @type PaymentSchedule $paymentSchedule
+         */
         $paymentSchedule = PaymentSchedule::query()->find($id);
 
         if(empty($paymentSchedule))

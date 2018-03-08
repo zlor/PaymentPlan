@@ -204,22 +204,26 @@ class PaymentSchedule extends Model
                 $this->plan_time = $time;
                 $this->plan_man  = $man;
                 $this->memo .="(计划调整:$memo)";
+                $this->status  = self::STATUS_PLAN;
                 break;
             case 'audit_due_money':
                 $this->audit_due_money = $money;
                 $this->audit_time = $time;
                 $this->audit_man  = $man;
                 $this->memo_audit .= "(一次核定调整:$memo)";
+                $this->status  = self::STATUS_CHECK;
                 break;
             case 'final_due_money':
                 $this->final_due_money = $money;
                 $this->final_time = $time;
                 $this->final_man  = $man;
                 $this->memo_final .= "(二次核定调整:$memo)";
+                $this->status  = self::STATUS_CHECK;
                 break;
             case 'due_money':
                 $this->due_money = $money;
                 $this->memo .= "(敲定应付款:$memo)";
+                $this->status  = self::STATUS_PAY;
                 break;
 
             default:break;

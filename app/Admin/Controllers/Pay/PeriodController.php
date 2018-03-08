@@ -359,8 +359,8 @@ SCRIPT;
              ->setWidth(8,3)
              ->options(BillPay::getSupplierOptions());
 
-        $form->text('company', '收款公司')
-            ->setWidth(8, 3);
+//        $form->text('company', '收款公司')
+//            ->setWidth(8, 3);
 
         $form->text('code', '付款凭证')
             ->setWidth(8, 3)

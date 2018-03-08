@@ -10,20 +10,20 @@
                 </div>
             </div>
         </div>
+        {{--<div class="form-group  ">--}}
+            {{--<label for="import_mapping" class="col-sm-3 control-label">表头对照</label>--}}
+            {{--<div class="col-sm-9">--}}
+                {{--<input type="hidden" name="import_mapping">--}}
+                {{--<select class="form-control import_mapping" style="width: 100%;" name="import_mapping">--}}
+                    {{--<option value=""></option>--}}
+                    {{--@foreach($import_mapping_options as $key=> $value)--}}
+                    {{--<option value="{{$key}}">{{$value}}</option>--}}
+                    {{--@endforeach--}}
+                {{--</select>--}}
+            {{--</div>--}}
+        {{--</div>--}}
         <div class="form-group  ">
-            <label for="import_mapping" class="col-sm-3 control-label">表头对照</label>
-            <div class="col-sm-9">
-                <input type="hidden" name="import_mapping">
-                <select class="form-control import_mapping" style="width: 100%;" name="import_mapping">
-                    <option value=""></option>
-                    @foreach($import_mapping_options as $key=> $value)
-                    <option value="{{$key}}">{{$value}}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-        <div class="form-group  ">
-            <label for="skip_row_number" class="col-sm-3 control-label">开始行数</label>
+            <label for="skip_row_number" class="col-sm-3 control-label text-gray">开始行</label>
             <div class="col-sm-9">
                 <div class="input-group">
                     <div class="input-group">
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="form-group  ">
-            <label for="skip_column_number" class="col-sm-3 control-label">开始列数</label>
+            <label for="skip_column_number" class="col-sm-3 control-label text-gray">开始列</label>
             <div class="col-sm-9">
                 <div class="input-group">
                     <div class="input-group">

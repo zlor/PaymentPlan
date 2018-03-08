@@ -155,6 +155,8 @@ Route::group([
     // --  付款明细档案
     $router->resource('/base/bill/payment_details', 'PaymentDetailController');
 
+    // -- 付款类型下属周期档案
+    $router->resource('/base/bill/payment_type_cycles', 'PaymentTypeCycleController');
 
 // dd(Route::getRoutes());
     // Select 动态加载

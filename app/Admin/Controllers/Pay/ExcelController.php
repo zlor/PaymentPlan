@@ -450,13 +450,15 @@ SCIPRT;
         // 导入使用的参数
         $options = [];
 
-        // 0. 取得默认的方案参数
-        if(empty($import_mapping_params = PaymentSchedule::getImportMappingParams($inputs['import_mapping'])))
-        {
-            return response()->json(['status'=>false, 'message'=>'读取Excel的配置未预设，请联系管理员添加！']);
-        }else{
-            $options = $import_mapping_params;
-        }
+        // @disabled 已使用统一表头
+        //        // 0. 取得默认的方案参数
+        //        if(empty($import_mapping_params = PaymentSchedule::getImportMappingParams($inputs['import_mapping'])))
+        //        {
+        //            return response()->json(['status'=>false, 'message'=>'读取Excel的配置未预设，请联系管理员添加！']);
+        //        }else{
+        //            $options = $import_mapping_params;
+        //        }
+        // @end_disabled
 
         // 取得跳过的行数
         if(!empty($inputs['skip_row_number']))
