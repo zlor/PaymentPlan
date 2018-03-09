@@ -39,7 +39,7 @@ Route::get('offset/suggestDueMoney/{id}', function($id){
         {
             $month = $schedule->pay_cycle_month;
         }
-        $schedule->suggest_due_money =$billPeriod->supplier_balance - $billPeriod->guestSuggestDueMoney($schedule->toArray(), $month);
+        $schedule->suggest_due_money =$schedule->supplier_balance - $billPeriod->guestSuggestDueMoney($schedule->toArray(), $month);
 
         $schedule->save();
     }
