@@ -442,7 +442,7 @@ class PaymentFile extends File
             /**
              * 推算建议应付款数额
              */
-            $newRow['suggest_due_money'] = $newRow['supplier_balance'] - $bill_period->guestSuggestDueMoney($newRow, $newRow['pay_cycle_month']);
+            $newRow['suggest_due_money'] = $bill_period->guestSuggestDueMoney($newRow, $newRow['pay_cycle_month']);
 
             /**
              * 验证数据有效性

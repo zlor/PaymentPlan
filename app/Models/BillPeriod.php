@@ -203,7 +203,13 @@ class BillPeriod extends Model
 
      public function guestSuggestDueMoney($data, $month)
      {
-         //  获得参与计算的 发票金额字段
+         $supplier_balance = isset($data['supplier_balance'])?$data['supplier_balance']:0;
+
+         if($supplier_balance<=0)
+         {
+             return 0;
+         }
+             //  获得参与计算的 发票金额字段
          $map = $this->getMonthNumber(true);
 
          $sum = 0;
@@ -225,7 +231,7 @@ class BillPeriod extends Model
                  }
              }
          }
-         return $offsetSum;
+         return $supplier_balance - $offsetSum;
      }
 
 

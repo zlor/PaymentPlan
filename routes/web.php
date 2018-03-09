@@ -39,7 +39,16 @@ Route::get('offset/suggestDueMoney/{id}', function($id){
         {
             $month = $schedule->pay_cycle_month;
         }
-        $schedule->suggest_due_money =$schedule->supplier_balance - $billPeriod->guestSuggestDueMoney($schedule->toArray(), $month);
+
+        // 总应付为非正数时，建议应付为0
+        if($schedule->supplier_balance<=0)
+        {
+            $schedule->suggest_due_money = 0;
+
+        }else{
+            // 若总应付存在正值，则即使计算结果为负值，也需要记录。观测异常。
+            $schedule->suggest_due_money = $billPeriod->guestSuggestDueMoney($schedule->toArray(), $month);
+        }
 
         $schedule->save();
     }
