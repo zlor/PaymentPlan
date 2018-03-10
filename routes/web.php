@@ -90,8 +90,3 @@ Route::get('getExcel/{id}', function($id){
         });
     })->download();
 });
-
-
-Route::get('', function(){
-
-});
