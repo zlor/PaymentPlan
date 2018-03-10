@@ -257,14 +257,20 @@ class PaymentScheduleController extends Controller
 
             }
 
+            // 截止月份
+            $form->text('pay_cycle_month', trans('payment.schedule.pay_cycle_month'));
+
+            // 付款周期
+            $form->textarea('pay_cycle', trans('payment.schedule.pay_cycle'))->rows(3);
+
             $form->divider();
 
             // 供应商余额
             $form->currency('supplier_balance', trans('payment.schedule.supplier_balance'))
                 ->symbol('￥');
 
-            // 供应商余额
-            $form->currency('supplier_balance', trans('payment.schedule.supplier_balance'))
+            // 建议应付余额
+            $form->currency('suggest_due_money', trans('payment.schedule.suggest_due_money'))
                  ->symbol('￥');
 
             // 上期未付清余款

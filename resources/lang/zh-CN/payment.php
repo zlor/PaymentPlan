@@ -37,6 +37,7 @@ return [
     'schedule.supplier_lpu_balance'   => '上期未付清余额',//supplier_last_period_unpaid_balance
 
     'schedule.pay_cycle'    => '付款周期',
+    'schedule.pay_cycle_month' =>'应付到期月份',
     'schedule.charge_man'    => '付款确认人',
 
     'schedule.materiel_name' => '物料名称(导入)',

@@ -26,6 +26,9 @@ Route::get('/', function(){
     return view('bill_books', compact('books', 'map'));
 });
 
+/**
+ *
+ */
 Route::get('offset/suggestDueMoney/{id}', function($id){
     $billPeriod = \App\Models\BillPeriod::query()->findOrFail($id);
 
@@ -54,6 +57,9 @@ Route::get('offset/suggestDueMoney/{id}', function($id){
     }
 });
 
+/**
+ * 获取指定账期下， 按照供应商罗列的 建议应付款 Excel
+ */
 Route::get('getExcel/{id}', function($id){
 
     $billPeriod = \App\Models\BillPeriod::query()->findOrFail($id);
@@ -76,11 +82,16 @@ Route::get('getExcel/{id}', function($id){
 
     $sheetName = 'tmp';
 
-    $excel = Excel::create('tmp', function($excel)use($sheetData, $sheetName){
+    $excel = Excel::create($billPeriod->name . '建议应付款', function($excel)use($sheetData, $sheetName){
 
         $excel->sheet($sheetName, function($sheet)use($sheetData) {
 
             $sheet->fromArray($sheetData);
         });
-    })->store('xls', storage_path('public'))->download();
+    })->download();
+});
+
+
+Route::get('', function(){
+
 });
