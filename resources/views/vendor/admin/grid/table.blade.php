@@ -24,9 +24,11 @@
     <div id="filter_div" class="box-header" style="border-top:#efefef 1px solid; margin-top: 0;">
         {!! $grid->renderFilter() !!}
     </div>
-
-    <div class="box-body table-responsive no-padding">
-        <table class="table table-hover" style="min-width:1200px">
+    <div id="scroll-div" class="scroll-offset">
+        <div id="scroll-sync-table"></div>
+    </div>
+    <div id="data-div" class="box-body table-responsive no-padding">
+        <table id="data-table" class="table table-hover" style="min-width:1200px">
 
             <tr class="ele-fixed bg-gray">
                 @foreach($grid->columns() as $column)

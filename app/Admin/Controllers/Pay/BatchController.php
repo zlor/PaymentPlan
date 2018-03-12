@@ -90,6 +90,12 @@ td .coin{
     color:white;
     margin-right:.3em;
 }
+#scroll-div{
+overflow: auto
+}
+#scroll-sync-table{
+height: 0.3em;
+}
 </style>
 STYLE;
             $content->row($css);
@@ -110,6 +116,17 @@ STYLE;
             target: document.getElementsByClassName('counter')[0], // it must be a HTMLElement
             offsetTop: (headHeight + 4 + offset) // height from window offsetTop
         });
+         eleFixed.push({
+            target: document.getElementsByClassName('scroll-offset')[0], // it must be a HTMLElement
+            offsetTop: (headHeight - 2 + offset) // height from window offsetTop
+        });
+        // 同步 table-scroll 的宽度
+        $('#scroll-sync-table').width($('#data-table').width());
+        $('#scroll-div').scroll(function(){
+            var left = $(this).scrollLeft();
+           // console.log(left);
+            $("#data-div").scrollLeft(left); // 横向滚动条
+     });
         
     };
     $('#filter_btn').click(function(){
@@ -126,6 +143,8 @@ STYLE;
         initFixed();
     });
     initFixed();
+    
+    
         
 SCRIPT;
             Admin::script($script);
