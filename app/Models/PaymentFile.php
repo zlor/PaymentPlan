@@ -198,8 +198,12 @@ class PaymentFile extends File
             // 识别原文件的行号
 
             // 预加载到 payment_schedule_file 中
-            for($rowIndex = $fromRowNumber; $rowIndex< count($rows); $rowIndex++)
+            for($rowIndex = $fromRowNumber; $rowIndex<= count($rows); $rowIndex++)
             {
+                if( ! isset($rows[$rowIndex]))
+                {
+                    continue;
+                }
 
                 $import_source = [];
 
