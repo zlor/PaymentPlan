@@ -328,6 +328,11 @@ SCRIPT;
 
         $import_mapping_options = PaymentSchedule::getImportMappingOptions();
 
+        $import_type_options = [
+            'normal'  => '正常导入：重复的数据保留最初一条',
+            'overwrite' => '覆盖导入：重复的数据进行覆盖重写',
+        ];
+
         $scirpt =<<<SCIPRT
 $(function(){
     function activeTr(tr){
@@ -402,7 +407,7 @@ SCIPRT;
         Admin::script($scirpt);
 
 
-        return view('admin.bill.excel_import', compact('data', 'import_mapping_options'));
+        return view('admin.bill.excel_import', compact('data', 'import_type_options'));
     }
 
 
@@ -471,11 +476,29 @@ SCIPRT;
             $options['skip_row_number'] = $inputs['skip_row_number'];
         }
 
+
+        // 当excel 作为补充文件导入时，具有覆盖的效应。
+        $setup_map = [
+            'allowOverwrite' => false,
+            'useLastWhenRepeat' => false,
+        ];
+        if(!empty($inputs['import_type']))
+        {
+            switch ($inputs['import_type']){
+                case 'normal':
+                    break;
+                case 'overwrite':
+                    $setup_map['allowOverwrite'] = true;
+                    break;
+                default:break;
+            }
+        }
+
         // 缓存文件
         $result = $file->cacheFile($options);
 
         // 载入数据
-        $result && $result = $file->setupSchedule();
+        $result && $result = $file->setupSchedule($setup_map['allowOverwrite'], $setup_map['useLastWhenRepeat']);
 
         // 获取载入后的信息
         $data = [
