@@ -62,20 +62,25 @@ Route::get('offset/suggestDueMoney/{id}', function($id){
  */
 Route::get('getExcel/{id}', function($id){
 
+    /**
+     * @type \App\Models\BillPeriod $billPeriod
+     */
     $billPeriod = \App\Models\BillPeriod::query()->findOrFail($id);
 
-    $schedules = \App\Models\PaymentSchedule::query()->where('bill_period_id', $billPeriod->id)->get();
-    $head = ["供应商名称", '类型', "总应付金额", "建议应付金额"];
+    $monthNumber = $billPeriod->getMonthNumber();
 
-    $sheetData[] = $head;
+    $schedules = \App\Models\PaymentSchedule::query()->where('bill_period_id', $billPeriod->id)->get();
 
     foreach ($schedules as $schedule)
     {
         $row = [
-            0=> $schedule->supplier_name,
-            1=> $schedule->payment_type_name,
-            2=> $schedule->supplier_balance,
-            3=> $schedule->suggest_due_money,
+            "供应商名称"=> $schedule->supplier_name,
+            "类型"=> $schedule->payment_type_name,
+            "总应付金额"=> $schedule->supplier_balance,
+            "建议应付金额"=> $schedule->suggest_due_money,
+            "付款周期"=> $schedule->pay_cycle,
+            "付款周期差异月份数" => $monthNumber - ($schedule->pay_cycle_month<=$monthNumber?:($schedule->pay_cycle_month-12)),
+            "到期月份"=> $schedule->pay_cycle_month . '月',
         ];
         $sheetData[] = $row;
     }
