@@ -757,5 +757,76 @@ class BillPeriod extends Model
 
     }
 
+    /** 
+     * 从指定的账期拷贝所有付款计划。
+     *
+     */
+    public function copyScheduleForInit(BillPeriod $fromBillPeriod, $initDiff = 1)
+    {
+        $initFieldsMap = [
+            'status' => PaymentSchedule::STATUS_INIT,
+            'bill_period_id' => $this->id,
+            'batch' => 1,
+            'is_checked' => 0,
+            'is_locked'  => 0,
+            'suggest_due_money' =>0,
+        ];
+        $copyFieldsMap = [
+           'bill_period_id', 'supplier_id', 'payment_type_id', 'payment_materiel_id',
+        'name', 'supplier_name', 'supplier_balance', 'supplier_lpu_balance', 'materiel_name', 'pay_cycle', 'charge_man',
+        'batch', 'suggest_due_money','pay_cycle_month',
+        'status', 'memo',
+        'invoice_m_1','invoice_m_2','invoice_m_3',
+        'invoice_m_4','invoice_m_5','invoice_m_6',
+        'invoice_m_7','invoice_m_8','invoice_m_9',
+        'invoice_m_10','invoice_m_11','invoice_m_12',
+        'is_checked', 'is_locked',
+        ];
+
+        $fromSchedules = \App\Models\PaymentSchedule::query()->where('bill_period_id', $fromBillPeriod->id)->get();
+
+        $toSchedules = [];
+
+        foreach ($fromSchedules as $item)
+        {
+            $newRow = [];
+            $itemRow = $item->toArray();
+
+            foreach ($copyFieldsMap as $key)
+            {   
+                // 截至月份：特殊处理_按照增加的账期月份来增加截至月份
+                if('pay_cycle_month' == $key)
+                {
+                    $newRow[$key] = $itemRow[$key] + $initDiff;
+
+                    $newRow[$key] = $newRow[$key]>12 ? ($newRow[$key] - 12): $newRow[$key];
+
+                    continue;
+                }
+
+                if(isset($initFieldsMap[$key]))
+                {
+                    $newRow[$key] = $initFieldsMap[$key];
+                }else{
+                    $newRow[$key] = $itemRow[$key];
+                }
+            }
+
+            // 查找或者-> 新建
+            $current = PaymentSchedule::query()->firstOrCreate([
+                'supplier_id'=> $newRow['supplier_id'],
+                // 'name'       => $newRow['name'],
+                'bill_period_id'=> $newRow['bill_period_id'],
+                'payment_type_id'=> $newRow['payment_type_id'],
+                'payment_materiel_id'=> $newRow['payment_materiel_id'],
+            ], $newRow);
+
+            $toSchedules[] = $current->toArray();
+        }
+
+        return $toSchedules;
+    }
+
+
 
 }

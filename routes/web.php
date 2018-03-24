@@ -95,3 +95,34 @@ Route::get('getExcel/{id}', function($id){
         });
     })->download();
 });
+
+/**
+ *  创建指定账期的计划,从上一个账期继承
+ */
+Route::get('buildSehedule/from/{fromId}/to/{toId}/{diffMonth}', function($fromId, $toId, $diffMonth){
+	/**
+     * @type \App\Models\BillPeriod $fromBillPeriod
+     */
+    $fromBillPeriod = \App\Models\BillPeriod::query()->findOrFail($fromId);
+
+    /**
+     * @type \App\Models\BillPeriod $toBillPeriod
+     */
+    $toBillPeriod = \App\Models\BillPeriod::query()->findOrFail($toId);
+
+    //$fromMonthNumber = $fromBillPeriod->getMonthNumber();
+
+    //$toMonthNumber = $toBillPeriod->getMonthNumber();
+    $schedules = $toBillPeriod->copyScheduleForInit($fromBillPeriod, empty($diffMonth)?1:$diffMonth);
+
+	$sheetName = "Form{$fromBillPeriod->name}_To{$toBillPeriod->name}";
+	
+    $excel = Excel::create($toBillPeriod->name . '计划总表', function($excel)use($schedules, $sheetName){
+
+        $excel->sheet($sheetName, function($sheet)use($schedules) {
+
+            $sheet->fromArray($schedules);
+        });
+    })->download();
+
+});
