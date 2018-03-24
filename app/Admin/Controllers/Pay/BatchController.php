@@ -261,7 +261,7 @@ SCRIPT;
 
             if(isset($params['bill_period_id']))
             {
-                $filter_bill_period_id = !is_null($params['bill_period_id']))?$params['bill_period_id'] : 0;
+                $filter_bill_period_id = !is_null($params['bill_period_id'])?$params['bill_period_id'] : 0;
 
                 $tmp = BillPeriod::query()->find($filter_bill_period_id);
                 
