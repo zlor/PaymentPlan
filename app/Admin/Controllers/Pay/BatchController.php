@@ -255,23 +255,30 @@ SCRIPT;
             // 设置默认账期
             $defaultBillPeriod = BillPeriod::envCurrent();
 
-            $params =  Input::get();
-
-            $filter_bill_period_id = (isset($params['bill_period_id']) && !is_null($params['bill_period_id']))?$params['bill_period_id'] : 0;
-
-            if( empty($params['bill_period_id']) &&  $defaultBillPeriod)
-            {
-                $grid->model()->where('bill_period_id', $defaultBillPeriod->id);
-            }
-
             $filterBillPeriod = $defaultBillPeriod;
 
-            $tmp = BillPeriod::query()->find($params['bill_period_id']);
-            
-            if(!empty($tmp->id))
+            $params =  Input::get();
+
+            if(isset($params['bill_period_id']))
             {
-                $filterBillPeriod  = $tmp;
+                $filter_bill_period_id = !is_null($params['bill_period_id']))?$params['bill_period_id'] : 0;
+
+                $tmp = BillPeriod::query()->find($filter_bill_period_id);
+                
+                if(!empty($tmp->id))
+                {
+                    $filterBillPeriod  = $tmp;
+                }
+
+            }else{
+                $filter_bill_period_id = $defaultBillPeriod->id;
+
+                if($defaultBillPeriod)
+                {
+                    $grid->model()->where('bill_period_id', $defaultBillPeriod->id);
+                }
             }
+            
 
             $grid->filter(function(Grid\Filter $filter)use($defaultBillPeriod){
 
