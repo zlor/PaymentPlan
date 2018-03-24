@@ -255,10 +255,11 @@ SCRIPT;
             // 设置默认账期
             $defaultBillPeriod = BillPeriod::envCurrent();
 
-            if($defaultBillPeriod)
+            $params =  Input::get();
+
+            if( !isset($params['bill_period_id']) &&  $defaultBillPeriod)
             {
-                //  解放就绪中的内容
-                //   $grid->model()->where('bill_period_id', $defaultBillPeriod->id);
+                $grid->model()->where('bill_period_id', $defaultBillPeriod->id);
             }
             
 
