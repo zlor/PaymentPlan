@@ -257,8 +257,10 @@ SCRIPT;
 
             if($defaultBillPeriod)
             {
-                $grid->model()->where('bill_period_id', $defaultBillPeriod->id);
+                //  解放就绪中的内容
+                //   $grid->model()->where('bill_period_id', $defaultBillPeriod->id);
             }
+            
 
             $grid->filter(function(Grid\Filter $filter)use($defaultBillPeriod){
 

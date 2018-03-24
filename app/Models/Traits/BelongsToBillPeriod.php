@@ -47,7 +47,7 @@ trait BelongsToBillPeriod
     {
         $query = BillPeriod::query();
 
-        $defaultStatus = ['active'];
+        $defaultStatus = ['active', 'standby'];
 
         if($noMore)
         {
