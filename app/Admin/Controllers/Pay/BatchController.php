@@ -257,11 +257,21 @@ SCRIPT;
 
             $params =  Input::get();
 
-            if( !isset($params['bill_period_id']) &&  $defaultBillPeriod)
+            $filter_bill_period_id = (isset($params['bill_period_id']) && !is_null($params['bill_period_id']))?$params['bill_period_id'] : 0;
+
+            if( empty($params['bill_period_id']) &&  $defaultBillPeriod)
             {
                 $grid->model()->where('bill_period_id', $defaultBillPeriod->id);
             }
+
+            $filterBillPeriod = $defaultBillPeriod;
+
+            $tmp = BillPeriod::query()->find($params['bill_period_id']);
             
+            if(!empty($tmp->id))
+            {
+                $filterBillPeriod  = $tmp;
+            }
 
             $grid->filter(function(Grid\Filter $filter)use($defaultBillPeriod){
 
@@ -364,7 +374,7 @@ SCRIPT;
 
             // 应付款发票
             // 按照当前的账期月份进行排序
-            $defaultMonthMap = $defaultBillPeriod->getMonthNumber(true);
+            $defaultMonthMap = $filterBillPeriod->getMonthNumber(true);
             foreach ($defaultMonthMap as $item)
             {
                 $grid->column($item, trans('payment.schedule.'.$item))
