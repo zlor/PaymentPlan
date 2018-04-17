@@ -132,6 +132,11 @@ Route::group([
 
 
     #### 发票管理
+    ## 发票导入 - 应付发票导入
+    $router->get('/pay/invoice/excel', 'Invoice\ExcelController@payment')->name('pay.invoice.excel');
+    $router->get('/pay/invoice/excel/import', 'Invoice\ExcelController@paymentImport')->name('pay.invoice.excel.import');
+    $router->post('/pay/invoice/excel/upload', 'Invoice\ExcelController@paymentUpload')->name('pay.invoice.excel.upload');
+
      ##  应付款发票
     $router->resource('/pay/invoice', 'Pay\InvoiceController');
      ##  应收款发票
