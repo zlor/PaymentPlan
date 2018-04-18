@@ -11,8 +11,8 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- 正在导出表  payment_plan.admin_permissions 的数据：~30 rows (大约)
-TRUNCATE  FROM `admin_permissions`;
+-- 正在导出表  payment_plan.admin_permissions 的数据：~31 rows (大约)
+DELETE FROM `admin_permissions`;
 /*!40000 ALTER TABLE `admin_permissions` DISABLE KEYS */;
 INSERT INTO `admin_permissions` (`id`, `name`, `slug`, `http_method`, `http_path`, `created_at`, `updated_at`) VALUES
 	(1, 'All permission', '*', '', '*', NULL, NULL),
@@ -44,7 +44,8 @@ INSERT INTO `admin_permissions` (`id`, `name`, `slug`, `http_method`, `http_path
 	(27, '基础档案》物料', 'base.materiel', '', '/base/bill/payment_materiels*', '2018-01-27 12:07:38', '2018-01-27 12:07:38'),
 	(28, '基础档案》计划', 'base.schedule', '', '/base/bill/payment_schedules*', '2018-01-27 12:08:21', '2018-01-27 12:08:21'),
 	(29, '基础档案》付款明细', 'base.payment_detail', '', '/base/bill/payment_details*', '2018-01-27 12:09:12', '2018-01-27 12:09:12'),
-	(30, '通用数据获取(付款计划)', 'common.select', '', '/select*', '2018-01-27 12:10:18', '2018-01-27 12:10:18');
+	(30, '通用数据获取(付款计划)', 'common.select', '', '/select*', '2018-01-27 12:10:18', '2018-01-27 12:10:18'),
+	(31, '付款管理》应付款发票', 'pay.invoice', '', '/pay/invoice*', '2018-04-18 09:03:54', '2018-04-18 09:03:54');
 /*!40000 ALTER TABLE `admin_permissions` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

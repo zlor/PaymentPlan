@@ -104,7 +104,7 @@ class InvoiceController extends Controller
              * 创建、导出
              */
             // $grid->disableCreation();
-            $grid->disableExport();
+             $grid->disableExport();
 
             // 设置默认账期
             $defaultBillPeriod = BillPeriod::envCurrent();
@@ -135,11 +135,11 @@ class InvoiceController extends Controller
              */
             $grid->tools(function(Grid\Tools $tools){
 
-                $tool_import = new Import();
-
-                $tool_import->setAction($this->getUrl('import'));
-
-                $tools->append($tool_import);
+//                $tool_import = new Import();
+//
+//                $tool_import->setAction($this->getUrl('import'));
+//
+//                $tools->append($tool_import);
 
             });
 
@@ -167,7 +167,11 @@ class InvoiceController extends Controller
             $grid->column('title', trans('invoice.title'));
 
             // // 供应商(匹配)
-            $grid->column('supplier.name', trans('invoice.supplier'))->popover('right', ['limit'=>15]);
+            $grid->column('supplier.name', trans('invoice.supplier'))
+                ->display(function($value){
+                    $txt = mb_strlen($value)>15?(mb_substr($value, 0, 15).'...'):$value;
+                    return "<span data-toggle='tooltip' data-title='{$value}'>{$txt}</span>";
+                });
 
             // 发票时间
             $grid->column('date', trans('invoice.date'));
@@ -175,8 +179,8 @@ class InvoiceController extends Controller
             // 发票金额
             $grid->column('money', trans('invoice.money'));
 
-            // 发票已付金额
-            $grid->column('money_paid', trans('invoice.money_paid'));
+//            // 发票已付金额
+//            $grid->column('money_paid', trans('invoice.money_paid'));
 
             // 发票备注
             $grid->column('memo', trans('invoice.memo'));
@@ -186,8 +190,8 @@ class InvoiceController extends Controller
             $grid->column('user.name', trans('invoice.user.name'));
 
 
-            // 物料类型
-            $grid->column('payment_type.name', trans('payment.schedule.payment_type'));
+//            // 物料类型
+//            $grid->column('payment_type.name', trans('payment.schedule.payment_type'));
         });
     }
 
