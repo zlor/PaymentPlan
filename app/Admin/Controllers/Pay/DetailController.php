@@ -378,32 +378,31 @@ SCRIPT;
             ->default(csrf_token());
 
         $form->hidden('payment_schedule_id')
-            ->setWidth(8, 3)
+            ->setWidth(8, 4)
             ->default($filter['payment_schedule_id']);
 
         $form->select('supplier_id', '收款公司')
-            ->setWidth(8, 3)
+            ->setWidth(8, 4)
             ->options(PaymentSchedule::getSupplierOptions())
             ->default(strval($paymentSchedule->supplier_id))
             ->readOnly();
 
         $form->select('pay_type', '付款方式')
-            ->setWidth(8, 3)
+            ->setWidth(8, 4)
             ->options(PaymentDetail::getPayTypeOptions());
 
-        $form->text('code', '付款凭证')
-            ->setWidth(8, 3)
-            ->rules('required');
-
         $form->date('time', '付款时间')
-            ->setWidth(8, 3);
+            ->setWidth(8, 4);
 
         $form->currency('money', '金额')
-            ->setWidth(8, 3)
+            ->setWidth(8, 4)
             ->prepend('￥');
 
+        $form->text('code', '凭据编码')
+            ->setWidth(8, 4);
+
         $form->textarea('memo', '备注')
-            ->setWidth(8, 3)
+            ->setWidth(8, 4)
             ->rows(4);
 
         return $form;

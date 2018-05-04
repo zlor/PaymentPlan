@@ -170,7 +170,7 @@ class PaymentSchedule extends Model
     {
         $this->cash_paid = -1 * $this->bill_period_flows()
                 ->where('type', 'pay')
-                ->where('kind', 'cash')
+                ->whereIn('kind', ['cash','tele_transfer'])
                 ->sum('money');
 
         $this->acceptance_paid = -1 * $this->bill_period_flows()

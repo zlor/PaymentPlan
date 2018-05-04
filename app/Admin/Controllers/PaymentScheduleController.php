@@ -163,7 +163,7 @@ class PaymentScheduleController extends Controller
 
                 // 类型
                 $filter->equal('payment_type_id', trans('payment.type'))
-                    ->select(PaymentSchedule::getPaymentTypeOptions());
+                    ->select(PaymentSchedule::getPaymentScheduleTypeOptions());
 
                 // 科目
                 $filter->like('name', trans('payment.schedule.name'));

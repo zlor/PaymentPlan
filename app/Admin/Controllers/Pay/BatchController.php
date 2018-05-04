@@ -291,7 +291,7 @@ SCRIPT;
 
                 // 分类
                 $filter->equal('payment_type_id', trans('payment.type'))
-                    ->select(PaymentSchedule::getPaymentTypeOptions());
+                    ->select(PaymentSchedule::getPaymentScheduleTypeOptions());
 
                 $filter->like('name', trans('payment.schedule.name'));
             });

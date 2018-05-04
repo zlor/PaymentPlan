@@ -111,6 +111,7 @@ return [
     'detail.pay_type'            => '付款方式',
     'detail.pay_type.cash'       => '现金',
     'detail.pay_type.acceptance' => '承兑',
+    'detail.pay_type.tele_transfer' => '电汇',
 
     'detail.code'   => '付款流水号',
     'detail.payment_proof' => '付款凭证',

@@ -2,4 +2,4 @@ INSERT INTO payment_plan.payment_types (name, code, memo, deleted_at, created_at
 INSERT INTO payment_plan.payment_types (name, code, memo, deleted_at, created_at, updated_at, icon) VALUES ('外协加工', 'wxjg', '外协加工', null, '2018-01-19 12:42:31', '2018-01-19 12:42:31', '');
 INSERT INTO payment_plan.payment_types (name, code, memo, deleted_at, created_at, updated_at, icon) VALUES ('刀具包装物', 'djbzw', '刀具包装物', null, '2018-01-19 12:42:46', '2018-01-19 12:42:46', '');
 INSERT INTO payment_plan.payment_types (name, code, memo, deleted_at, created_at, updated_at, icon) VALUES ('辅料及其他', 'fl', null, null, '2018-01-19 12:43:02', '2018-01-19 15:13:46', 'fa-pencil');
-INSERT INTO payment_plan.payment_types (name, code, memo, deleted_at, created_at, updated_at, icon) VALUES ('其他', 'qt', '其他', '2018-01-19 15:10:29', '2018-01-19 12:43:17', '2018-01-19 15:10:29', '');
+INSERT INTO payment_plan.payment_types (name, code, memo, deleted_at, created_at, updated_at, icon) VALUES ('其他', 'qt', '其他'1-19 12:43:17', '2018-01-19 15:10:29', '');

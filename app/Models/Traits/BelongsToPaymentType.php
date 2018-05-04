@@ -3,6 +3,7 @@ namespace App\Models\Traits;
 
 use App\Models\PaymentType;
 use Closure;
+use Illuminate\Queue\InvalidPayloadException;
 
 trait BelongsToPaymentType
 {
@@ -22,6 +23,23 @@ trait BelongsToPaymentType
     public function getPaymentTypeNameAttribute()
     {
         return empty($this->payment_type) ? '' : $this->payment_type->name;
+    }
+
+    /**
+     * 获取付款(计划)类型-备选
+     * @param Closure|null $callable
+     * @return \Illuminate\Support\Collection|mixed
+     */
+    public static function getPaymentScheduleTypeOptions(Closure $callable = null)
+    {
+        $query = PaymentType::query()->schedule();
+
+        if(! is_null($callable))
+        {
+            return call_user_func($callable, $query);
+        }
+
+        return $query->get()->pluck('name', 'id');
     }
 
     /**

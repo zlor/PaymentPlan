@@ -44,6 +44,6 @@ class PaymentDetail extends Model
      */
     public static function getPayTypeOptions()
     {
-        return trans_options('pay_type', ['cash', 'acceptance'], 'payment.detail');
+        return trans_options('pay_type', ['cash', 'acceptance', 'tele_transfer'], 'payment.detail');
     }
 }

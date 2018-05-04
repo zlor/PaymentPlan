@@ -104,7 +104,7 @@ class HomeController extends Controller
         }
 
         // 识别聚焦的类型
-        $focusPaymentType = PaymentType::query()->findOrNew($type_id);
+        $focusPaymentType = PaymentType::query()->schedule()->findOrNew($type_id);
 
 
         return Admin::content(function(Content $content)use($focusBillPeriod, $focusPaymentType){
@@ -194,7 +194,7 @@ SCRIPT;
      */
     protected function _gatherPartInfo($focusBillPeriod, $focusPaymentType)
     {
-        $paymentTypes = PaymentType::query()->get();
+        $paymentTypes = PaymentType::query()->schedule()->get();
 
         $paymentTypes->prepend(new PaymentType([
             'id' => 0,
@@ -262,6 +262,7 @@ SCRIPT;
             'current_cash_balance' => $focusBillPeriod->current_cash_balance,
             'current_acceptance_balance' => $focusBillPeriod->current_acceptance_balance,
             'cash_paid' => $focusBillPeriod->sumCashPaid(['payment_type_id'=>$focusTypeId]),
+            'tt_paid' => $focusBillPeriod->sumTeleTransferPaid(['payment_type_id'=>$focusTypeId]),
             'acceptance_paid' => $focusBillPeriod->sumAcceptancePaid(['payment_type_id'=>$focusTypeId]),
             'cash_paid_total' => $focusBillPeriod->cash_paid,
             'acceptance_paid_total' => $focusBillPeriod->acceptance_paid,
@@ -313,7 +314,9 @@ SCRIPT;
                          <p>支付：
                             <span class='money text-black' data-toggle='tooltip' data-title='总额'>".number_format($count['paid'],2)."  = </span>
                             <span class='money text-blue' data-toggle='tooltip' data-title='现金'>( ".number_format($count['cash_paid_total'],2)." )</span>
+                            <span class='money text-blue' data-toggle='tooltip' data-title='电汇'>+ ( ".number_format($count['tt_paid'],2)." )</span>
                             <span class='money text-green'  data-toggle='tooltip' data-title='承兑'> + ( ".number_format($count['acceptance_paid_total'], 2)." )</span>
+                            
                           </p>
                          <p>当前： 
                          <span class='money text-black' data-toggle='tooltip' data-title='余额'>".number_format($count['balance'], 2)."  = </span>

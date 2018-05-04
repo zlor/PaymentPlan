@@ -5,6 +5,7 @@ return [
     'kind' => '付款类型',
     'kind.cash' => '现金',
     'kind.acceptance'=> '承兑',
+    'kind.tele_transfer' => '电汇',
 
     'payment'=> '付款',
     'payment.schedule' => '付款计划',

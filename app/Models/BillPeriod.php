@@ -255,7 +255,7 @@ class BillPeriod extends Model
         {
             $this->cash_paid = -1 * $this->bill_period_flows()
                                     ->where('type', 'pay')
-                                    ->where('kind', 'cash')
+                                    ->whereIn('kind', ['cash', 'tele_transfer'])
                                     ->sum('money');
 
             $this->acceptance_paid = -1 * $this->bill_period_flows()
@@ -541,6 +541,22 @@ class BillPeriod extends Model
 
         return -1 * $query->sum('money');
     }
+
+    public function sumTeleTransferPaid($filter)
+    {
+        $query = $this->bill_period_flows();
+
+        $query->where('type', 'pay')
+            ->where('kind', 'tele_transfer');
+
+        if(!empty($filter['payment_type_id']))
+        {
+            $query->where('payment_type_id', $filter['payment_type_id']);
+        }
+
+        return -1 * $query->sum('money');
+    }
+
     /**
      * 当前支付的承兑
      * @param array $filter

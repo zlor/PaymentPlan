@@ -7,6 +7,7 @@ use App\Models\BillPay;
 use App\Models\BillPeriod;
 use App\Models\PaymentDetail;
 use App\Models\PaymentSchedule;
+use App\Models\PaymentType;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
@@ -353,18 +354,18 @@ SCRIPT;
 
         $form->select('kind', '付款方式')
             ->setWidth(8, 3)
-            ->options(BillPay::getL5Options('pay',['cash', 'acceptance'], 'kind'));
+            ->options(BillPay::getL5Options('pay',['cash', 'acceptance', 'tele_transfer'], 'kind'));
 
         $form->select('supplier_id', '供应商')
              ->setWidth(8,3)
              ->options(BillPay::getSupplierOptions());
 
+        $form->select('payment_type_id', '付款类型')
+            ->setWidth(8, 3)
+            ->options(BillPay::getPaymentTypeOptions());
+
 //        $form->text('company', '收款公司')
 //            ->setWidth(8, 3);
-
-        $form->text('code', '付款凭证')
-            ->setWidth(8, 3)
-            ->rules('required');
 
         $form->date('date', '付款时间')
             ->setWidth(8, 3);
@@ -372,6 +373,10 @@ SCRIPT;
         $form->currency('money', '金额')
             ->setWidth(8, 3)
             ->prepend('￥');
+
+        $form->text('code', '凭据编码')
+            ->setWidth(8, 3);
+        //->rules('required');
 
         $form->textarea('memo', '备注')
             ->setWidth(8, 3)

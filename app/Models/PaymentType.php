@@ -35,4 +35,15 @@ class PaymentType extends Model
      * 拥有 付款明细
      */
     use HasManyBillPay;
+
+    /**
+     * 限制查询只包括计划需要的记录。
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSchedule($query)
+    {
+        return $query->where('is_plan', 1);
+    }
+
 }
