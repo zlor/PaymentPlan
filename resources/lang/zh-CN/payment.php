@@ -89,6 +89,7 @@ return [
     'schedule.status.check_final'      => '二次核定',
     'schedule.status.checked'      => '已核定',
 
+    'schedule.status.plan'      => '计划中',
     'schedule.status.paying'       => '付款中',
     'schedule.status.lock'         => '锁定',
 

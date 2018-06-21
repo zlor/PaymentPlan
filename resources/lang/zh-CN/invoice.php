@@ -13,6 +13,7 @@ return [
     'supplier' => '供应商',
     'user'       =>'操作人',
 
+    'payment_terms'=>'付款条款',
 
 
 ];

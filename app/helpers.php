@@ -1,5 +1,28 @@
 <?php
 
+if(! function_exists('withLayUI_Table')){
+    /**
+     * 使用LayUI
+     *
+     * @param Encore\Admin\Grid\ $grid
+     *
+     * @return Encore\Admin\Grid\ $grid
+     */
+    function withLayUI_Table($grid){
+        Admin::css([admin_asset("/vendor/layui/css/layui.css")]);
+        Admin::js([
+            admin_asset("/vendor/layui/layui.js"),
+            admin_asset("/vendor/layui/lay/modules/table.js"),
+        ]);
+        Admin::script(view("layouts.layui_table_init")->render());
+
+        $grid->with(["useLayUI"=>"yes"]);
+
+        return $grid;
+    }
+}
+
+
 if(! function_exists('_A')){
     /**
      * 获得列表页面编辑用的a标签

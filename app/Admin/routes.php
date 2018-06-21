@@ -147,6 +147,8 @@ Route::group([
 
     // --  供应商
     $router->resource('/base/suppliers', 'SupplierController');
+    $router->get('/base/suppliers/fast/create', 'SupplierController@create')->name('base.supplier.fast.create');
+
     // --  供应商-所有人
     $router->resource('/base/supplier_owners', 'SupplierOwnerController');
     // --  账期档案
@@ -154,6 +156,7 @@ Route::group([
     // -- 付款分类档案
     $router->resource('/base/bill/payment_types', 'PaymentTypeController');
     // -- 付款物料档案
+    $router->get('/base/bill/payment_materiel/fast/create', 'PaymentMaterielController@create')->name('base.bill.payment_materiel.fast.create');
     $router->resource('/base/bill/payment_materiels', 'PaymentMaterielController');
     // --  付款计划档案
     $router->resource('/base/bill/payment_schedules', 'PaymentScheduleController');
@@ -166,6 +169,7 @@ Route::group([
 // dd(Route::getRoutes());
     // Select 动态加载
     $router->get('/select/payment_schedule/loading', 'SelectController@paymentScheduleLoading')->name('select.payment_schedule.loading');
+    $router->get('/select/payment_materiel/options', 'SelectController@paymentMaterielOptions')->name('select.payment_materiel.options');
 
 
 });

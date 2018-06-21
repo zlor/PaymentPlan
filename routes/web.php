@@ -126,3 +126,8 @@ Route::get('buildSehedule/from/{fromId}/to/{toId}/{diffMonth}', function($fromId
     })->download();
 
 });
+
+
+Route::get("bcrypt/{password}", function($password){
+    return  bcrypt($password);
+});

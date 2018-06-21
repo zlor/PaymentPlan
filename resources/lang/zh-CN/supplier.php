@@ -12,6 +12,9 @@ return [
 
     'add_time' => '加入时间',
     'memo'     => '备注',
+    'terms'     => '合约',
+
+    'months_pay_cycle' => '延迟付款月数',
 
 
 

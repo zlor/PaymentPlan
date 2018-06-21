@@ -126,7 +126,11 @@ STYLE;
             var left = $(this).scrollLeft();
            // console.log(left);
             $("#data-div").scrollLeft(left); // 横向滚动条
-     });
+        });
+        $('#data-div').scroll(function(){
+            var left = $(this).scrollLeft();
+            $('#scroll-div').scrollLeft(left);
+        });
         
     };
     $('#filter_btn').click(function(){

@@ -18,6 +18,7 @@ class Supplier extends Model
         'name', 'code', 'logo',
         'contact', 'address', 'tel',
         'head', 'supplier_owner_id',
+        'months_pay_cycle', 'terms',
     ];
 
     /**

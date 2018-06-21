@@ -26,7 +26,12 @@ class AppServiceProvider extends ServiceProvider
         // utf8mb64 时控制字符长度
         Schema::defaultStringLength(191);
         //
-        Config::load();
+        try{
+            Config::load();
+        }catch (\Exception $ex)
+        {
+            // nothing to do ;
+        }
 
         // 计划明细 -（绑定生成相应的付款记录）
         PaymentDetail::observe(PaymentDetailObserver::class);

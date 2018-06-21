@@ -69,6 +69,8 @@
 <script src="{{ admin_asset ("/vendor/laravel-admin/sweetalert/dist/sweetalert.min.js") }}"></script>
 {!! Admin::js() !!}
 <script src="{{ admin_asset ("/vendor/laravel-admin/laravel-admin/laravel-admin.js") }}"></script>
+<script src="{{ admin_asset ("/vendor/laravel-admin/ele-fixed/eleFixed.js") }}"></script>
+<script src="{{ admin_asset ("/vendor/layui/layui.js") }}"></script>
 
 </body>
 </html>

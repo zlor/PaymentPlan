@@ -19,6 +19,11 @@ class InvoiceController extends Controller
     protected $routeMap = [
         'index'  => 'pay.invoice',
         'import'  => 'pay.invoice.excel',
+        'fastCreateMateriel' =>'base.bill.payment_materiel.fast.create',
+        'fastCreateSupplier' =>'base.supplier.fast.create',
+        'reloadMaterielOptions'=>'select.payment_materiel.options',
+        'reloadSupplierOptions'=>'select.supplier.options'
+
     ];
 
     /**
@@ -202,27 +207,53 @@ class InvoiceController extends Controller
      */
     protected function form()
     {
+
         return Admin::form(InvoicePayment::class, function (Form $form) {
 
-
+            // 发票编码
             $form->text('code', trans('invoice.code'))
                 ->rules('required');
 
-
-            $form->select('supplier_id', trans('invoice.supplier'))
-                ->options(InvoicePayment::getSupplierOptions());
-
+            // 发票抬头
             $form->text('title', trans('invoice.title'));
 
+            //发票时间
             $form->date('date', trans('invoice.date'));
 
-
+            //发票金额
             $form->currency('money', trans('invoice.money'))
                      ->rules('required')
                      ->symbol('￥');
 
+            $form->divider();
+            // 指定的供应商
+            $textA = _A("新增供应商", ['class'=>'text-green', 'id'=>'fastSupplierAction'],['url'=>$this->getUrl('fastCreateSupplier'), 'reloadOptionsUrl'=>$this->getUrl('reloadSupplierOptions'), 'targetName'=>'supplier_id']);
+            $form->select('supplier_id', trans('invoice.supplier'))
+                ->options(InvoicePayment::getSupplierOptions())
+                ->help($textA, 'fa fa-plus text-green');
+            Admin::script(view("admin.base.supplier_fast_action")->render());
+
+
+            //关联的付款类型
+            $form->select('payment_type_id', trans('payment.type'))
+                ->options(InvoicePayment::getPaymentTypeOptions())
+                ->rules('required');
+
+            // 关联的物料
+            $textA = _A("新增物料", ['class'=>'text-green', 'id'=>'fastMaterielAction'],['url'=>$this->getUrl('fastCreateMateriel'), 'reloadOptionsUrl'=>$this->getUrl('reloadMaterielOptions'), 'targetName'=>'materiel_id']);
+            $form->select('materiel_id', trans('payment.materiel'))
+                ->options(InvoicePayment::getPaymentMaterielOptions())
+                ->rules('required')
+                ->help($textA,"fa fa-plus text-green");
+            Admin::script(view("admin.base.materiel_fast_action")->render());
+
+            //付款备注
+            $form->textarea('payment_terms', trans('invoice.payment_terms'));
+
+            //发票备注
             $form->textarea('memo',  trans('invoice.memo'));
 
+            //创建人
             $form->hidden('user_id');
 
             $form->saving(function(Form $form){

@@ -119,6 +119,23 @@ class SupplierController extends Controller
             // 标识号
             $form->text('code', trans('supplier.code'));
 
+            $form->divider();
+
+            //付款相关
+            // 付款周期月份数
+            $form->number('months_pay_cycle', trans('supplier.months_pay_cycle'))
+            ->default(3);
+
+            //
+            $form->textarea('terms', trans('supplier.terms'));
+
+            $form->divider();
+
+            // 供应商所有人
+            // TODO 使用自动完成控件
+            $form->select('supplier_owner_id', trans('supplier.owner'))
+                ->options(Supplier::getOwnerOptions());
+
             // 联系人
             $form->text('contact', trans('supplier.contact'));
 
@@ -128,10 +145,7 @@ class SupplierController extends Controller
             // 联系地址
             $form->text('address', trans('supplier.address'));
 
-            // 供应商所有人
-            // TODO 使用自动完成控件
-            $form->select('supplier_owner_id', trans('supplier.owner'))
-                ->options(Supplier::getOwnerOptions());
+
 
             $form->divider();
 

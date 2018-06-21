@@ -46,12 +46,17 @@ class BillPeriodController extends Controller
      */
     public function index()
     {
+
         return Admin::content(function (Content $content) {
 
             $content->header(trans('bill.periods'));
             $content->description(trans('admin.list'));
 
-            $content->body($this->grid());
+            $grid = $this->grid();
+
+//            $grid = withLayUI_Table($grid);
+
+            $content->body($grid);
         });
     }
 
@@ -160,7 +165,6 @@ class BillPeriodController extends Controller
             // 负责人
             $grid->column('charge_man', trans('bill.period.charge_man'));
 
-
             // 现金池
             $grid->column('cash_pool', trans('bill.period.cash_pool'))->display(function($value){
                 return $this->cash_pool;
@@ -170,7 +174,6 @@ class BillPeriodController extends Controller
             $grid->column('balance', trans('bill.period.balance'))->display(function($value){
                 return $this->balance;
             });
-
 
             $grid->created_at();
             $grid->updated_at();
