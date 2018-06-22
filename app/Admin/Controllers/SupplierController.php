@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Layout\CustomContent;
 use App\Models\Supplier;
 
 use Encore\Admin\Form;
@@ -10,6 +11,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\Input;
 
 class SupplierController extends Controller
 {
@@ -55,12 +57,37 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        return Admin::content(function (Content $content) {
+        $inputs = Input::all();
+
+        if(isset($inputs['useFast']) && $inputs['useFast']>0)
+        {
+            return $this->_fastCreate();
+        }
+        return $this->_createForm($this->form());
+    }
+
+    protected function _fastCreate()
+    {
+        $form = $this->form();
+        // 取消动作条
+        $form->tools(function(Form\Tools $tools){
+            $tools->disableBackButton();
+            $tools->disableListButton();
+        });
+
+        // 设置保存后关闭页面的动作
+        $form->saved(function(){
+        });
+        return new CustomContent($this->_createForm($form), true);
+    }
+
+    protected function _createForm($form)
+    {
+        return Admin::content(function (Content $content) use($form){
 
             $content->header(trans('supplier.index'));
             $content->description(trans('admin.create'));
-
-            $content->body($this->form());
+            $content->body($form);
         });
     }
 

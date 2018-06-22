@@ -19,8 +19,8 @@ class InvoiceController extends Controller
     protected $routeMap = [
         'index'  => 'pay.invoice',
         'import'  => 'pay.invoice.excel',
-        'fastCreateMateriel' =>'base.bill.payment_materiel.fast.create',
-        'fastCreateSupplier' =>'base.supplier.fast.create',
+        'fastCreateMateriel' =>'base.bill.payment_materiel.create',
+        'fastCreateSupplier' =>'base.supplier.create',
         'reloadMaterielOptions'=>'select.payment_materiel.options',
         'reloadSupplierOptions'=>'select.supplier.options'
 
@@ -227,7 +227,7 @@ class InvoiceController extends Controller
 
             $form->divider();
             // 指定的供应商
-            $textA = _A("新增供应商", ['class'=>'text-green', 'id'=>'fastSupplierAction'],['url'=>$this->getUrl('fastCreateSupplier'), 'reloadOptionsUrl'=>$this->getUrl('reloadSupplierOptions'), 'targetName'=>'supplier_id']);
+            $textA = _A("新增供应商", ['class'=>'text-green', 'id'=>'fastSupplierAction'],['url'=>$this->getUrl('fastCreateSupplier', ['useFast'=>1]), 'reloadOptionsUrl'=>$this->getUrl('reloadSupplierOptions'), 'targetName'=>'supplier_id']);
             $form->select('supplier_id', trans('invoice.supplier'))
                 ->options(InvoicePayment::getSupplierOptions())
                 ->help($textA, 'fa fa-plus text-green');
@@ -240,7 +240,7 @@ class InvoiceController extends Controller
                 ->rules('required');
 
             // 关联的物料
-            $textA = _A("新增物料", ['class'=>'text-green', 'id'=>'fastMaterielAction'],['url'=>$this->getUrl('fastCreateMateriel'), 'reloadOptionsUrl'=>$this->getUrl('reloadMaterielOptions'), 'targetName'=>'materiel_id']);
+            $textA = _A("新增物料", ['class'=>'text-green', 'id'=>'fastMaterielAction'],['url'=>$this->getUrl('fastCreateMateriel', ['useFast'=>1]), 'reloadOptionsUrl'=>$this->getUrl('reloadMaterielOptions'), 'targetName'=>'materiel_id']);
             $form->select('materiel_id', trans('payment.materiel'))
                 ->options(InvoicePayment::getPaymentMaterielOptions())
                 ->rules('required')
