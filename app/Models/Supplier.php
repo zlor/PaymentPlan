@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToPaymentMateriel;
+use App\Models\Traits\BelongsToPaymentType;
 use App\Models\Traits\BelongsToSupplierOwner;
 use App\Models\Traits\HasManyPaymentDetail;
 use App\Models\Traits\HasManyPaymentSchedule;
@@ -17,6 +19,7 @@ class Supplier extends Model
     protected $fillable = [
         'name', 'code', 'logo',
         'contact', 'address', 'tel',
+        'charge_man',
         'head', 'supplier_owner_id',
         'months_pay_cycle', 'terms',
     ];
@@ -24,7 +27,7 @@ class Supplier extends Model
     /**
      * 归属于 供应商所有人
      */
-    use BelongsToSupplierOwner;
+    use BelongsToSupplierOwner, BelongsToPaymentMateriel, BelongsToPaymentType;
 
     /**
      * 拥有 付款计划、付款明细

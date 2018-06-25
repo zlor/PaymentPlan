@@ -24,8 +24,8 @@ class CreateInvoiceTables extends Migration
             $table->integer('payment_detail_id')->default(0)->comment('实际付款明细ID');
 
             $table->decimal('money', 12, 2)->default(0)->comment('发票金额');
-            $table->string('code', 50)->default('')->comment('发票凭证');
-            $table->string('title', 50)->default('')->comment('发票抬头');
+            $table->string('code', 50)->nullable()->default('')->comment('发票凭证');
+            $table->string('title', 50)->nullable()->default('')->comment('发票抬头');
             $table->date('date')->nullable()->comment('日期');
             $table->integer('year')->default(0)->comment('年份');
             $table->integer('month')->default(0)->comment('月份');

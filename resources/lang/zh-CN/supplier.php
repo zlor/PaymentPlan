@@ -6,6 +6,7 @@ return [
     'name'  => '名称',
     'code'  => '识别码',
     'contact' => '联系人',
+    'charge_man'=>'负责人',
     'tel'     => '联系电话',
     'address' => '联系地址',
     'logo'    => 'logo',

@@ -29,12 +29,12 @@ class CreateSuppliersTable extends Migration
             $table->increments('id');
             $table->integer('supplier_owner_id')->default(0)->comment('默认所有人');
             $table->string('name', 150)->default('')->comment('供应商名称');
-            $table->string('code', 50)->default('')->comment('供应商识别码');
-            $table->string('address', 200)->default('')->comment('供应商地址');
-            $table->string('logo', 250)->default('')->comment('供应商logo');
-            $table->string('tel', 100)->default('')->comment('供应商联系电话');
-            $table->string('head', 100)->default('')->comment('供应商抬头');
-            $table->string('contact')->default('')->comment('供应商联系人');
+            $table->string('code', 50)->nullable()->default('')->comment('供应商识别码');
+            $table->string('address', 200)->nullable()->default('')->comment('供应商地址');
+            $table->string('logo', 250)->nullable()->default('')->comment('供应商logo');
+            $table->string('tel', 100)->nullable()->default('')->comment('供应商联系电话');
+            $table->string('head', 100)->nullable()->default('')->comment('供应商抬头');
+            $table->string('contact')->nullable()->default('')->comment('供应商联系人');
             $table->text('memo')->nullable()->comment('备注');
             $table->timestamps();
             $table->softDeletes();

@@ -40,7 +40,7 @@
 </head>
 
 <body class="hold-transition {{config('admin.skin')}} {{join(' ', config('admin.layout'))}}">
-<div class="wrapper">
+<div class="content-wrapper" id="pjax-container" style="margin-left: 0">
          @yield('content')
         {!! Admin::script() !!}
 </div>

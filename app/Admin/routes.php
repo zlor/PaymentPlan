@@ -146,7 +146,9 @@ Route::group([
     // 基础档案
 
     // --  供应商
-    $router->resource('/base/suppliers', 'SupplierController');
+    $router->resource('/base/suppliers', 'SupplierController', ['names'=>'base.supplier']);
+    $router->get('/base/supplier/one', 'SupplierController@one')->name('base.supplier.one');
+
 
     // --  供应商-所有人
     $router->resource('/base/supplier_owners', 'SupplierOwnerController');
@@ -155,7 +157,7 @@ Route::group([
     // -- 付款分类档案
     $router->resource('/base/bill/payment_types', 'PaymentTypeController');
     // -- 付款物料档案
-    $router->resource('/base/bill/payment_materiels', 'PaymentMaterielController');
+    $router->resource('/base/bill/payment_materiels', 'PaymentMaterielController', ['names'=>'base.bill.payment_materiel']);
     // --  付款计划档案
     $router->resource('/base/bill/payment_schedules', 'PaymentScheduleController');
     // --  付款明细档案
@@ -168,6 +170,7 @@ Route::group([
     // Select 动态加载
     $router->get('/select/payment_schedule/loading', 'SelectController@paymentScheduleLoading')->name('select.payment_schedule.loading');
     $router->get('/select/payment_materiel/options', 'SelectController@paymentMaterielOptions')->name('select.payment_materiel.options');
+    $router->get('/select/payment_supplier/options', 'SelectController@paymentSupplierOptions')->name('select.payment_supplier.options');
 
 
 });

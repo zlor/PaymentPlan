@@ -5,6 +5,7 @@ namespace App\Admin\Controllers\Pay;
 use App\Admin\Extensions\Tools\Import;
 use App\Models\BillPeriod;
 use App\Models\InvoicePayment;
+use App\Models\Supplier;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -22,8 +23,8 @@ class InvoiceController extends Controller
         'fastCreateMateriel' =>'base.bill.payment_materiel.create',
         'fastCreateSupplier' =>'base.supplier.create',
         'reloadMaterielOptions'=>'select.payment_materiel.options',
-        'reloadSupplierOptions'=>'select.supplier.options'
-
+        'reloadSupplierOptions'=>'select.payment_supplier.options',
+        'getSupplierOne' => 'base.supplier.one',
     ];
 
     /**
@@ -215,7 +216,8 @@ class InvoiceController extends Controller
                 ->rules('required');
 
             // 发票抬头
-            $form->text('title', trans('invoice.title'));
+            $form->text('title', trans('invoice.title'))
+                ->help('若留空，则自动填充为供应商名称');
 
             //发票时间
             $form->date('date', trans('invoice.date'));
@@ -223,15 +225,25 @@ class InvoiceController extends Controller
             //发票金额
             $form->currency('money', trans('invoice.money'))
                      ->rules('required')
-                     ->symbol('￥');
+                     ->symbol('￥')
+                    ->help('计划(发票金额)');
+
+//            //付款确认人
+//            $form->text('confirm_man', trans('invoice.confirm_man'))
+//                ->help('计划(付款确认人)');
 
             $form->divider();
-            // 指定的供应商
+
+            // 快速新增供应商
             $textA = _A("新增供应商", ['class'=>'text-green', 'id'=>'fastSupplierAction'],['url'=>$this->getUrl('fastCreateSupplier', ['useFast'=>1]), 'reloadOptionsUrl'=>$this->getUrl('reloadSupplierOptions'), 'targetName'=>'supplier_id']);
+            Admin::script(view("admin.base.supplier_fast_action",[
+                'getSupplierOneUrl' => $this->getUrl('getSupplierOne')
+            ])->render());
+            // 指定的供应商
             $form->select('supplier_id', trans('invoice.supplier'))
                 ->options(InvoicePayment::getSupplierOptions())
-                ->help($textA, 'fa fa-plus text-green');
-            Admin::script(view("admin.base.supplier_fast_action")->render());
+                ->help($textA, 'fa fa-plus text-green')
+                ->rules('required');
 
 
             //关联的付款类型
@@ -239,19 +251,18 @@ class InvoiceController extends Controller
                 ->options(InvoicePayment::getPaymentTypeOptions())
                 ->rules('required');
 
+
             // 关联的物料
-            $textA = _A("新增物料", ['class'=>'text-green', 'id'=>'fastMaterielAction'],['url'=>$this->getUrl('fastCreateMateriel', ['useFast'=>1]), 'reloadOptionsUrl'=>$this->getUrl('reloadMaterielOptions'), 'targetName'=>'materiel_id']);
-            $form->select('materiel_id', trans('payment.materiel'))
+            $form->select('payment_materiel_id', trans('payment.materiel'))
                 ->options(InvoicePayment::getPaymentMaterielOptions())
-                ->rules('required')
-                ->help($textA,"fa fa-plus text-green");
-            Admin::script(view("admin.base.materiel_fast_action")->render());
+                ->rules('required');
 
             //付款备注
             $form->textarea('payment_terms', trans('invoice.payment_terms'));
 
             //发票备注
             $form->textarea('memo',  trans('invoice.memo'));
+
 
             //创建人
             $form->hidden('user_id');
@@ -262,6 +273,13 @@ class InvoiceController extends Controller
                     $user = Admin::user();
 
                     $form->user_id = $user->id;
+                }
+
+                // 设置抬头为供应商的名称
+                if(empty($form->title) && $form->supplier_id > 0)
+                {
+                    $supplier = Supplier::query()->find($form->supplier_id);
+                    $form->title = $supplier->name;
                 }
             });
 

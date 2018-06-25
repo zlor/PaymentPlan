@@ -12,6 +12,8 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Response;
 
 class PaymentMaterielController extends Controller
 {
@@ -70,16 +72,6 @@ class PaymentMaterielController extends Controller
     protected function _fastCreate()
     {
         $form = $this->form();
-        // 取消动作条
-        $form->tools(function(Form\Tools $tools){
-            $tools->disableBackButton();
-            $tools->disableListButton();
-        });
-
-        // 设置保存后关闭页面的动作
-        $form->saved(function(){
-
-        });
         return new CustomContent($this->_createForm($form), true);
     }
 
@@ -126,7 +118,9 @@ class PaymentMaterielController extends Controller
      */
     protected function form()
     {
-        return Admin::form(PaymentMateriel::class, function (Form $form) {
+        $inputs = Input::all();
+
+        return Admin::form(PaymentMateriel::class, function (Form $form) use ($inputs){
 
             $form->display('id', 'ID');
 
@@ -142,6 +136,24 @@ class PaymentMaterielController extends Controller
 
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
+
+            if(isset($inputs['useFast']) && $inputs['useFast']>0)
+            {
+                $form->hidden('useFast')->value($inputs['useFast']);
+
+                // 取消动作条
+                $form->tools(function(Form\Tools $tools){
+                    $tools->disableBackButton();
+                    $tools->disableListButton();
+                });
+
+                // 设置保存后关闭页面的动作
+                $form->saved(function(){
+                    return Response::view('admin.base.pop_close');
+                });
+
+                $form->ignore('useFast');
+            }
         });
     }
 }
