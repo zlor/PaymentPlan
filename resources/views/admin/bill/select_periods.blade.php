@@ -6,7 +6,7 @@
 <div class="buttons">
         <input type="hidden" name="default_bill_period_id" id="default_bill_period_id" value="{{ $defaultPeriodId or 0 }}">
         @foreach($options as $option)
-                <a href="{{ $option['url']  }}" class="btn btn-default @if($option['selected']) btn-success active @endif">{{ $option['text'] }}</a>
+                <a href="{{ $option['url']  }}" class="btn btn-default @if($option['selected']) btn-success active @else btn-sm @endif" title="{{ $option['text'] }}">{{ $option['text_short'] }}</a>
         @endforeach
 </div>
 

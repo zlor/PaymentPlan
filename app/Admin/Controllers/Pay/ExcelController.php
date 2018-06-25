@@ -80,6 +80,7 @@ class ExcelController extends Controller
             {
                 $options[] = [
                     'text'      =>  $period->name . '_' . $period->month . '('. trans('bill.period.status.'.$period->status) .')',
+                    'text_short' => $period->month,
                     'value'     =>  $period->id,
                     'selected'  =>  $defaultPeriodId == $period->id,
                     'url'       =>  $this->getUrl('index', ['default_bill_period_id' => $period->id])
