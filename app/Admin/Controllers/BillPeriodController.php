@@ -36,6 +36,7 @@ class BillPeriodController extends Controller
         'billGather' => 'bill.gather',
         'editCashPool' => 'bill.pool.edit',
         'updateCashPool' => 'bill.pool.update',
+        'initSchedule' => 'bill.init.schedule',
     ];
 
     /**
@@ -133,6 +134,48 @@ class BillPeriodController extends Controller
 
             $content->body($this->form());
         });
+    }
+
+    /**
+     * 计划初始化界面
+     *
+     * @param $id
+     * @return bool
+     */
+    public function initSchedule($id)
+    {
+        return  Admin::content(function(Content $content){
+            $content->header(trans('bill.periods'));
+            $content->description('初始化账期计划');
+
+            $content->breadcrumb(
+                ['text' => '付款管理', 'href'=>''],
+                ['text' => '账期汇总', 'href'=>$this->getUrl('billGather')],
+                ['text' => '初始化账期计划', 'href'=>$this->getUrl('initSchedule')]
+            );
+
+            // 展示账期的预统计信息
+
+            // 给出可选项目，生成计划
+
+            // **  付款类型
+
+            // 提供清单导出 Excel
+
+            $content->body("正在开发中");
+        });
+    }
+
+    /**
+     * 初始化计划内容
+     *
+     * @param $id
+     * @return bool
+     */
+    public function initScheduleHandler($id)
+    {
+        // 生成账期的相关计划
+        return "正在开发中";
     }
 
     /**

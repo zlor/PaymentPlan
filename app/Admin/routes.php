@@ -21,6 +21,8 @@ Route::group([
     $router->get('/bill/{id}/{type_id}/gather', 'HomeController@indexGatherBillPeriod')->name('bill.target.gather');
     $router->get('/bill/gather/{id}', 'BillPeriodController@editCashPool')->name('bill.pool.edit');
     $router->put('/bill/gather/{id}', 'BillPeriodController@updateCashPool')->name('bill.pool.update');
+    $router->get('/bill/{id}/init/schedule', 'BillPeriodController@initSchedule')->name('bill.init.schedule');
+    $router->post('/bill/{id}/init/schedule', 'BillPeriodController@initScheduleHandler')->name('bill.init.schedule.handler');
 
     ## 账期设置
     $router->get('/bill/period', 'PeriodController@index')->name('bill.period.index');

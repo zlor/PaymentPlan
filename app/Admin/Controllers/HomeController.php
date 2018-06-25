@@ -32,6 +32,7 @@ class HomeController extends Controller
         'base.bill_period.edit' => 'bill_periods.edit',
 
         'setBillPeriod'  => 'bill.pool.edit',
+        'setBillScheduleInit'=>'bill.init.schedule',
 
         'fireBillPeriod'  => 'bill.period.index',
 
@@ -223,6 +224,8 @@ SCRIPT;
         $url = [
             // 设置账期
             'set_cash_pool'     =>$this->getUrl('setBillPeriod', ['id'=>$focusBillPeriodId]),
+            // 设置计划初始化
+            'set_schedule'      => $this->getUrl('setBillScheduleInit', ['id'=>$focusBillPeriodId]),
             // 账期下文件管理
             'file_page'         =>  $this->getUrl('excel_page', ['default_bill_period_id'=>$focusBillPeriodId]),
 
@@ -332,8 +335,9 @@ SCRIPT;
             ],
             [
                 'status' => "<p>"
-                            .($focusBillPeriod->allowSetPool()?"<a href='{$url['set_cash_pool']}' >设置账期</a>":'设置账期(已锁定)')
-                            ."</p>"
+                    ."".($focusBillPeriod->allowSetPool()?"<a href='{$url['set_cash_pool']}'  class='btn btn-default'>设置账期</a>":'设置账期(已锁定)')."</p>"
+                    ."<p>".($focusBillPeriod->allowSetSchedule()?"<a href='{$url['set_schedule']}'  class='btn btn-default'>计划生成</a>":'<i class="text-sm">计划已生成</i>')
+                    ."</p>"
 
                 ,'type'  => '<p>'._A('档案:付款计划', ['href'=>$url['schedules_manage'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'
                            .'<p>'._A('档案:付款详情', ['href'=>$url['details_manage'], 'target'=>'_blank', 'class'=>"btn btn-default margin"]).'</p>'

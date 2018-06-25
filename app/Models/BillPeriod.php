@@ -93,7 +93,25 @@ class BillPeriod extends Model
      */
     public function allowSetPool()
     {
-        return in_array($this->original['status'], ['standby','active']);
+        return in_array($this->original['status'], ['standby', 'active']);
+    }
+
+    /**
+     *是否允许设置 计划的初始化
+     *
+     * &1 计划数为0
+     * @return bool
+     */
+    public function allowSetSchedule()
+    {
+        // &1 计划数不为0时，不可初始化
+        $count  = $this->payment_schedules->count();
+        if($count>0)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /**
