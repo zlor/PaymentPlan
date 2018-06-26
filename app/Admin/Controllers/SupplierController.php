@@ -169,9 +169,6 @@ class SupplierController extends Controller
                     $tools->disableListButton();
                 });
 
-                $form->saving(function(Form $form){
-                });
-
                 $form->ignore('useFast');
                 // 设置保存后关闭页面的动作
                 $form->saved(function(Form $form){
@@ -181,7 +178,6 @@ class SupplierController extends Controller
 
             // 标识号
             $form->text('code', trans('supplier.code'))
-                ->rules('required')
                 ->help("计划(科目编码)");
 
             // 名称
@@ -258,6 +254,15 @@ class SupplierController extends Controller
 
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
+
+
+            $form->saving(function(Form $form){
+                // code 不为空
+                if(empty($form->code))
+                {
+                    $form->input('code', '');
+                }
+            });
         });
     }
 }

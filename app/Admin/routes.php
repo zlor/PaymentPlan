@@ -148,9 +148,8 @@ Route::group([
     // 基础档案
 
     // --  供应商
-    $router->resource('/base/suppliers', 'SupplierController', ['names'=>'base.supplier']);
     $router->get('/base/supplier/one', 'SupplierController@one')->name('base.supplier.one');
-
+    $router->resource('/base/suppliers', 'SupplierController', ['names'=>'base.supplier']);
 
     // --  供应商-所有人
     $router->resource('/base/supplier_owners', 'SupplierOwnerController');

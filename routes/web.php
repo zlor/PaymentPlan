@@ -11,6 +11,14 @@ use  Maatwebsite\Excel\Facades\Excel;
 | contains the "web" middleware group. Now create something great!
 |
 */
+//Route::get('testIntval', function(){
+//    $str = '1529989121';
+//    echo time().'<br>';
+//    echo date('Y-m-d h:i:s', 1529989121).'<br>';
+//    echo $a = intval($str).'<br>';
+//    echo $str.'<br>';
+//    echo $str>=$a?'yes':'no';
+//});
 
 Route::get('/', function(){
 
