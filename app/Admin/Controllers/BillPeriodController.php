@@ -4,12 +4,14 @@ namespace App\Admin\Controllers;
 
 use App\Models\BillPeriod;
 
+use App\Models\PaymentType;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Support\MessageBag;
 
 /**
@@ -144,7 +146,10 @@ class BillPeriodController extends Controller
      */
     public function initSchedule($id)
     {
-        return  Admin::content(function(Content $content){
+        $billPeriod = BillPeriod::query()->find($id);
+
+        return  Admin::content(function (Content $content) use($billPeriod){
+
             $content->header(trans('bill.periods'));
             $content->description('初始化账期计划');
 
@@ -154,16 +159,47 @@ class BillPeriodController extends Controller
                 ['text' => '初始化账期计划', 'href'=>$this->getUrl('initSchedule')]
             );
 
-            // 展示账期的预统计信息
+            // 展示账期信息
+            // -展示付款计划类型
+            // -- 补充完整信息不完善的供应商
+            $paymentTypeBox = new Box('当前账期: '.$billPeriod->name." - [{$billPeriod->month}]", $this->_choosePaymentTypes());
+            $paymentTypeBox->collapsable()->solid();
+            $content->row($paymentTypeBox);
+
+            // 展示供应商信息
+            $supplierBox = new Box('供应商信息', $this->_supplierInfos());
+            $supplierBox->collapsable()->solid();
+            $content->row($supplierBox);
 
             // 给出可选项目，生成计划
-
             // **  付款类型
-
             // 提供清单导出 Excel
+            $handlerBox =  new Box('生成计划信息', "正在开发中");
+            $content->row($handlerBox);
 
-            $content->body("正在开发中");
+//            $content->body("正在开发中");
         });
+    }
+
+    /**
+     * 选择要处理的付款类型
+     * || 默认全部选中
+     *
+     */
+    private function _choosePaymentTypes()
+    {
+        $payment_types = PaymentType::all();
+
+        return view("admin.schedule.init_chosse_payment_types", compact('payment_types'));
+    }
+
+    /**
+     * 罗列供应商信息
+     * @return string
+     */
+    private function _supplierInfos()
+    {
+        return '';
     }
 
     /**
