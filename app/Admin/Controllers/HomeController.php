@@ -9,11 +9,13 @@ use App\Models\PaymentType;
 use App\Models\UserEnv;
 use Encore\Admin\Controllers\Dashboard;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
+use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Widgets\Widget;
 use Illuminate\Support\MessageBag;
@@ -48,6 +50,53 @@ class HomeController extends Controller
         'detail_page'     => 'payment.schedule.pay',
     ];
 
+    // 登陆后的状态
+    public function dashboard()
+    {
+        $that = $this;
+        $grid =  Admin::grid(BillPeriod::class, function(Grid $grid) use ($that){
+
+            $grid->disableActions();
+
+            $grid->disableRowSelector();
+
+            $grid->disableCreateButton();
+
+            $grid->disableExport();
+
+            $grid->disableFilter();
+
+            $grid->column('more ', '总计')->expand(function () use ($that){
+
+                $tabContent = new Tab();
+
+                $tabContent->add('总计', $that->account_period($this), true);
+
+                $tabContent->add('分类统计',  $that->_gatherPartInfo($this, new PaymentType()), false);
+
+                return $tabContent;
+
+            }, '明细');
+
+            $grid->column('id', 'ID');
+
+
+            $grid->column('month', '月份');
+
+
+            $grid->column('status', '状态');
+
+        });
+
+        return Admin::content(function(Content $content)use ($grid){
+
+            $content->header("");
+            $content->description("");
+
+            $content->body($grid);
+        });
+    }
+
     public function index()
     {
         return Admin::content(function (Content $content) {
@@ -61,10 +110,15 @@ class HomeController extends Controller
         });
     }
 
-    protected function account_period()
+    protected function account_period($targetBillPeriod)
     {
-        // 设置付款计划
-        $billPeriod = UserEnv::getCurrentPeriod(false);
+        if(!empty($targetBillPeriod) && !empty($targetBillPeriod->id))
+        {
+            // 设置付款计划
+            $billPeriod = $targetBillPeriod;
+        }else{
+            $billPeriod = UserEnv::getCurrentPeriod(false);
+        }
 
         $statusTxt = empty($billPeriod->status)?'':trans("bill.period.status.{$billPeriod->status}");
 

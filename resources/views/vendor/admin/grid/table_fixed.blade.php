@@ -27,7 +27,7 @@
         <div id="scroll-sync-table"></div>
     </div>
     <div id="data-div" class="box-body table-responsive no-padding">
-        <table id="data-table" class="table table-hover" style="min-width:1200px">
+        <table id="data-table" class="table table-hover" style="">
 
             <tr class="ele-fixed bg-gray">
                 @foreach($grid->columns() as $column)

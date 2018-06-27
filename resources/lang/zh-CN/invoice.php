@@ -3,7 +3,7 @@ return [
 
     'payment'=> '应付款',
     'date' => '发票时间',
-    'code' => '编码',
+    'code' => '发票号码',
     'title'  => '抬头',
     'money' => '发票金额',
     'money_paid' => '发票已付金额',

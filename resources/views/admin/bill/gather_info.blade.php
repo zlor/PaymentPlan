@@ -111,11 +111,13 @@
         white-space: nowrap;
     }
     .gather-info{
-        overflow-x: auto;
-        max-width:900px;
+        width: 100%;
+        /*max-width:900px;*/
     }
     .gather-info>div{
-        min-width:850px;
+        /*min-width:850px;*/
+        overflow-x: auto;
+        width: 100%;
     }
 </style>
 <div class="box gather-info">
@@ -151,7 +153,7 @@
         </ul>
     </div>
     <div class="box-body period-info">
-        <div class="row">
+        <div class="row no-margin">
             {!! $html['table'] !!}
             {{--<div class="col-sm-6">--}}
                 {{--{!! $html['schedule'] !!}--}}
