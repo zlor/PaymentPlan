@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\BillPeriod;
 
 use App\Models\PaymentType;
+use App\Models\Supplier;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -142,13 +143,13 @@ class BillPeriodController extends Controller
      * 计划初始化界面
      *
      * @param $id
-     * @return bool
+     * @return Content
      */
     public function initSchedule($id)
     {
         $billPeriod = BillPeriod::query()->find($id);
 
-        return  Admin::content(function (Content $content) use($billPeriod){
+        return Admin::content(function(Content $content)use($billPeriod){
 
             $content->header(trans('bill.periods'));
             $content->description('初始化账期计划');
@@ -167,17 +168,15 @@ class BillPeriodController extends Controller
             $content->row($paymentTypeBox);
 
             // 展示供应商信息
-            $supplierBox = new Box('供应商信息', $this->_supplierInfos());
+            $supplierBox = new Box('供应商信息', $this->_supplierInfos($billPeriod));
             $supplierBox->collapsable()->solid();
             $content->row($supplierBox);
 
             // 给出可选项目，生成计划
             // **  付款类型
             // 提供清单导出 Excel
-            $handlerBox =  new Box('生成计划信息', "正在开发中");
+            $handlerBox =  new Box('生成计划信息', $this->_schedulePart());
             $content->row($handlerBox);
-
-//            $content->body("正在开发中");
         });
     }
 
@@ -197,16 +196,37 @@ class BillPeriodController extends Controller
      * 罗列供应商信息
      * @return string
      */
-    private function _supplierInfos()
+    private function _supplierInfos($billPeriod)
     {
-        return '';
+        if(empty($billPeriod) || empty($billPeriod->id))
+        {
+            return "";
+        }
+        // 获取账期关联的供应商
+
+        // 账期所在月份
+        $month = $billPeriod->month;
+        // 符合条件的供应商
+        $suppliers = Supplier::all();
+
+        if(empty($suppliers))
+        {
+            return '无需要付款的供应商';
+        }else{
+            return view('admin.schedule.init_suppliers', compact('suppliers'));
+        }
+    }
+
+    public function _schedulePart()
+    {
+        return view('admin.schedule.init_buttons');
     }
 
     /**
      * 初始化计划内容
      *
      * @param $id
-     * @return bool
+     * @return string
      */
     public function initScheduleHandler($id)
     {

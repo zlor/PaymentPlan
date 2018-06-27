@@ -7,6 +7,7 @@ use App\Models\Traits\BelongsToPaymentType;
 use App\Models\Traits\BelongsToSupplierOwner;
 use App\Models\Traits\HasManyPaymentDetail;
 use App\Models\Traits\HasManyPaymentSchedule;
+use App\Models\Traits\HasManySupplierBalanceFlow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -32,7 +33,7 @@ class Supplier extends Model
     /**
      * 拥有 付款计划、付款明细
      */
-    use HasManyPaymentSchedule, HasManyPaymentDetail;
+    use HasManyPaymentSchedule, HasManyPaymentDetail, HasManySupplierBalanceFlow;
 
 
     /**
@@ -67,5 +68,16 @@ class Supplier extends Model
         }
 
         return $supplier;
+    }
+
+    public function getBalanceMoneyAttribute()
+    {
+        $money = 0;
+
+        if(empty($this->supplier_balance_flows))
+        {
+            $money = $this->supplier_balance_flows->sum('money');
+        }
+        return $money;
     }
 }

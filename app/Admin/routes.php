@@ -155,6 +155,11 @@ Route::group([
 
     // --  供应商-所有人
     $router->resource('/base/supplier_owners', 'SupplierOwnerController');
+    // --  供应商-账户流水
+    $router->resource('/base/supplier_balance_inits', 'SupplierBalanceFlowController');
+    // --  供应商-发票汇总
+    $router->resource('/base/supplier_invoice_gathers', 'SupplierInvoiceGatherController');
+
     // --  账期档案
     $router->resource('/base/bill_periods', 'BillPeriodController');
     // -- 付款分类档案

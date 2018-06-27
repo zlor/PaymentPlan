@@ -38,6 +38,18 @@ class BillPay extends Model
     }
 
 
+    public function getYearAttribute()
+    {
+        return  empty($this->year)?date('Y', strtotime($this->date)):$this->year;
+    }
+
+    public function getMonthAttribute()
+    {
+        return  empty($this->month)?date('m', strtotime($this->date)):$this->month;
+    }
+
+
+
     /**
      * 同步付款计划明细数据
      *

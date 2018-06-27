@@ -28,4 +28,22 @@ return [
     'owner.code' => '所有人识别码',
     'owner.memo' => '备注',
 
+
+    'balance' => '账户',
+    'balance.init.index' => '账户应付额',
+
+    'balance.flow.year' =>'年',
+    'balance.flow.month' => '月',
+    'balance.flow.money' => '发生数额',
+    'balance.flow.kind' => '方式 ',
+    'balance.flow.type' => '类别',
+    'balance.flow.type.init' => '初始化',
+    'balance.flow.type.pay' => '支付',
+    'balance.flow.type.invoice' => '应付款发票',
+    'balance.flow.memo' => '备注',
+
+    'invoice.gather.index' => '应付款发票汇总',
+
+
+
 ];

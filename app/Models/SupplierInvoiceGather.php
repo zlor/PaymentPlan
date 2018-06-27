@@ -13,42 +13,31 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class InvoicePayment
+ * Class SupplierInvoiceGather
  *
  * 应付发票
  *
  * @package App\Models
  */
-class InvoicePayment extends Model
+class SupplierInvoiceGather extends Model
 {
     use CommonOptions;
 
-    const  MORPH_KEY = 'invoice';
+    const  MORPH_KEY = 'invoice_gather';
 
-    protected $table = 'invoice_payments';
+    protected $table = 'invoice_gather_shoots';
 
     /**
      * reg_ex == ''
      * @var array
      */
     protected $fillable = [
-        'supplier_id',
-        'payment_type_id',
-        'payment_materiel_id',
-        'user_id',
-        'payment_detail_id',
-        'title', 'code', 'date',
-        'year', 'month', 'lay_month',
-        'money', 'money_paid',
-        'materiel',
-        'payment_terms',
-        'memo'
+        'year', 'month', 'date',
+        'supplier_id', 'payment_schedule_id',
+        'money'
     ];
 
-    use  BelongsToSupplier, BelongsToAdministrator, BelongsToPaymentDetail, BelongsToPaymentType;
-
-    use BelongsToPaymentMateriel;
-
+    use  BelongsToSupplier;
 
     public function getYearAttribute()
     {

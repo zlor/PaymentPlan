@@ -139,3 +139,26 @@ Route::get('buildSehedule/from/{fromId}/to/{toId}/{diffMonth}', function($fromId
 Route::get("bcrypt/{password}", function($password){
     return  bcrypt($password);
 });
+
+Route::get("backend/supplier/invoice/gather/{year}/{month}/init/{account}/{password}", function($year, $month, $account, $password){
+    // 验证账户密码
+    if($account == 'admin' && $password == 'admin123')
+    {
+        // 按照 year month 刷新并生成供应商发票初始化
+
+
+    }else{
+        return "帐户名密码不正确";
+    }
+});
+Route::get("backend/supplier/invoice/gather/{year}/{month}/refresh/{account}/{password}", function($year, $month, $account, $password){
+    // 验证账户密码
+    if($account == 'admin' && $password == 'admin123')
+    {
+        // 按照 year month 刷新并生成供应商发票汇总
+
+
+    }else{
+        return "帐户名密码不正确";
+    }
+});

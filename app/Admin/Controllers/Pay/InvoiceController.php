@@ -281,6 +281,7 @@ class InvoiceController extends Controller
                     $supplier = Supplier::query()->find($form->supplier_id);
                     $form->title = $supplier->name;
                 }
+
             });
 
 //            $form->row(function(Form\Row $row) use($form){
