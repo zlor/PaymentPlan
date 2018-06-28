@@ -22,6 +22,7 @@ use Encore\Admin\Grid\Column;
 use App\Admin\Extensions\Popover;
 use App\Admin\Extensions\Currency;
 use App\Admin\Extensions\Column\ExpandRow;
+use App\Admin\Extensions\Column\TransMultiRow;
 use App\Admin\Extensions\Column\OpenMap;
 use App\Admin\Extensions\Column\FloatBar;
 use App\Admin\Extensions\Column\Qrcode;
@@ -53,6 +54,7 @@ Column::extend('floatBar', FloatBar::class);
 Column::extend('qrcode', Qrcode::class);
 Column::extend('urlWrapper', UrlWrapper::class);
 Column::extend('action', Grid\Displayers\Actions::class);
+Column::extend('trans', TransMultiRow::class);
 
 Column::extend('prependIcon', function ($value, $icon) {
 
