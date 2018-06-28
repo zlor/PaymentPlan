@@ -4,8 +4,10 @@ namespace App\Admin\Controllers;
 
 use App\Models\BillPeriod;
 
+use App\Models\PaymentSchedule;
 use App\Models\PaymentType;
 use App\Models\Supplier;
+use App\Models\SupplierInvoiceGather;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -13,6 +15,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\MessageBag;
 
 /**
@@ -40,6 +43,7 @@ class BillPeriodController extends Controller
         'editCashPool' => 'bill.pool.edit',
         'updateCashPool' => 'bill.pool.update',
         'initSchedule' => 'bill.init.schedule',
+        'refreshInvoiceGather' =>'base.supplier.invoice.gather.refresh',
     ];
 
     /**
@@ -163,19 +167,19 @@ class BillPeriodController extends Controller
             // 展示账期信息
             // -展示付款计划类型
             // -- 补充完整信息不完善的供应商
-            $paymentTypeBox = new Box('当前账期: '.$billPeriod->name." - [{$billPeriod->month}]", $this->_choosePaymentTypes());
+            $paymentTypeBox = new Box('当前账期: '.$billPeriod->name." - [{$billPeriod->month}]", $this->_paymentTypesPart($billPeriod));
             $paymentTypeBox->collapsable()->solid();
             $content->row($paymentTypeBox);
 
             // 展示供应商信息
-            $supplierBox = new Box('供应商信息', $this->_supplierInfos($billPeriod));
+            $supplierBox = new Box('供应商信息', $this->_supplierPart($billPeriod));
             $supplierBox->collapsable()->solid();
             $content->row($supplierBox);
 
             // 给出可选项目，生成计划
             // **  付款类型
             // 提供清单导出 Excel
-            $handlerBox =  new Box('生成计划信息', $this->_schedulePart());
+            $handlerBox =  new Box('生成计划信息', $this->_schedulePart($billPeriod));
             $content->row($handlerBox);
         });
     }
@@ -185,18 +189,26 @@ class BillPeriodController extends Controller
      * || 默认全部选中
      *
      */
-    private function _choosePaymentTypes()
+    private function _paymentTypesPart($billPeriod)
     {
         $payment_types = PaymentType::all();
 
-        return view("admin.schedule.init_chosse_payment_types", compact('payment_types'));
+        $yearMonth = $billPeriod->month;
+
+        $year = date('Y', strtotime($yearMonth));
+        $month = date('m', strtotime($yearMonth));
+
+        $url = $this->getUrl('refreshInvoiceGather');
+
+        return view("admin.schedule.init_chosse_payment_types",
+            compact('payment_types', 'month', 'billPeriod', 'url'));
     }
 
     /**
      * 罗列供应商信息
      * @return string
      */
-    private function _supplierInfos($billPeriod)
+    private function _supplierPart($billPeriod)
     {
         if(empty($billPeriod) || empty($billPeriod->id))
         {
@@ -205,21 +217,36 @@ class BillPeriodController extends Controller
         // 获取账期关联的供应商
 
         // 账期所在月份
-        $month = $billPeriod->month;
+        $yearMonth = $billPeriod->month;
+        $year = date('Y', strtotime($yearMonth));
+        $month = date('m', strtotime($yearMonth));
+
         // 符合条件的供应商
         $suppliers = Supplier::all();
+        $balanceSuppliers = [];
+        $invoiceGathers = [];
+
+        foreach ($suppliers as $supplier)
+        {
+            $balanceSuppliers[$supplier->id] =  $supplier->getBalanceMoneyMonth($year, $month);
+            $invoiceGathers[$supplier->id] = $supplier->getInvoiceGatherMonth($year, $month);
+        }
 
         if(empty($suppliers))
         {
             return '无需要付款的供应商';
         }else{
-            return view('admin.schedule.init_suppliers', compact('suppliers'));
+            return view('admin.schedule.init_suppliers', compact('month','suppliers', 'balanceSuppliers', 'invoiceGathers'));
         }
     }
 
-    public function _schedulePart()
+    public function _schedulePart($billPeriod)
     {
-        return view('admin.schedule.init_buttons');
+        $url = $this->getUrl('initSchedule', ['id'=>$billPeriod->id]);
+        return view('admin.schedule.init_schedules', [
+            'url' => $url,
+            'billPeriod' => $billPeriod
+        ]);
     }
 
     /**
@@ -230,8 +257,84 @@ class BillPeriodController extends Controller
      */
     public function initScheduleHandler($id)
     {
-        // 生成账期的相关计划
-        return "正在开发中";
+        /**
+         * @var BillPeriod $billPeriod
+         */
+        $billPeriod =  BillPeriod::query()->find($id);
+
+        if(empty($billPeriod))
+        {
+            return Response::json(['status'=>false, 'message'=>'获取账期信息失败']);
+        }
+        // 获取账期信息
+        $yearMonth = $billPeriod->month;
+        $year = date('Y', strtotime($yearMonth));
+        $month = date('m', strtotime($yearMonth));
+
+        // 遍历供应商信息
+        $suppliers = Supplier::all();
+        // 构建
+        $scheduleList = [];
+        $failSupplierList = [];
+        $count = 0;
+        $columns = $billPeriod->getMonthNumber(true);
+        $date = date('Y-m-d ');
+        foreach ($suppliers as $supplier)
+        {
+            // 获取供应商账户余额
+            $balanceMoney = $supplier->getBalanceMoneyMonth($year, $month);
+
+            $rowWhere = [
+                'supplier_id' => $supplier->id,
+                'bill_period_id' => $billPeriod->id,
+            ];
+            $months_pay_cycle = empty($billPeriod->months_pay_cycle)?3:$billPeriod->months_pay_cycle;
+            $row = [
+                'bill_period_id' => $billPeriod->id,
+                'supplier_id' => $supplier->id,
+                'name' => $supplier->code,
+                'supplier_name' =>$supplier->name,
+                'supplier_balance' =>$balanceMoney,
+                'payment_type_id' =>$supplier->payment_type_id,
+                'payment_materiel_id' =>$supplier->payment_materiel_id,
+                'materiel_name' => empty($supplier->payment_materiel)?'':$supplier->payment_materiel->name,
+                'charge_man' => empty($supplier->charge_man)?'':$supplier->charge_man,
+                'batch' => 0,
+                'status' =>'init',
+                // 付款周期
+                'pay_cycle' => $months_pay_cycle . '个月',
+                // 截止到的月份数
+                'pay_cycle_month'=> $billPeriod->getCycleMonthByNum($months_pay_cycle),
+                'memo' => '初始化',
+            ];
+
+            // 获取供应商关联月份的发票数额
+            foreach ($columns as $column)
+            {
+                $subMonth =intval(substr($column, strlen('invoice_m_')));
+                $subYear = ($subMonth>$month)?($year-1):$year;
+
+                $row[$column] =  $supplier->supplier_invoice_gathers->where('year', $subYear)->where('month', $subMonth)->sum('money');
+            }
+
+            /**
+            * 推算建议应付款数额
+            */
+            $row['suggest_due_money'] = $billPeriod->guestSuggestDueMoney($row, $row['pay_cycle_month']);
+
+            // 构建信息
+            $newSchedule = PaymentSchedule::updateOrCreate($rowWhere, $row);
+
+            if($newSchedule)
+            {
+                $count++;
+                $scheduleList[] = $newSchedule;
+            }else{
+                $failSupplierList[] = $supplier;
+            }
+        }
+
+        return Response::json(['status'=>true, 'message'=>"构建/更新：计划数{$count}"]);
     }
 
     /**

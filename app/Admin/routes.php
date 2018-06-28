@@ -158,6 +158,8 @@ Route::group([
     // --  供应商-账户流水
     $router->resource('/base/supplier_balance_inits', 'SupplierBalanceFlowController');
     // --  供应商-发票汇总
+    $router->post('/base/supplier_invoice_gather/init', 'SupplierInvoiceGatherController@initShoot')->name('base.supplier.invoice.gather.init');
+    $router->post('/base/supplier_invoice_gather/refresh', 'SupplierInvoiceGatherController@refreshShoot')->name('base.supplier.invoice.gather.refresh');
     $router->resource('/base/supplier_invoice_gathers', 'SupplierInvoiceGatherController');
 
     // --  账期档案

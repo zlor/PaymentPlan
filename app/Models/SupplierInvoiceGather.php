@@ -39,13 +39,13 @@ class SupplierInvoiceGather extends Model
 
     use  BelongsToSupplier;
 
-    public function getYearAttribute()
+    public function getYearAttribute($value)
     {
-        return empty($this->year)?date('Y', strtotime($this->date)):$this->year;
+        return empty($value)?date('Y', strtotime($this->date)):$value;
     }
 
-    public function getMonthAttribute()
+    public function getMonthAttribute($value)
     {
-        return empty($this->month)?date('m', strtotime($this->date)):$this->month;
+        return empty($value)?date('m', strtotime($this->date)):$value;
     }
 }

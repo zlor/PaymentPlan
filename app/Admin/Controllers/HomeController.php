@@ -83,6 +83,10 @@ class HomeController extends Controller
 
             $grid->column('month', '月份');
 
+            $grid->column('name', trans('bill.period.name'));
+
+            $grid->column('charge_man', trans('bill.period.charge_man'));
+
 
             $grid->column('status', '状态')->trans('bill.period.status');
 

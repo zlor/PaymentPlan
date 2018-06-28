@@ -258,7 +258,7 @@ class SupplierController extends Controller
 
             $form->saving(function(Form $form){
                 // code 不为空
-                if(empty($form->code))
+                if(is_null($form->code))
                 {
                     $form->input('code', '');
                 }

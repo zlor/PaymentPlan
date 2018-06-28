@@ -9,6 +9,7 @@ use App\Models\Traits\BelongsToSupplier;
 use App\Models\Traits\CommonOptions;
 use App\Models\Traits\HasManyBillPay;
 use App\Models\Traits\HasManyPaymentSchedule;
+use App\Models\Traits\HasManySupplier;
 use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,7 +30,7 @@ class PaymentType extends Model
     /**
      * 拥有 付款计划
      */
-    use HasManyPaymentSchedule;
+    use HasManyPaymentSchedule,HasManySupplier;
 
     /**
      * 拥有 付款明细
@@ -44,6 +45,12 @@ class PaymentType extends Model
     public function scopeSchedule($query)
     {
         return $query->where('is_plan', 1);
+    }
+
+
+    public function getSuppliersCountAttribute()
+    {
+        return empty($this->suppliers)?0:$this->suppliers->count();
     }
 
 }

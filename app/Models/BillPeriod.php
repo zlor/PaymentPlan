@@ -185,6 +185,27 @@ class BillPeriod extends Model
     }
 
     /**
+     * @param $months_pay_cycle
+     * @return int
+     */
+    public function getCycleMonthByNum($months_pay_cycle)
+    {
+        $year = date('Y', strtotime($this->month));
+        $month = date('m', strtotime($this->month));
+
+        $delay_num = $months_pay_cycle>0?$months_pay_cycle:$this->pay_cycle_month;
+
+        $cycle_month = $month;
+
+        if($cycle_month <= $delay_num)
+        {
+            $cycle_month = $cycle_month + 12 - $delay_num;
+        }
+
+        return  $cycle_month;
+    }
+
+    /**
      * 从给定的文本中猜测出，应付款付款周期的月的值
      *
      * @param $txt

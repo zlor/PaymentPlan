@@ -5,9 +5,11 @@ namespace App\Models;
 use App\Models\Traits\BelongsToPaymentMateriel;
 use App\Models\Traits\BelongsToPaymentType;
 use App\Models\Traits\BelongsToSupplierOwner;
+use App\Models\Traits\HasManyInvoicePayment;
 use App\Models\Traits\HasManyPaymentDetail;
 use App\Models\Traits\HasManyPaymentSchedule;
 use App\Models\Traits\HasManySupplierBalanceFlow;
+use App\Models\Traits\HasManySupplierInvoiceGather;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,7 +35,7 @@ class Supplier extends Model
     /**
      * 拥有 付款计划、付款明细
      */
-    use HasManyPaymentSchedule, HasManyPaymentDetail, HasManySupplierBalanceFlow;
+    use HasManyPaymentSchedule, HasManyPaymentDetail, HasManySupplierBalanceFlow, HasManySupplierInvoiceGather, HasManyInvoicePayment;
 
 
     /**
@@ -74,10 +76,41 @@ class Supplier extends Model
     {
         $money = 0;
 
-        if(empty($this->supplier_balance_flows))
+        if(!empty($this->supplier_balance_flows))
         {
             $money = $this->supplier_balance_flows->sum('money');
         }
+        return $money;
+    }
+
+    /**
+     * 按截止月来合计账户余额
+     *
+     * @param $year
+     * @param $month
+     * @return int
+     */
+    public function getBalanceMoneyMonth($year, $month)
+    {
+        $money = 0;
+
+        if(!empty($this->supplier_balance_flows))
+        {
+            $money = $this->supplier_balance_flows->where('(100*year+month)', '<=', 100*$year+$month)->sum('money');
+        }
+
+        return $money;
+    }
+
+    public function getInvoiceGatherMonth($year, $month)
+    {
+        $money = 0;
+
+        if(!empty($this->supplier_invoice_gathers))
+        {
+            $money = $this->supplier_invoice_gathers->where('year', $year)->where('month', $month)->sum('month');
+        }
+
         return $money;
     }
 }
