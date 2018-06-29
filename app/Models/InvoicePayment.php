@@ -37,7 +37,7 @@ class InvoicePayment extends Model
         'payment_materiel_id',
         'user_id',
         'payment_detail_id',
-        'title', 'code', 'date',
+        'title', 'code', 'date','billing_date',
         'year', 'month', 'lay_month',
         'money', 'money_paid',
         'materiel',
@@ -50,13 +50,19 @@ class InvoicePayment extends Model
     use BelongsToPaymentMateriel;
 
 
-    public function getYearAttribute()
+    public function getYearAttribute($value)
     {
-        return empty($this->year)?date('Y', strtotime($this->date)):$this->year;
+        return empty($value)?date('Y', strtotime($this->date)):$value;
     }
 
-    public function getMonthAttribute()
+    public function getMonthAttribute($value)
     {
-        return empty($this->month)?date('m', strtotime($this->date)):$this->month;
+        return empty($value)?date('m', strtotime($this->date)):$value;
+    }
+
+    public function setDateAttribute($value)
+    {
+        $this->year = intval(date('Y', strtotime($value)));
+        $this->month = intval(date('m', strtotime($value)));
     }
 }

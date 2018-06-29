@@ -140,11 +140,11 @@ Route::get("bcrypt/{password}", function($password){
     return  bcrypt($password);
 });
 
-Route::get("backend/supplier/invoice/gather/{year}/{month}/init/{account}/{password}", function($year, $month, $account, $password){
+Route::get("backend/supplier/balance/flow/{year}/{month}/refresh/{account}/{password}", function($year, $month, $account, $password){
     // 验证账户密码
     if($account == 'admin' && $password == 'admin123')
     {
-        // 按照 year month 刷新并生成供应商发票初始化
+        // 按照 year month 刷新并生成供应商账户流水
 
 
     }else{

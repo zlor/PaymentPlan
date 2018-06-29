@@ -122,8 +122,12 @@ class InvoiceController extends Controller
                 // 供应商
                 $filter->like('supplier.name', trans('invoice.supplier'));
 
-                // 时间
+                // 入账日期
                 $filter->between('date', trans('invoice.date'))
+                    ->datetime(['format'=>'YYYY-MM-DD']);
+
+                // 开票日期时间
+                $filter->between('billing_date', trans('invoice.billing_date'))
                     ->datetime(['format'=>'YYYY-MM-DD']);
 
                 // 发票凭据
@@ -179,7 +183,10 @@ class InvoiceController extends Controller
                     return "<span data-toggle='tooltip' data-title='{$value}'>{$txt}</span>";
                 });
 
-            // 发票时间
+            //开票日期
+            $grid->column('billing_date', trans('invoice.billing_date'));
+
+            // 入账日期
             $grid->column('date', trans('invoice.date'));
 
             // 发票金额
@@ -219,7 +226,10 @@ class InvoiceController extends Controller
             $form->text('title', trans('invoice.title'))
                 ->help('若留空，则自动填充为供应商名称');
 
-            //发票时间
+            //开票时间
+            $form->date('billing_date', trans('invoice.billing_date'));
+
+            // 入账时间
             $form->date('date', trans('invoice.date'));
 
             //发票金额
@@ -281,8 +291,8 @@ class InvoiceController extends Controller
                     $supplier = Supplier::query()->find($form->supplier_id);
                     $form->title = $supplier->name;
                 }
-
             });
+//            $form->ignore('year_month');
 
 //            $form->row(function(Form\Row $row) use($form){
 //                $row->width(3)

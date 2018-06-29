@@ -2,7 +2,8 @@
 return [
 
     'payment'=> '应付款',
-    'date' => '发票时间',
+    'date' => '入账日期',
+    'billing_date' => '开票日期',
     'code' => '发票号码',
     'title'  => '抬头',
     'money' => '发票金额',
