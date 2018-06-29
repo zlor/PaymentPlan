@@ -126,6 +126,14 @@ class SupplierController extends Controller
             // 关闭导出按钮
             $grid->disableExport();
 
+            $grid->filter(function(Grid\Filter $filter){
+
+                $filter->like('name', trans('supplier.name'));
+
+                $filter->like('code', trans('supplier.code'));
+
+            });
+
             $grid->id('ID')->sortable();
 
             $grid->column('name', trans('supplier.name'));
@@ -140,7 +148,16 @@ class SupplierController extends Controller
 
             $grid->column('address', trans('supplier.address'));
 
-            $grid->column('owner.name', trans('supplier.owner'));
+//            $grid->column('owner.name', trans('supplier.owner'));
+
+            $grid->column('months_pay_cycle', trans('supplier.months_pay_cycle'));
+
+            $grid->column('payment_type.name', trans('payment.types'));
+
+            $grid->column('payment_materiel.name', trans('payment.materiels'));
+
+            $grid->column('charge_man', trans('supplier.charge_man'));
+
 
             $grid->created_at();
             $grid->updated_at();
