@@ -52,17 +52,27 @@ class InvoicePayment extends Model
 
     public function getYearAttribute($value)
     {
-        return empty($value)?date('Y', strtotime($this->date)):$value;
+        if(empty($value))
+        {
+            return $value;
+        }
+        return empty($this->date)?0:date('Y', strtotime($this->date));
     }
 
     public function getMonthAttribute($value)
     {
-        return empty($value)?date('m', strtotime($this->date)):$value;
+        if(empty($value))
+        {
+            return $value;
+        }
+        return empty($this->date)?0:date('m', strtotime($this->date));
     }
 
     public function setDateAttribute($value)
     {
-        $this->year = intval(date('Y', strtotime($value)));
-        $this->month = intval(date('m', strtotime($value)));
+        if(!empty($value)){
+            $this->year = intval(date('Y', strtotime($value)));
+            $this->month = intval(date('m', strtotime($value)));
+        }
     }
 }
