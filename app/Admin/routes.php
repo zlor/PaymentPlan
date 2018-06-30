@@ -146,9 +146,13 @@ Route::group([
      ##  应收款发票
     $router->resource('/collect/invoice', 'Collect\InvoiceController');
 
+    ##分析报表
+    ###月度对比
+    //供应商付款月度环比分析
+    $router->get('/report/monthly/supplier/payment', 'Report\SupplierController@paymentMonthly');
+
 
     // 基础档案
-
     // --  供应商
     $router->get('/base/supplier/one', 'SupplierController@one')->name('base.supplier.one');
     $router->resource('/base/suppliers', 'SupplierController', ['names'=>'base.supplier']);
