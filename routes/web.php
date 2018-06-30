@@ -162,3 +162,82 @@ Route::get("backend/supplier/invoice/gather/{year}/{month}/refresh/{account}/{pa
         return "帐户名密码不正确";
     }
 });
+
+Route::get('backend/bill/{id}/supplier/completion/{account}/{password}', function($id, $account, $password){
+    // 验证账户密码
+    if($account =='admin' && $password =='admin123')
+    {
+        $billPeriod = \App\Models\BillPeriod::query()->find($id);
+
+        /**
+         * @var $billPeriod \App\Models\BillPeriod
+         */
+        if(empty($billPeriod))
+        {
+            return '未找到指定账期';
+        }
+
+        // 获取账期供应商信息
+        $schedules = $billPeriod->payment_schedules()->get();
+
+        $month = intval(date('m', strtotime($billPeriod->month)));
+
+        $count = 0;
+
+        foreach ($schedules as $schedule)
+        {
+            /**
+             * @var $supplier \App\Models\Supplier
+             */
+            $supplier = $schedule->supplier;
+
+            if(empty($supplier))
+            {
+                continue;
+            }
+            // 识别码
+            if(empty($supplier->code))
+            {
+                $supplier->code = $schedule->name;
+            }
+
+            //付款类型
+            if(empty($supplier->payment_type_id))
+            {
+                $supplier->payment_type_id =  $schedule->payment_type_id;
+            }
+
+            //物料编码
+            if(empty($supplier->payment_materiel_id))
+            {
+                $supplier->payment_materiel_id =  $schedule->payment_materiel_id;
+            }
+
+            //付款负责人
+            if(empty($supplier->charge_man))
+            {
+                $supplier->charge_man =  $schedule->charge_man;
+            }
+
+            //pay_cycle_month
+            if(empty($supplier->months_pay_cycle))
+            {
+                $num = $schedule->pay_cycle_month;
+
+                $supplier->months_pay_cycle =  ($num>$month?(12+$month-$num):($month-$num)) - 1;
+            }
+
+            $flag = $supplier->save();
+
+            if($flag)
+            {
+                $count++;
+            }
+        }
+
+        return "更新账期{$billPeriod->name}, 计划数{$schedules->count()},供应商数{$count}";
+    }
+    else{
+        return '身份验证失败';
+    }
+});
