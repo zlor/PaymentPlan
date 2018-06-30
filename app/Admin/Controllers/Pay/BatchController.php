@@ -228,6 +228,15 @@ SCRIPT;
     {
         $grid = $this->grid();
 
+        /**
+         * 暂不提供的按钮
+         *
+         * 创建、导出
+         */
+        $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableRowSelector();
+
         //不使用分页
         $grid->disablePagination();
 
@@ -246,15 +255,6 @@ SCRIPT;
         return Admin::grid(PaymentSchedule::class, function (Grid $grid) {
 
             // $grid->id('ID')->sortable();
-
-            /**
-             * 暂不提供的按钮
-             *
-             * 创建、导出
-             */
-            $grid->disableCreateButton();
-            $grid->disableExport();
-            $grid->disableRowSelector();
 
             // 设置默认账期
             $defaultBillPeriod = BillPeriod::envCurrent();

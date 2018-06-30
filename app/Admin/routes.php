@@ -169,7 +169,7 @@ Route::group([
     // -- 付款物料档案
     $router->resource('/base/bill/payment_materiels', 'PaymentMaterielController', ['names'=>'base.bill.payment_materiel']);
     // --  付款计划档案
-    $router->resource('/base/bill/payment_schedules', 'PaymentScheduleController');
+    $router->resource('/base/bill/payment_schedules', 'PaymentScheduleController', ['names'=>'base.bill.payment_schedule']);
     // --  付款明细档案
     $router->resource('/base/bill/payment_details', 'PaymentDetailController');
 

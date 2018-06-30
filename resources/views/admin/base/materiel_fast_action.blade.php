@@ -1,3 +1,12 @@
+{{--<script type="text/javascript">--}}
+$(function(){
+    $('select[name="payment_materiel_id"]').change(function(){
+
+        @if(isset($needRenderName) && $needRenderName)
+            $('[name="materiel_name"]').val($(this).find('option:selected').text());
+        @endif
+    });
+});
 layui.use('layer', function(){
         var layer = layui.layer;
 
@@ -30,3 +39,4 @@ layui.use('layer', function(){
         });
 
 });
+{{--</script>--}}

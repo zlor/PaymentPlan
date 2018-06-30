@@ -17,6 +17,13 @@ class PaymentScheduleController extends Controller
 {
     use ModelForm;
 
+    protected $routeMap = [
+        'fastCreateMateriel' =>'base.bill.payment_materiel.create',
+        'fastCreateSupplier' =>'base.supplier.create',
+        'reloadMaterielOptions'=>'select.payment_materiel.options',
+        'reloadSupplierOptions'=>'select.payment_supplier.options',
+        'getSupplierOne' => 'base.supplier.one',
+    ];
     /**
      * Index interface.
      *
@@ -211,38 +218,78 @@ class PaymentScheduleController extends Controller
 
             $billPeriod = BillPeriod::query()->findOrFail($billPeriodId);
 
+            // 付款计划状态
+            $form->select('status', trans('payment.schedule.status'))
+                ->options(PaymentSchedule::getStatusOptions('payment.schedule', ['init','import_init', 'web_init', 'checked','paying','lock' ]))
+                ->default('web_init');
+
             // 账期
             $form->select('bill_period_id', trans('payment.schedule.bill_period'))
                  ->options($billPeriodOptions)
                  ->default($currentBillPeriodId)
                  ->rules('required');
 
+            $form->divider();
+
+            // 供应商
+            $textA = _A("新增供应商", ['class'=>'text-green', 'id'=>'fastSupplierAction'],['url'=>$this->getUrl('fastCreateSupplier', ['useFast'=>1]), 'reloadOptionsUrl'=>$this->getUrl('reloadSupplierOptions'), 'targetName'=>'supplier_id']);
+            Admin::script(view("admin.base.supplier_fast_action",[
+                'getSupplierOneUrl' => $this->getUrl('getSupplierOne'),
+                'needRenderName'=>true,
+            ])->render());
+
             // 供应商(系统匹配)
             $form->select('supplier_id', trans('payment.schedule.supplier'))
-                ->options(PaymentSchedule::getSupplierOptions());
-
+                ->options(PaymentSchedule::getSupplierOptions())
+                ->rules('required')
+                ->help($textA, 'fa fa-plus text-green');
             // 供应商(原始名称)
-            $form->text('supplier_name', trans('payment.schedule.supplier_name'));
+            $form->text('supplier_name', trans('payment.schedule.supplier_name'))
+                ->rules('required')
+                ->help('导入信息(供应商名称)');
+
+            // 付款计划 科目编号
+            $form->text('name', trans('payment.schedule.name'))
+                ->rules('required');
+
+            $form->divider();
+
+
+
+
+            // 快速新增物料
+            $textA = '物品名称   &nbsp;|&nbsp; <span><i class="fa fa-plus text-green"></i>'
+                ._A(
+                    " 新增物料 "
+                    ,['class'=>'text-green', 'id'=>'fastMaterielAction']
+                    ,[
+                        'url'=>$this->getUrl('fastCreateMateriel', ['useFast'=>1])
+                        , 'reloadOptionsUrl'=>$this->getUrl('reloadMaterielOptions')
+                        , 'targetName'=>'payment_materiel_id'
+                    ]
+                ).'</span>';
+            Admin::script(view("admin.base.materiel_fast_action", [
+                'needRenderName'=>true,
+            ])->render());
+            // 付款物料(系统匹配)
+            $form->select('payment_materiel_id', trans('payment.schedule.payment_materiel'))
+                ->options(PaymentSchedule::getPaymentMaterielOptions())
+                ->rules('required')
+                ->help($textA);
+
+            // 付款物料(导入名称)
+            $form->text('materiel_name', trans('payment.schedule.materiel_name'))
+                ->rules('required')
+                ->help('导入信息(物料名称)');
+
+            $form->divider();
 
             // 付款类型
             $form->select('payment_type_id', trans('payment.schedule.payment_type'))
-                ->options(PaymentSchedule::getPaymentTypeOptions());
+                ->options(PaymentSchedule::getPaymentTypeOptions())
+                ->rules('required');
 
-            // 付款物料(系统匹配)
-            $form->select('payment_materiel_id', trans('payment.schedule.payment_materiel'))
-                ->options(PaymentSchedule::getPaymentMaterielOptions());
-
-            // 付款物料(导入名称)
-            $form->text('materiel_name', trans('payment.schedule.materiel_name'));
-
-
-            // 付款计划流水
-            $form->text('name', trans('payment.schedule.name'));
-
-            // 付款计划状态
-            $form->select('status', trans('payment.schedule.status'))
-                ->options(PaymentSchedule::getStatusOptions('payment.schedule', ['init','import_init', 'web_init', 'checked','paying','lock' ]))
-                ->default('web_init');
+            $form->textarea('memo', trans('admin.memo'))->rows(2);
 
             if($isEdit)
             {
@@ -256,12 +303,16 @@ class PaymentScheduleController extends Controller
                 }
 
             }
-
-            // 截止月份
-            $form->text('pay_cycle_month', trans('payment.schedule.pay_cycle_month'));
-
+            $form->divider();
             // 付款周期
-            $form->textarea('pay_cycle', trans('payment.schedule.pay_cycle'))->rows(3);
+            $form->textarea('pay_cycle', trans('payment.schedule.pay_cycle'))->rows(2);
+            // 截止月份
+            $form->number('pay_cycle_month', trans('payment.schedule.pay_cycle_month'))
+                ->prepend('月')
+                ->max(12)->min(1)->value(intval(date('m')));
+            // 付款确认人
+            $form->text('charge_man', trans('payment.schedule.charge_man'))
+                    ->rules('required');
 
             $form->divider();
 
@@ -302,6 +353,10 @@ class PaymentScheduleController extends Controller
 
             // 计划时间
             $form->date('plan_time', trans('payment.schedule.plan_time'));
+
+            // 计划应付款
+            $form->currency('plan_due_money', trans('payment.schedule.plan_due_money'))
+                ->symbol('￥');
 
             // 导入批次
             $form->display('batch', trans('payment.schedule.batch'));

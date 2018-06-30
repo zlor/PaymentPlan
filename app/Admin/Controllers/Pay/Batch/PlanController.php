@@ -6,6 +6,7 @@ use App\Admin\Controllers\Pay\BatchController;
 use App\Admin\Extensions\Tools\AreaEdit;
 use App\Admin\Extensions\Tools\BatchPost;
 use App\Admin\Extensions\Tools\Import;
+use App\Admin\Extensions\Tools\NewWindowLink;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid\Displayers\Actions;
 use Encore\Admin\Grid\Tools;
@@ -27,6 +28,7 @@ class PlanController extends BatchController
         'excel'  => 'payment.plan.excel',
 
         'editPlan' => 'plan.schedule.update.batch',
+        'createPlan' =>'base.bill.payment_schedule.create',
     ];
 
     protected $batch_column = 'plan_due_money';
@@ -50,18 +52,26 @@ class PlanController extends BatchController
     {
         $grid = parent::_effectBatchGrid();
 
+//        $grid->option('allowCreate', true);
+
         $grid->tools(function(Tools $tools){
 
             ## 导入链接
             $tool_import = new Import();
             $tool_import->setAction($this->getUrl('excel'));
             $tools->append($tool_import);
+
             ##
             $tool_open_edit = new AreaEdit('planArea', 'planHead');
 
             $tool_open_edit->setInputType();
 
             $tools->append($tool_open_edit);
+
+            $tool_open_create = new NewWindowLink();
+            $tool_open_create->setText(trans('admin.new'));
+            $tool_open_create->setAction($this->getUrl('createPlan'));
+            $tools->append($tool_open_create);
 
             // ## 批量操作调整
             $tools->disableBatchActions();

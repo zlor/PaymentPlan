@@ -1,6 +1,17 @@
 {{--<script type="text/javascript">--}}
     {{--  增加供应商选中后的操作 --}}
-    $('select[name="supplier_id"]').change(function(){
+    $(function(){
+        var old_supplier_obj = {'value':$('select[name="supplier_id"]').val(), 'text':$('select[name="supplier_id"]').find('option:selected').text()};
+
+        $('select[name="supplier_id"]').change(function(){
+            var supplier_name = $(this).find('option:selected').text();
+            if($('[name="supplier_name"]')
+                && ( !$('[name="supplier_name"]').val() || old_supplier_obj.text == $('[name="supplier_name"]').val())
+            ){
+                $('[name="supplier_name"]').val(supplier_name);
+            }
+            old_supplier_obj = {'value':$(this).val(), 'text':supplier_name};
+
             // 获取供应商信息，填充表单
             var url = '{{$getSupplierOneUrl}}';
             $.get(url, {'id':$(this).val()}, function(data){
@@ -10,20 +21,30 @@
                     // 填充物料信息
                     if(supplier.payment_materiel_id>0)
                     {
-                        $('[name="payment_materiel_id"]').val(supplier.payment_materiel_id);
+                        $('[name="payment_materiel_id"]').val(supplier.payment_materiel_id).change();
+                    }else{
+                        $('[name="payment_materiel_id"]').val(0).change();
                     }
+
                     // 填充类型
                     if(supplier.payment_type_id>0)
                     {
-                        $('[name="payment_type_id"]').val(supplier.payment_type_id);
+                        $('[name="payment_type_id"]').val(supplier.payment_type_id).change();
+                    }else{
+                        $('[name="payment_type_id"]').val(0).change();
                     }
                     // 填充抬头
                     if(!$('#title').val()){
                         $('[name="title"]').val(supplier.name);
                     }
+                    @if(isset($needRenderName) && $needRenderName)
+                        $('[name="name"]').val(supplier.code);
+                    @endif
                 }
             }, 'json');
+        });
     });
+
 
    {{-- 启用 layui 构建快速添加界面 --}}
     layui.use('layer', function(){
