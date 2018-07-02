@@ -17,6 +17,8 @@ use League\Flysystem\Exception;
 
 class PaymentSchedule extends Model
 {
+    const MORPH_KEY = 'payment_schedule';
+
     protected $table = 'payment_schedules';
 
     protected $fillable = [

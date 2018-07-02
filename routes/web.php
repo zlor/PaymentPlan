@@ -107,7 +107,8 @@ Route::get('getExcel/{id}', function($id){
 /**
  *  创建指定账期的计划,从上一个账期继承
  */
-Route::get('buildSehedule/from/{fromId}/to/{toId}/{diffMonth}', function($fromId, $toId, $diffMonth){
+Route::get('buildSehedule/from/{fromId}/to/{toId}/{diffMonth}'
+    , function($fromId, $toId, $diffMonth){
 	/**
      * @type \App\Models\BillPeriod $fromBillPeriod
      */
@@ -140,30 +141,149 @@ Route::get("bcrypt/{password}", function($password){
     return  bcrypt($password);
 });
 
-Route::get("backend/supplier/balance/flow/{year}/{month}/refresh/{account}/{password}", function($year, $month, $account, $password){
-    // 验证账户密码
-    if($account == 'admin' && $password == 'admin123')
-    {
-        // 按照 year month 刷新并生成供应商账户流水
-
-
-    }else{
-        return "帐户名密码不正确";
-    }
-});
+/**
+ * && 已在页面中体现  位置: SupplierInvoiceGatherController@init
+ *
+ * 刷新供应商应付款发票汇总
+ *
+ * 0. 获取指定的账期
+ * 1. 将指定账期的所有付款计划，关联月的发票汇总刷新到对应的 汇总表中
+ *
+ */
 Route::get("backend/supplier/invoice/gather/{year}/{month}/refresh/{account}/{password}", function($year, $month, $account, $password){
     // 验证账户密码
     if($account == 'admin' && $password == 'admin123')
     {
         // 按照 year month 刷新并生成供应商发票汇总
-
-
+        return 'web中封闭';
     }else{
         return "帐户名密码不正确";
     }
 });
 
-Route::get('backend/bill/{id}/supplier/completion/{account}/{password}', function($id, $account, $password){
+/**
+ *  重置供应商应付账户 流水记录
+ *
+ * 0. 清空所有流水记录
+ * 1. 从指定年月开始记录
+ * 2. 期初数据，采用指定年月的 付款计划 总应付数据作为 期初数据
+ * 3. 从指定年月开始，同步应付款发票记录
+ * 4. 从指定年月开始，同步付款记录(包含 账期付款/计划付款)
+ *
+ * && 该方法的使用条件：从指定年月开始，将以发票数据为计划生成来源（预付款项也应作为 ‘应付款增项‘ 计入到流水中）
+ * && 使用账期来关联区分，实际年月。
+ *
+ */
+Route::get('backend/supplier/balance_flow/{year}/{month}/reset/{account}/{password}'
+    , function($year, $month,$account, $password){
+    //确认身份
+    if($account == 'admin' && $password =  'admin123')
+    {
+        ### 确认指定年月的账期
+        $billPeriod = \App\Models\BillPeriod::query()->where('month', date('Y-m', strtotime("{$year}-{$month}")))
+            ->first();
+        if(empty($billPeriod))
+        {
+            return "{$year}年{$month}月 未找到对应账期";
+        }
+
+        ### 确认将作为所有数据来源的全部账期
+        $billPeriods = \App\Models\BillPeriod::query()->where('month', '<=', date('Y-m', strtotime("{$year}-{$month}")))
+            ->get();
+        if(count($billPeriods)<=0)
+        {
+            return "{$year}年{$month}月 往后未找到账期";
+        }
+        $bill_period_ids = [];
+        $bill_period_months = [];
+        foreach ($billPeriods as $period)
+        {
+            $bill_period_ids[] = $period->id;
+            $bill_period_months[] = 100*intval(date('Y', strtotime($period->month))) + intval(date('m', strtotime($period->month)));
+        }
+
+        //供应商数据
+        $suppliers = \App\Models\Supplier::all();
+
+        $count = [
+            'init' => 0,
+            'bill_pay' => 0,
+            'payment_detail'=>0,
+            'invoice_payment'=>0,
+        ];
+
+        foreach ($suppliers as $supplier)
+        {
+            ## 应付款初始余额
+            // 同步期初数据
+            // - 按照指定的年月获取供应商的期初数据
+            // - 期初数据来源: 付款计划的 期初总余额
+            $schedule = \App\Models\PaymentSchedule::query()
+                    ->where('supplier_id', $supplier->id)
+                    ->where('bill_period_id', $billPeriod->id)
+                    ->first();
+
+            if(!empty($schedule))
+            {
+               $res = \App\Models\SupplierBalanceFlow::syncInitByPaymentSchedule($schedule, false, true);
+//               // 若初始化失败，则不同步后期数据
+//               if(!$res)
+//               {
+//                   continue;
+//               }
+                $count['init'] = $count['init'] + $res?1:0;
+            }
+
+            ## 应付款增项
+            $str = "''";
+            if(count($bill_period_months)>0)
+            {
+                $str = join(',', $bill_period_months);
+            }
+            // 同步发票数据
+            $invoices = \App\Models\InvoicePayment::query()
+                    ->where('supplier_id', $supplier->id)
+                    ->whereRaw("(100*year + month) IN ({$str})")
+                    ->get();
+            foreach ($invoices as $invoice)
+            {
+                $count['invoice_payment'] =  $count['invoice_payment'] + $invoice->save();
+            }
+
+            ## 应付款余额
+            // 同步付款数据
+            $bill_pays = \App\Models\BillPay::query()
+                ->where('supplier_id', $supplier->id)
+                ->whereIn('bill_period_id', $bill_period_ids)
+                ->get();
+            foreach ($bill_pays as $pay)
+            {
+                $count['bill_pay'] =  $count['bill_pay'] + $pay->save();
+            }
+            $payment_details = \App\Models\PaymentDetail::query()
+                ->where('supplier_id', $supplier->id)
+                ->whereIn('bill_period_id', $bill_period_ids)
+                ->get();
+            foreach ($payment_details as $detail)
+            {
+                $count['payment_detail'] =  $count['payment_detail'] + $detail->save();
+            }
+        }
+
+        $strBillPeriod = join(',',  array_column( $billPeriods->toArray(), 'month'));
+        return "更新完毕, 涉及供应商:{$suppliers->count()}, 账期:[{$strBillPeriod}],期初：{$count['init']}, 期内付款：{$count['bill_pay']},计划付款:{$count['payment_detail']}, 应付款发票：{$count['invoice_payment']}";
+
+    }else{
+        return "账户名或密码不正确";
+    }
+});
+
+/**
+ * 补全供应商基础信息
+ * - 按照指定的账期-付款计划数据，来生成
+ */
+Route::get('backend/bill/{id}/supplier/completion/{account}/{password}'
+    , function($id, $account, $password){
     // 验证账户密码
     if($account =='admin' && $password =='admin123')
     {

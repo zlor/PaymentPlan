@@ -167,8 +167,9 @@ class SupplierBalanceFlowController extends Controller
 
             $grid->column('month', trans('supplier.balance.flow.month'));
 
-            $grid->column('money', trans('supplier.balance.flow.money'));
+            $grid->column('date', trans('supplier.balance.flow.date'));
 
+            $grid->column('money', trans('supplier.balance.flow.money'));
 
             $grid->created_at();
             $grid->updated_at();
@@ -226,18 +227,24 @@ class SupplierBalanceFlowController extends Controller
                 ->options(SupplierBalanceFlow::getPaymentTypeOptions())
                 ->rules('required');
 
-
-            // 付款周期月份数
+            // 年
             $form->number('year', trans('supplier.balance.flow.year'))
-                ->rules('required')
-                ->value(date('Y'));
+                ->default(date('Y'))
+                ->rules('required');
 
+            // 月
             $form->number('month', trans('supplier.balance.flow.month'))
-                ->rules('required')
-                ->value(date('m'));
+                ->default(date('m'))
+                ->rules('required');
 
+            // 发生时间
             $form->currency('money', trans('supplier.balance.flow.money'))
-            ->rules('required');
+                ->symbol('￥')
+                ->rules('required');
+
+            // 发生日期
+            $form->date('date', trans('supplier.balance.flow.date'))
+                ->rules('required');
 
             //备注
             $form->textarea('memo', trans('supplier.balance.flow.memo'));

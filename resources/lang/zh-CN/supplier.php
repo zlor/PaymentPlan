@@ -32,8 +32,9 @@ return [
     'balance' => '账户',
     'balance.init.index' => '账户应付额',
 
-    'balance.flow.year' =>'年',
-    'balance.flow.month' => '月',
+    'balance.flow.year' =>'账期-年',
+    'balance.flow.month' => '账期-月',
+    'balance.flow.date' =>'发生时间',
     'balance.flow.money' => '发生数额',
     'balance.flow.kind' => '方式 ',
     'balance.flow.type' => '类别',
