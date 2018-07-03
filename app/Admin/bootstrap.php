@@ -47,7 +47,7 @@ Column::extend('popover', Popover::class);
 Column::extend('currency', Currency::class);
 // Admin::extend('hansontable', HansonTable::class);
 
-
+Column::extend('floatBar', FloatBar::class);
 Column::extend('expand', ExpandRow::class);
 Column::extend('openMap', OpenMap::class);
 Column::extend('floatBar', FloatBar::class);

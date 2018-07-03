@@ -149,6 +149,7 @@ Route::group([
     ##分析报表
     ###月度对比
     //供应商付款月度环比分析
+    $router->get('/report/supplier/payment/year', 'Report\SupplierController@paymentByYear')->name('report.supplier.payment.year');
     $router->get('/report/monthly/supplier/payment', 'Report\SupplierController@paymentMonthly');
 
 

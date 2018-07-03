@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Extensions\Column;
+namespace App\Admin\Extensions;
 
 use Encore\Admin\Admin;
 use Encore\Admin\Grid\Displayers\AbstractDisplayer;
@@ -32,7 +32,6 @@ EOT;
         Admin::script($script);
 
         $btn = $btn ?: $this->column->getName();
-
 
         $key = $this->getKey();
 

@@ -75,4 +75,23 @@ trait CommonOptions
         return trans_options($key, $int?[0,1]:['false', 'true'], $lang);
     }
 
+
+    /**
+     * @return array
+     */
+    public static function getReportYearOptions()
+    {
+        $fromYear = 2017;
+
+        $endYear = intval(date('Y'));
+
+        $years = [];
+
+        for($i = $fromYear; $i<=$endYear; $i++)
+        {
+            $years[$i] = $i.'年';
+        }
+
+        return $years;
+    }
 }
