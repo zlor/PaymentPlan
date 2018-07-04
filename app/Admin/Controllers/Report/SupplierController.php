@@ -11,6 +11,8 @@ namespace App\Admin\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use App\Models\BillPay;
+use App\Models\BillPeriod;
+use App\Models\PaymentSchedule;
 use App\Models\Supplier;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
@@ -23,11 +25,53 @@ class SupplierController extends Controller
 {
 
     protected $routeMap = [
-        'yearly' => 'report.supplier.payment.year'
+        'paymentYearly' => 'report.supplier.payment.year',
+        'balanceYearly'   => 'report.supplier.balance.year',
+
     ];
 
     /**
+     * 指定年度[|供应商]-每月的付款情况
+     *
+     * 必要条件：供应商
+     */
+    public function balanceByYear()
+    {
+
+        return Admin::content(function(Content $content){
+            $content->header('应付款余额报表');
+            $content->description('年度应付款余额分析');
+
+            $content->breadcrumb(
+                ['text'=>'分析报表'],
+                ['text'=>'应付款余额报表', 'url'=>$this->getUrl('balanceYearly')]
+            );
+
+            // 准备数据
+
+            // 构建页面
+
+
+            $grid = Admin::grid(Supplier::class, function (Grid $grid){
+
+                $grid->disableActions();
+                $grid->disableRowSelector();
+                $grid->disableCreateButton();
+                $grid->disableExport();
+
+                $grid->filter(function(Grid\Filter $filter){
+                    $filter->equal('');
+                });
+            });
+
+            $content->body($grid);
+        });
+    }
+
+    /**
      * 指定年度- 每月付款统计
+     *
+     * 必要条件，存在付款记录
      */
     public function paymentByYear()
     {
@@ -37,8 +81,15 @@ class SupplierController extends Controller
 
             $content->breadcrumb(
                 ['text'=>'分析报表'],
-                ['text'=>'付款数据报表', 'url'=>$this->getUrl('yearly')]
+                ['text'=>'付款数据报表', 'url'=>$this->getUrl('paymentYearly')]
             );
+
+            $data = [];
+
+            /**
+             * 以供应商为主表，统计所有应付、建议付款、实际付款
+             */
+            $sql = "";
 
             $grid = $this->_gridPaymentByYear();
 
@@ -48,7 +99,10 @@ class SupplierController extends Controller
 
     public function _gridPaymentByYear()
     {
-        return Admin::grid(BillPay::class, function(Grid $grid){
+        // 获取分析数据Map
+        $reportMap = $this->_helpPaymentByYear();
+
+        return Admin::grid(BillPay::class, function(Grid $grid)use($reportMap){
 
             $grid->disableCreateButton();
             $grid->disableExport();
@@ -72,7 +126,7 @@ class SupplierController extends Controller
             // 扩展信息
             $grid->column('expand', '更多')
                 ->expand(function(){
-                    return '';
+                    return '图表';
                 }, '对比数据');
 
             ### 检索条件
@@ -87,10 +141,11 @@ class SupplierController extends Controller
             $map = [];
             for($i =1; $i<=12; $i++)
             {
-                $map[$i] = ['key'=>"m{$i}", 'text'=>"{$i}月"];
+                $map[$i] = ['key'=>"m{$i}", 'text'=>"{$i}月", 'month'=>str_pad($i,2,"0",STR_PAD_LEFT)];
             }
-            $fields =  ['supplier_id',
-                DB::raw("supplier_id as id"),
+            $fields =  [
+                DB::raw('supplier_id'),
+                DB::raw('supplier_id as id'),
                 DB::raw("year(date) as yearReport"),
                 // DB::raw("month(date) as monthReport"),
                 DB::raw("SUM(money) as moneySum")
@@ -100,30 +155,53 @@ class SupplierController extends Controller
                 $fields[]= DB::raw("SUM(case month(date)  when {$key} then money else 0 end) as {$item['key']} ");
 
                 // 动态显示月份的数据
-                $grid->column($item['key'], $item['text'])->display(function($value){
-                    return trim($value,'.00' );
+                $grid->column($item['key'], $item['text'])->display(function($value)use($item, $reportMap){
+                    // 获取对比数据
+                    $key = $this->yearReport.'-'.$item['month'].'_'.$this->supplier_id;
+
+                    return  view('admin.report.paymentYearCell', compact('value', 'key', 'reportMap', 'item'))->render();
                 });
             }
 
-            $groupBys = ['supplier_id'
+            $groupBys = [
+                DB::raw('supplier_id')
                 , DB::raw("year(date)")
                 //  , DB::raw("month(date)")
             ];
             $grid->model()
                 ->select($fields)
                 ->groupBy($groupBys);
-
-            $grid->rows(function(Grid\Row $row){
-                // 计算扩展数据
-                // - 当前应付款余额  use  $model['xxxx'] = 'xxx'的形式即可
-                $row->setAttributes(['test'=>'sds']);
-
-                $model = $row->model();
-                $model['test']= 'sdsd';
-//                dd($row);
-            });
-
         });
+    }
+
+    public function _helpPaymentByYear()
+    {
+        $helpData = [];
+
+        $inputs = Input::all();
+
+        $year =  isset($inputs['date'])?$inputs['date']:date('Y');
+        $supplier_id = isset($inputs['supplier_id'])?$inputs['supplier_id']:'';
+
+        $billPeriods = BillPeriod::query()->where('month', 'like', "%{$year}%")->get();
+        $querySchedule = PaymentSchedule::query()
+                ->whereIn('bill_period_id', array_column($billPeriods->toArray(), 'id'));
+        if(!empty($supplier_id))
+        {
+            $querySchedule->whereIn('supplier_id', [$supplier_id]);
+        }
+        $schedules = $querySchedule->get();
+
+        foreach ($schedules as $schedule)
+        {
+            $key = $schedule->bill_period_month.'_'.$schedule->supplier_id;
+            $helpData[$key] =  [
+                'supplier_balance'=>$schedule->supplier_balance,
+                'suggest_due_money'=>$schedule->suggest_due_money,
+            ];
+        }
+
+        return $helpData;
     }
 
     /**

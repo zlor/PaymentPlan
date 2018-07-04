@@ -37,6 +37,26 @@ trait BelongsToBillPeriod
     }
 
     /**
+     * 账期年数
+     * @return int
+     */
+    public function getBillPeriodMonthMAttribute()
+    {
+        $month = $this->bill_period_month;
+        return intval(substr($month, 5, 2));
+    }
+
+    /**
+     * 账期月数
+     * @return bool|string
+     */
+    public function getBillPeriodMonthYAttribute()
+    {
+        $month = $this->bill_period_month;
+        return substr($month, 0, 4);
+    }
+
+    /**
      * 账期备选
      * @param bool $noMore
      * @param bool $allowStatus
